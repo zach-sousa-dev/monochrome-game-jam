@@ -1,0 +1,384 @@
+@tool
+extends EditorPlugin
+class_name GodotTogether
+
+signal session_started
+signal session_ended
+
+enum Permission {
+	EDIT_SCRIPTS,
+	EDIT_SCENES,
+	DELETE_SCENES,
+	DELETE_SCRIPTS,
+	ADD_CUSTOM_FILES,
+	MODIFY_CUSTOM_FILES
+}
+
+const PROTOCOL_VERSION = 2
+const SUPPORTED_ENGINE_VERSION = [4, 7, 2]
+
+const MIN_DISK_SPACE = 1024 * 1024 * 500 + 1 # 500 MB
+
+const ENABLE_MULTIPLAYER_OVERRIDE = true
+const ENABLE_CUSTOM_LOGGER = true
+
+const _META_LOCK_NAME = "gdt_lock"
+
+const GUI_SCENE = preload("../scenes/GUI/GUI.tscn")
+const CHAT_SCENE = preload("../scenes/GUI/chat/chat.tscn")
+
+var client = GDTClient.new(self, "client")
+var server = GDTServer.new(self, "server")
+var dual = GDTDual.new(self, "dual")
+
+var file_sync = GDTFileSync.new(self, "file_sync")
+var node_sync = GDTNodeSync.new(self, "node_sync")
+
+# Do not access this directly, use get_gui()
+# Godot will randomly throw a "Cyclic reference" error
+var gui: GodotTogetherGUI = GUI_SCENE.instantiate()  
+var chat: GDTChat = CHAT_SCENE.instantiate()
+
+var button = GDTMenuButton.new()
+var toaster: EditorToaster = EditorInterface.get_editor_toaster()
+
+var settings = GDTSettings.new(self, "settings")
+var script_security = GDTScriptSecurity.new(self, "script_security")
+var updater = GDTUpdater.new(self, "updater")
+var tests = GDTUnitTests.new(self, "tests")
+var debug = GDTDebug.new(self, "debug")
+var extras = GDTExtras.new(self, "extras")
+
+var logger: GDTLogger = null
+var mp_override: GDTMultiplayerExtension = null
+
+var plugin_started := false
+var components = []
+
+func _enter_tree() -> void:
+	await get_tree().process_frame
+	
+	if not pre_start_check():
+		printerr("GodotTogether will not run.")
+		return
+	
+	name = "GodotTogether"
+	plugin_started = true
+	
+	if ENABLE_MULTIPLAYER_OVERRIDE:
+		mp_override = GDTMultiplayerExtension.new(self, SceneMultiplayer.new())
+		get_tree().set_multiplayer(mp_override, GDTMultiplayerExtension.ROOT_PATH)
+	
+	if ENABLE_CUSTOM_LOGGER:
+		logger = GDTLogger.new()
+		logger.attach()
+	
+	init_components()
+	setup_menu_button()
+	settings.load_settings()
+	
+	if not check_path():
+		return
+	
+	if not create_lock():
+		return
+	
+	if not check_disk_space():
+		return
+	
+	await get_tree().process_frame
+	
+	if settings.get_setting("dev/run_tests_on_start"):
+		tests.run_boot_tests()
+	
+	setup_chat()
+	
+	GDTSceneWarning.new(self).add(CONTAINER_CANVAS_EDITOR_MENU)
+	GDTSceneWarning.new(self).add(CONTAINER_SPATIAL_EDITOR_MENU)
+	
+	updater.conditional_check()
+	
+	post_check_components()
+
+func _exit_tree() -> void:
+	if not plugin_started:
+		return
+	
+	close_connection()
+	
+	if gui:
+		gui.cleanup()
+	
+	if settings:
+		settings.save_if_changed()
+	
+	if chat:
+		remove_control_from_bottom_panel(chat)
+	
+	if button:
+		button.queue_free()
+	
+	if logger:
+		logger.detach()
+	
+	cleanup_components()
+	release_lock()
+	
+	if ENABLE_MULTIPLAYER_OVERRIDE:
+		get_tree().set_multiplayer(SceneMultiplayer.new(), GDTMultiplayerExtension.ROOT_PATH)
+
+func init_components() -> void:
+	
+	components = [
+		client, server, dual,
+		file_sync, node_sync, 
+		settings,
+		gui,
+		script_security,
+		updater, 
+		tests,
+		debug,
+		extras
+	]
+	
+	# The array may become empty or null if an error occurs
+	if not components or components.is_empty():
+		gui.get_menu_window().set_error_of_death(
+			"Plugin failed to load", 
+			"Error initializing components, please report this."
+		)
+		
+		return
+	
+	var root = get_tree().root
+	
+	for i in components:
+		i.main = self
+		root.add_child(i)
+
+func cleanup_components() -> void:
+	for i in components:
+		if i:
+			i.queue_free()
+
+func create_lock() -> bool:
+	if EditorInterface.has_meta(_META_LOCK_NAME):
+		GDTUtils.printerr_stack("Lock already set. Plugin will not run.")
+		
+		gui.get_menu_window().set_error_of_death(
+			"Dead instance of the plugin detected", 
+			GDTUtils.join([
+				"Seems like a dead instance of GodotTogether is running the editor",
+				"Please restart Godot to remove it, or the plugin will not work properly.",
+				"",
+				"If restarting doesn't help, please report this."
+			], "\n")
+		)
+		
+		return false
+	
+	EditorInterface.set_meta(_META_LOCK_NAME, true)
+	
+	return true
+
+func release_lock() -> void:
+	EditorInterface.remove_meta(_META_LOCK_NAME)
+
+func get_global_rpc_checksum() -> int:
+	var res = 0
+	
+	for i in components:
+		if i:
+			res += GDTUtils.get_rpc_checksum(i)
+	
+	return res
+
+func check_disk_space() -> bool:
+	var dir = DirAccess.open("res://")
+	
+	if not dir:
+		GDTUtils.printerr_stack("Unable to open directory 'res://'. Skipping disk space check.")
+		return true
+	
+	var space = dir.get_space_left()
+	
+	if space <= 0: # Not supporteed
+		return true
+	
+	if space > MIN_DISK_SPACE:
+		return true
+	
+	var msg = GDTUtils.join([
+		"You have %s left on the disk where the project is stored." % String.humanize_size(space),
+		"To make sure your system remains bootable, the plugin needs at least %s " +
+		"to not fill up the disk with downloaded projects." % String.humanize_size(MIN_DISK_SPACE),
+		"Please clean up some files."
+	], "\n")
+	
+	gui.get_menu_window().set_error_of_death("Not enough disk space!", msg)
+	
+	return false
+
+func post_check_components() -> void:
+	await get_tree().create_timer(0.25).timeout
+	await get_tree().process_frame
+	
+	var failed = []
+	var errors = []
+	
+	for i in components:
+		if i is GDTComponent and (not i.component_ready or i.component_errors):
+			failed.append(i.name)
+			
+			if i.component_errors:
+				for err in i.component_errors:
+					var err_txt = "%s: %s" % [i.name, err]
+					errors.append(err_txt)
+	
+	if not failed.is_empty():
+		var failed_str = GDTUtils.join(failed, ", ")
+		var err_str = "Diagnosis not available."
+		
+		if errors:
+			err_str = "\n" + GDTUtils.join(errors, "\n")
+		
+		printerr("Some plugin components did not start: \n%s" % failed_str)
+		printerr(err_str)
+		printerr("Check for errors in _ready() and make sure _component_ready() is called")
+		
+		gui.get_menu_window().set_error_of_death(
+			"Plugin failed to load",
+			
+			GDTUtils.join([
+				"The following components did not start:",
+				failed_str,
+				err_str,
+				"",
+				"Please try restarting the plugin, Godot, and if it still doesn't work, file a bug report.",
+				"Make sure to include the console output and errors you see on this screen."
+			], "\n")
+		)
+
+func shutdown() -> void:
+	EditorInterface.set_plugin_enabled("GodotTogether", false)
+
+func restart() -> void:
+	close_connection()
+
+	EditorInterface.get_base_control().add_child(
+		GDTRestarter.new()
+	)
+	
+	if not self: return
+	if not is_instance_valid(self): return
+	
+	var tree = get_tree()
+	if not tree: return
+	
+	await tree.create_timer(1).timeout
+	gui.alert("Godot is having problems restarting the plugin. Please do it manually")
+
+func is_session_active() -> bool:
+	return (
+		multiplayer.has_multiplayer_peer() and
+		Engine.is_editor_hint() and
+		(
+			GDTUtils.is_peer_connected(client.client_peer) or 
+			GDTUtils.is_peer_connected(server.server_peer)
+		)
+	)
+
+func setup_menu_button() -> void:
+	add_control_to_container(EditorPlugin.CONTAINER_TOOLBAR, button)
+	
+	button.get_parent().move_child(button, 1)
+	button.pressed.connect(gui.open_menu)
+
+func pre_start_check() -> bool:
+	if not gui:
+		printerr("GUI is not available")
+		return false
+		
+	if not gui.get_menu_window():
+		printerr("get_menu_window() is not available and errors cannot be properly displayed")
+		return false
+	
+	if OS.has_feature("standalone"):
+		printerr(
+			"GodotTogether ended up in your exported game. \n" +
+			"It only wastes space and could slow it down. \n" +
+			"Please update your export presets: \n" + 
+			"Project -> Export -> <select> -> Resources -> Filters to exclude... -> Add `addons/GodotTogether/*`"
+		)
+
+		return false
+
+	return true
+
+func check_path() -> bool:
+	var path: String = get_script().get_path()
+	
+	if path.begins_with("res://addons/GodotTogether/"):
+		return true
+	
+	gui.get_menu_window().set_error_of_death(
+		"You didn't install the plugin correctly",
+		GDTUtils.join([
+			"The plugin's directory must be named 'GodotTogether', not 'GodotTogether-main' or anything else.",
+			"Please change it, or the plugin will not work.",
+			"",
+			"Restart the plugin when you're done.",
+			"If you encounter issues, try also restarting Godot."
+		], "\n")
+	)
+	
+	return false
+
+func setup_chat() -> void:
+	chat.main = self
+
+	var chat_btn = add_control_to_bottom_panel(chat, "Chat")
+	chat_btn.tooltip_text = "Toggle GodotTogether chat"
+
+func prepare_session() -> void:
+	file_sync.reset()
+	EditorInterface.save_all_scenes()
+
+func get_gui() -> GodotTogetherGUI:
+	return gui
+
+func get_chat() -> GDTChat:
+	return chat
+
+func get_settings() -> GDTSettings:
+	return settings
+
+func close_connection() -> void:
+	if client:
+		client.connection_cancelled = true
+		client.client_peer.close()
+	
+	if server:
+		server.server_peer.close()
+	
+	multiplayer.multiplayer_peer = null
+	
+	post_session_end()
+
+func session_start() -> void:
+	session_started.emit()
+
+func post_session_end() -> void:
+	gui.scene_tree_editor.clear_colors()
+	gui.scene_editor_tabs.clear_colors()
+	
+	dual.users.clear()
+	dual.update_scene_colors()
+	
+	button.reset()
+	dual.clear_avatars()
+	
+	gui.get_menu().users.clear()
+	gui.get_menu().main_menu()
+
+	session_ended.emit()

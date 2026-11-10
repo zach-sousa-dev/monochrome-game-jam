@@ -1,0 +1,419 @@
+@tool
+extends GDTComponent
+class_name GDTDual
+
+signal user_connected(user: GDTUser)
+signal user_disconnected(user: GDTUser)
+
+signal user_pending(user: GDTUser)
+signal user_rejected(user: GDTUser)
+
+signal users_listed(users: Array[GDTUser])
+
+signal user_script_changed(user: GDTUser, path: String)
+signal user_scene_changed(user: GDTUser, path: String)
+
+enum NetChannel {
+	MAIN,
+	USER_STATE
+}
+
+var camera: Camera3D
+var users: Array[GDTUser]
+
+var update_timer = Timer.new()
+var broadcast_timer = Timer.new()
+
+var prev_mouse_pos := Vector2()
+var prev_3d_pos := Vector3()
+var prev_3d_rot := Vector3()
+
+# preload() causes 'Busy' errors
+# relative paths are not supported by load()
+var avatar_3d_scene = load("res://addons/GodotTogether/src/scenes/Avatar3D/Avatar3D.tscn")
+var avatar_2d_scene = load("res://addons/GodotTogether/src/scenes/Avatar2D/Avatar2D.tscn")
+
+var avatar_3d_markers: Array[GDTAvatar3D] = []
+var avatar_2d_markers: Array[GDTAvatar2D] = []
+
+func _ready() -> void:
+	if not main: return
+	
+	camera = EditorInterface.get_editor_viewport_3d().get_camera_3d()
+	
+	multiplayer.peer_connected.connect(_peer_connected)
+	multiplayer.peer_disconnected.connect(_peer_disconnected)
+	
+	update_timer.timeout.connect(_update)
+	update_timer.wait_time = 0.02
+	update_timer.one_shot = false
+	add_child(update_timer)
+	update_timer.start()
+	
+	broadcast_timer.timeout.connect(broadcast_avatars)
+	broadcast_timer.timeout.connect(broadcast_selection)
+	broadcast_timer.wait_time = 1
+	broadcast_timer.one_shot = false
+	add_child(broadcast_timer)
+	broadcast_timer.start()
+	
+	EditorInterface.get_selection().selection_changed.connect(broadcast_selection)
+	
+	report_ready()
+
+func _update() -> void:
+	if not main: return
+	if not main.is_session_active(): return
+	if not DisplayServer.window_is_focused(): return
+	
+	var viewport_2d = EditorInterface.get_editor_viewport_2d()
+	if not viewport_2d: return
+	
+	var mouse_pos = viewport_2d.get_mouse_position()
+	
+	if mouse_pos != prev_mouse_pos:
+		prev_mouse_pos = mouse_pos
+		update_2d_avatar.rpc(mouse_pos)
+	
+	var viewport_3d = EditorInterface.get_editor_viewport_3d()
+	if not viewport_3d: return
+	
+	var new_camera = viewport_3d.get_camera_3d()
+	
+	if not new_camera or not is_instance_valid(new_camera): 
+		return
+	
+	if new_camera != camera:
+		camera = new_camera
+		prev_3d_pos = Vector3.ZERO
+		prev_3d_rot = Vector3.ZERO
+		return
+	
+	if camera.position == Vector3.ZERO and camera.rotation == Vector3.ZERO:
+		return
+	
+	if camera.position != prev_3d_pos or camera.rotation != prev_3d_rot:
+		prev_3d_pos = camera.position
+		prev_3d_rot = camera.rotation
+		update_3d_avatar.rpc(camera.position, camera.rotation)
+
+func _peer_connected(_id: int) -> void:
+	pass
+	
+func _peer_disconnected(id: int) -> void:
+	print("Peer %s disconnected" % id)
+
+	remove_avatars_of_user(id)
+
+func _user_pending(user: GDTUser) -> void:
+	user_pending.emit(user)
+
+func _user_rejected(user: GDTUser) -> void:
+	user_rejected.emit(user)
+
+func _user_connected(user: GDTUser) -> void:
+	if not user in users:
+		users.append(user)
+	
+	user_connected.emit(user)
+	broadcast_avatars()
+	
+	create_avatar_2d(user)
+	create_avatar_3d(user)
+	
+	if should_notify_user_connection():
+		var ip = user.get_address()
+		main.toaster.push_toast("User %s (%s) joined" % [user.name, ip])
+
+func _user_disconnected(user: GDTUser) -> void:
+	user.current_scene = ""
+	user.current_script = ""
+	
+	users.erase(user)
+	user_disconnected.emit(user)
+	
+	main.get_gui().scene_tree_editor.clear_matching_colors(
+		user_color_to_selection_color(user.color)
+	)
+	
+	if user.was_ever_authenticated() and should_notify_user_connection():
+		var ip = user.get_address()
+		main.toaster.push_toast("User %s (%s) disconnected" % [user.name, ip])
+	
+	update_scene_colors()
+
+func _users_listed(new_users: Array[GDTUser]) -> void:
+	var self_id = multiplayer.get_unique_id()
+	
+	users = new_users
+	users_listed.emit(new_users)
+	
+	clear_avatars()
+	
+	for user in new_users:
+		if user.id == self_id: 
+			continue
+		
+		create_avatar_2d(user)
+		create_avatar_3d(user)
+
+func broadcast_selection() -> void:
+	if not main:
+		return
+	
+	if not main.is_session_active():
+		return
+	
+	if main.client.is_active() and not main.client.is_fully_synced:
+		return
+	
+	var root = EditorInterface.get_edited_scene_root()
+	if not root: return
+	
+	var nodes = EditorInterface.get_selection().get_selected_nodes()
+	var paths = []
+	
+	for i in nodes:
+		var path = root.get_path_to(i)
+		
+		if path:
+			paths.append(path)
+	
+	receive_selection.rpc_id(0, paths, root.scene_file_path)
+	receive_current_scene.rpc_id(0, root.scene_file_path)
+	
+	var script_editor = EditorInterface.get_script_editor()
+	var current_script = script_editor.get_current_script()
+	
+	if script_editor.is_visible_in_tree() and current_script:
+		receive_current_script.rpc_id(0, current_script.resource_path)
+	else:
+		receive_current_script.rpc_id(0, "")
+
+func update_scene_colors() -> void:
+	var tabs = main.get_gui().scene_editor_tabs
+	tabs.clear_colors()
+	
+	for user in users:
+		if not user.current_scene: continue
+		
+		tabs.set_scene_color(user.current_scene, user.color)
+
+func should_notify_user_connection() -> bool:
+	return main.get_settings().get_setting("notifications/users")
+
+func get_user_by_id(id: int) -> GDTUser:
+	for i in users:
+		if i.id == id:
+			return i
+
+	return
+
+func get_server_user() -> GDTUser:
+	for i in users:
+		if i.type == GDTUser.Type.HOST:
+			return i
+
+	return
+
+func get_local_user() -> GDTUser:
+	var id = multiplayer.get_unique_id()
+	
+	for i: GDTUser in users:
+		if i.id == id:
+			return i
+	
+	return
+
+func get_avatar_2d(id: int) -> GDTAvatar2D:
+	for i in avatar_2d_markers:
+		if is_instance_valid(i) and i.id == id and i.is_inside_tree(): 
+			return i
+	
+	return null 
+
+func get_avatar_3d(id: int) -> GDTAvatar3D:
+	for i in avatar_3d_markers:
+		if is_instance_valid(i) and i.id == id and i.is_inside_tree(): 
+			return i
+	
+	return null
+
+func remove_avatars_of_user(user_id: int) -> void:
+	var avatar_2d = get_avatar_2d(user_id)
+	var avatar_3d = get_avatar_3d(user_id)
+	
+	if avatar_2d: 
+		avatar_2d_markers.erase(avatar_2d)
+		avatar_2d.queue_free()
+	
+	if avatar_3d: 
+		avatar_3d_markers.erase(avatar_3d)
+		avatar_3d.queue_free()
+
+func clear_avatars() -> void:
+	for i in avatar_3d_markers:
+		if is_instance_valid(i):
+			i.queue_free()
+
+	for i in avatar_2d_markers:
+		if is_instance_valid(i):
+			i.queue_free()
+
+	avatar_3d_markers.clear()
+	avatar_3d_markers.clear()
+
+func broadcast_avatars() -> void:
+	if not main: return
+	
+	if not main.is_session_active():
+		return
+		
+	if main.client.is_active() and not main.client.is_fully_synced:
+		return
+	
+	var viewport_3d = EditorInterface.get_editor_viewport_3d()
+	var viewport_2d = EditorInterface.get_editor_viewport_2d()
+	
+	if viewport_3d:
+		var cam = viewport_3d.get_camera_3d()
+		
+		if cam:
+			update_3d_avatar.rpc(cam.position, cam.rotation)
+		
+	if viewport_2d and DisplayServer.window_is_focused():
+		var mouse_pos = viewport_2d.get_mouse_position()
+		update_2d_avatar.rpc(mouse_pos)
+
+@rpc("authority", "call_remote", "reliable")
+func create_avatar_3d(user: GDTUser) -> GDTAvatar3D:
+	var avatar = avatar_3d_scene.instantiate()
+	
+	if not avatar:
+		push_error("Unable to create 3D avatar. Likely due to another instance of Godot holding the scene open")
+		return
+	
+	avatar.main = self.main
+	add_child(avatar)
+	
+	avatar.set_user(user)
+	avatar_3d_markers.append(avatar)
+	
+	return avatar
+
+@rpc("authority", "call_remote", "reliable")
+func create_avatar_2d(user: GDTUser) -> GDTAvatar2D:
+	var avatar = avatar_2d_scene.instantiate()
+	
+	if not avatar:
+		push_error("Unable to create 2D avatar. Likely due to another instance of Godot holding the scene open")
+		return
+	
+	tree_exiting.connect(avatar.queue_free)
+	EditorInterface.get_editor_viewport_2d().add_child(avatar)
+	
+	avatar.set_user(user)
+	avatar_2d_markers.append(avatar)
+	
+	return avatar
+
+@rpc("any_peer", "unreliable_ordered", "call_remote", NetChannel.USER_STATE)
+func update_2d_avatar(position: Vector2) -> void:
+	if not main: return
+	
+	var marker = get_avatar_2d(multiplayer.get_remote_sender_id())
+	if not marker: return
+	
+	marker.global_position = position
+
+@rpc("any_peer", "unreliable_ordered", "call_remote", NetChannel.USER_STATE)
+func update_3d_avatar(position: Vector3, rotation: Vector3) -> void:
+	if not main: return
+	if position == Vector3.ZERO and rotation == Vector3.ZERO: return
+	
+	var marker = get_avatar_3d(multiplayer.get_remote_sender_id())
+	if not marker: return
+	
+	marker.receive_transform(position, rotation)
+
+func user_color_to_selection_color(color: Color) -> Color:
+	return Color(
+			color.r,
+			color.g,
+			color.b,
+			0.25
+		)
+
+@rpc("any_peer", "reliable", "call_remote", NetChannel.USER_STATE)
+func receive_selection(node_paths: Array, scene_path: String) -> void:
+	var id = multiplayer.get_remote_sender_id()
+	var user = get_user_by_id(id)
+	if not user: return
+	
+	var tree_editor = main.get_gui().scene_tree_editor
+	
+	var color = user_color_to_selection_color(user.color)
+	tree_editor.clear_matching_colors(color)
+	
+	var root = EditorInterface.get_edited_scene_root()
+	if not root: return
+	if not root.scene_file_path: return
+	
+	if not scene_path: return
+	if root.scene_file_path != scene_path: return
+	
+	for node_path in node_paths:
+		var tp = typeof(node_path)
+		
+		if tp not in [TYPE_STRING, TYPE_STRING_NAME, TYPE_NODE_PATH]:
+			printerr("Expected String for node path, got %s" % tp)
+			continue
+			
+		var item = tree_editor.get_tree_item_at_path(node_path)
+		if not item: continue
+		
+		item.set_custom_bg_color(0, color)
+
+@rpc("any_peer", "reliable", "call_remote", NetChannel.USER_STATE)
+func receive_current_scene(path: String) -> void:
+	var id = multiplayer.get_remote_sender_id()
+	var user = get_user_by_id(id)
+	if not user: return
+	
+	if user.current_scene != path:
+		user_scene_changed.emit(user, path)
+	
+	user.current_scene = path
+	update_scene_colors()
+
+@rpc("any_peer", "reliable", "call_remote", NetChannel.USER_STATE)
+func receive_current_script(path: String) -> void:
+	var id = multiplayer.get_remote_sender_id()
+	var user = get_user_by_id(id)
+	if not user: return
+	
+	if user.current_script != path:
+		user_script_changed.emit(user, path)
+	
+	user.current_script = path
+
+@rpc("authority", "call_remote", "reliable")
+func restart() -> void:
+	if not main.get_settings().get_setting("dev/restart_broadcast"):
+		return
+
+	var id = multiplayer.get_remote_sender_id()
+
+	print("==================================")
+	print("! RESTART BROADCAST !")
+	print("Sender ID: %s" % id)
+	print("A plugin restart broadcast was activated. If this happened unintentionally please turn it off:")
+	print("GodotTogether menu -> Settings -> Advanced -> 'Enable restart broadcast'")
+	print("==================================")
+
+	EditorInterface.get_editor_toaster().push_toast(
+		"Restart broadcast received. Check console.", 
+		EditorToaster.SEVERITY_WARNING
+	)
+
+	main.restart()

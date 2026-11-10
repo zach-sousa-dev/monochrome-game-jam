@@ -1,0 +1,1550 @@
+@tool
+extends GDTComponent
+class_name GDTUnitTests
+
+var success_count = 0
+var fail_count = 0
+
+var test_times = {}
+var longest_test_name = 0
+var running_on_start = false
+
+var created_nodes = []
+
+func _ready() -> void:
+	report_ready()
+
+func run_boot_tests() -> void:
+	running_on_start = true
+	run_tests()
+	await get_tree().process_frame
+	running_on_start = false
+
+func exec_test(f: Callable) -> void:
+	var start = Time.get_unix_time_from_system()
+	var res = f.call()
+	var time = Time.get_unix_time_from_system() - start
+	
+	var test_name = str(f.get_method())
+	var separator = ".".repeat(longest_test_name - test_name.length())
+	var spaced_name = test_name + " " + separator
+	
+	test_times[test_name] = time
+	
+	if res:
+		print_rich("%s : [color=green]Ok[/color]   %s s" % [spaced_name, time])
+		success_count += 1
+	else:
+		print_rich("%s : [color=red]FAIL[/color]   %s s" % [spaced_name, time])
+		fail_count += 1
+		
+	cleanup_tests()
+
+func cleanup_tests() -> void:
+	for i in created_nodes:
+		if i and i is Node:
+			i.queue_free()
+		else:
+			created_nodes.erase(i)
+			#printerr("%s is not a Node, but was added to created_nodes" % i)
+
+func run_tests() -> void:
+	if not main:
+		printerr("Cannot run tests without main")
+		return
+	
+	print("--- Running GodotTogether tests ---")
+	
+	var test_names = []
+	
+	for i in get_method_list():
+		if i["name"].begins_with("test_"):
+			var nm: String = i["name"]
+			test_names.append(nm)
+			
+			if nm.length() > longest_test_name:
+				longest_test_name = nm.length()
+	
+	for func_name in test_names:
+		exec_test(get(func_name))
+	
+	print()
+	print("Testing complete")
+	print("Slowest: ", get_by_slowest().slice(0, 5))
+	
+	var fail_str = fail_count
+	
+	if fail_count != 0:
+		fail_str = "[color=red]%s[/color]" % fail_count
+	
+	print_rich("Successful: %s | Failed: %s" % [success_count, fail_str])
+	
+	reset()
+	
+	print("------------------------------------")
+
+func reset() -> void:
+	success_count = 0
+	fail_count = 0
+	test_times.clear()
+
+func get_by_slowest() -> Array:
+	var tests = test_times.keys()
+	
+	tests.sort_custom(func(a, b):
+		return test_times[a] > test_times[b]
+	)
+	
+	return tests
+
+func check_version(ver: String) -> String:
+	if ver.is_empty():
+		return "Version cannot be empty"
+		
+	if ver == "unreleased":
+		return ""
+	
+	if not ver[0].is_valid_int():
+		return "Version must start with a number"
+	
+	const ALLOWED_CHARS = "1234567890.-qwertyuiopasdfghjklzxcvbnm"
+	
+	for i in ver:
+		if not ALLOWED_CHARS.contains(i):
+			return "Illegal character '%s'" % i
+	
+	return ""
+
+func test_ui() -> bool:
+	var gui = main.get_gui()
+	
+	if not gui:
+		printerr("get_gui() failed")
+		return false
+	
+	var menu_window = gui.get_menu_window()
+	
+	if not menu_window:
+		printerr("get_menu_window() failed. Make sure the script is set")
+		return false
+	
+	var settings = menu_window.get_settings_gui()
+	
+	if not settings:
+		printerr("get_settings_gui() failed. Make sure the script is set")
+		return false
+	
+	if running_on_start:
+		if not settings:
+			printerr("Settings window not found")
+			return false
+			
+		if settings.visible:
+			printerr("Settings window should be hidden or it will cause a flash")
+			return false
+	
+	return true
+
+func test_versions() -> bool:
+	var valid = [
+		main.get_plugin_version(),
+		"1.0-alpha",
+		"2.5.1-beta",
+		"1.0",
+		"unreleased"
+	]
+	
+	var invalid = [
+		"v.1.0",
+		"1,4-alpha",
+		"test_version",
+	]
+	
+	var ok = true
+	
+	for i in valid:
+		var err = check_version(i)
+		
+		if not err.is_empty():
+			ok = false
+			printerr("%s: %s" % [i, err])
+	
+	for i in invalid:
+		var err = check_version(i)
+		
+		if err.is_empty():
+			ok = false
+			printerr("%s should be invalid" % i)
+	
+	return ok 
+
+func test_internals() -> bool:
+	var gui = main.get_gui()
+	
+	var node_wrappers = [
+		gui.scene_editor_tabs,
+		gui.scene_tree_editor,
+		gui.external_file_change_dialog
+	]
+	
+	for i: GDTNodeWrapper in node_wrappers:
+		if not i.get_wrapped_node():
+			printerr("Wrapper %s failed" % i)
+			return false
+	
+	return true
+
+func test_plugin_version() -> bool:
+	var ver = main.get_plugin_version()
+	var err = check_version(ver)
+	
+	if err:
+		printerr("Invalid plugin version %s")
+		return false
+	
+	if not FileAccess.file_exists("res://addons/GodotTogether/.dev") and ver == "unreleased":
+		printerr("The plugin version must not be 'unreleased' in a release build")
+		return false
+	
+	return true
+
+func test_rpc_checksum() -> bool:
+	var a = main.get_global_rpc_checksum()
+	var b = main.get_global_rpc_checksum()
+	
+	if a != b:
+		printerr("RPC checksum doesn't match %s != %s" % [a, b])
+		return false
+	
+	return true
+
+func test_disconnect_reasons() -> bool:
+	for code in GDTUser.DisconnectReason.values():
+		var msg = GDTUser.disconnect_reason_to_string(code)
+		
+		if "Unknown status" in msg:
+			var key = GDTUser.DisconnectReason.find_key(code)
+			printerr("No string message for disconnect reason %s (%s)" % [code, key])
+			return false
+	
+	return true
+
+func test_local_resource_encoding() -> bool:
+	var a = StandardMaterial3D.new()
+	a.albedo_texture = NoiseTexture2D.new()
+	
+	var encoded = main.node_sync.encode_resource(a)
+	
+	if not encoded:
+		printerr("encoded is null")
+		return false
+		
+	if not GDTNodeSync.is_encoded_resource(encoded):
+		printerr("Encoded not recognized as an encoded resource")
+		return false
+	
+	var decoded = main.node_sync.decode_resource(encoded)
+	
+	if not decoded:
+		printerr("decoded is null")
+		return false
+	
+	if decoded.get_class() != a.get_class():
+		printerr("Class %s != %s" % [decoded.get_class(), a.get_class()])
+		return false
+	
+	if not decoded.albedo_texture:
+		printerr("Missing 'albedo_texture'")
+		return false
+	
+	return true
+
+func test_resource_encoding_setget_props() -> bool:
+	var tset = TileSet.new()
+	
+	var img = load("res://addons/GodotTogether/src/img/x.svg")
+	
+	if not img:
+		printerr("Unable to load sample texture")
+		return false
+	
+	var src = TileSetAtlasSource.new()
+	src.texture = img
+	tset.add_source(src)
+	
+	tset.tile_size = Vector2(2, 8)
+	tset.add_occlusion_layer()
+	tset.set_occlusion_layer_light_mask(0, 2)
+	
+	var encoded: Dictionary = main.node_sync.encode_resource(tset)
+	var decoded: TileSet = main.node_sync.decode_resource(encoded, true)
+	
+	if not decoded:
+		printerr("Decoded is null")
+		return false
+	
+	var decoded_mask = decoded.get_occlusion_layer_light_mask(0)
+	
+	if decoded_mask != tset.get_occlusion_layer_light_mask(0):
+		printerr("Occlusion layer mask mismatch")
+		return false
+	
+	var decoded_src = decoded.get_source(0)
+	
+	if not decoded_src:
+		printerr("Source 0 is null")
+		return false
+		
+	if not decoded_src is TileSetAtlasSource:
+		printerr("Source 0 not TileSetAtlasSource: %s" % decoded_src.get_class())
+		return false
+		
+	if decoded_src.texture.resource_path != src.texture.resource_path:
+		printerr("Texture path mismatch")
+		return false
+	
+	return true
+
+func test_file_resource_encoding() -> bool:
+	const PATH = "res://addons/GodotTogether/src/scenes/Avatar3D/material.tres"
+	
+	if not FileAccess.file_exists(PATH):
+		printerr("Material used in testing missing: %s" % PATH)
+		return false
+	
+	var loaded = load(PATH)
+	
+	if not loaded is StandardMaterial3D:
+		printerr("Test material should be StandardMaterial3D")
+		return false
+	
+	loaded = loaded as StandardMaterial3D
+	
+	var encoded = main.node_sync.encode_resource(loaded)
+	
+	if not encoded:
+		printerr("Encoding failed")
+		return false
+	
+	var decoded = main.node_sync.decode_resource(encoded, true)
+	
+	if not decoded:
+		printerr("Decoding failed")
+		return false
+	
+	if decoded.get_class() != loaded.get_class():
+		printerr("Wrong class: %s" % decoded.get_class())
+		return false
+	
+	if loaded.albedo_color != decoded.albedo_color:
+		printerr("albedo_color wrong")
+		return false
+	
+	return true
+
+func test_callable_encoding() -> bool:
+	var encoded_original = GDTNodeSync.encode_callable_ref(_dummy_function)
+	var encoded_bound = GDTNodeSync.encode_callable_ref(_dummy_function.bind("Hello"))
+	
+	if not encoded_original:
+		printerr("encoded_original empty")
+		return false
+	
+	if not encoded_bound:
+		printerr("encoded_bound empty")
+		return false
+	
+	var decoded_original = GDTNodeSync.decode_callable_ref(self, encoded_original)
+	var decoded_bound = GDTNodeSync.decode_callable_ref(self, encoded_bound)
+	
+	if decoded_original == GDTNodeSync._invalid_callable:
+		printerr("decoded_original is invalid")
+		return false
+	
+	if decoded_bound == GDTNodeSync._invalid_callable:
+		printerr("decoded_bound is invalid")
+		return false
+	
+	var decoded_original_res = decoded_original.call()
+	var decoded_bound_res = decoded_bound.call()
+	
+	if decoded_original_res != "":
+		printerr("decoded_original() <empty string> != '%s'" % decoded_original_res)
+		return false
+	
+	if decoded_bound_res != "Hello":
+		printerr("decoded_bound() '%s' != 'Hello'" % decoded_bound_res)
+		return false
+	
+	
+	return true
+
+func test_sha256() -> bool:
+	var a1 = [1, 2, 3, 4]
+	var a2 = [1, 2, 3, 4]
+	
+	var b = [1, 4, 8, 9]
+	
+	var hash_a1 = GDTUtils.sha256_of_buffer(a1)
+	var hash_a2 = GDTUtils.sha256_of_buffer(a2)
+	
+	if hash_a1.is_empty():
+		printerr("Hash is empty")
+		return false
+	
+	if hash_a1 != hash_a2:
+		printerr("Hashes of 'a' don't match")
+		return false
+	
+	if hash_a1 == GDTUtils.sha256_of_buffer(b):
+		printerr("Hashes of different values equal")
+		return false
+	
+	return true
+
+func test_sha256_file() -> bool:
+	var script = get_script()
+	
+	if not script:
+		printerr("Unable to get script instance")
+		return false
+	
+	var path: String = script.resource_path
+	
+	if path.is_empty():
+		printerr("Script instance not a file")
+		return false
+		
+	var buf = FileAccess.get_file_as_bytes(path)
+	
+	if buf.is_empty():
+		printerr("Unable to open file %s" % path)
+		return false
+	
+	var hash_buf = GDTUtils.sha256_of_buffer(buf)
+	var hash_file = FileAccess.get_sha256(path)
+	
+	if hash_buf.is_empty():
+		printerr("sha256_of_buffer() empty")
+		return false
+	
+	if hash_file.is_empty():
+		printerr("FileAccess.get_sha256() empty")
+		return false
+		
+	if hash_buf != hash_file:
+		printerr("Hashes differ: \n%s\n%s" % [hash_file, hash_buf])
+		return false
+	
+	return true
+
+func test_compare_dicts() -> bool:
+	var a = {
+		"sub_dict": {
+			"this": {
+				"is": {
+					"deep": true
+				}
+			},
+			"hi": "hello",
+			"bye": "cya"
+		},
+		
+		"thing": true,
+		"null": null
+	}
+	
+	var b = {
+		"sub_dict": {
+			"this": {
+				"is": {
+					"deep": {
+						"innit": true
+					}
+				}
+			},
+			"hi": "hello",
+			"bye": "goodbye"
+		},
+		
+		"thing": false,
+		"null": null,
+		"missing": 123
+	}
+	
+	var ab_expected_diff = ["thing", "sub_dict/this/is/deep", "missing", "sub_dict/bye"]
+	
+	var a_copy = a.duplicate(true)
+	
+	var equal_diff = GDTUtils.compare_dicts(a, a_copy)
+	var ab_diff = GDTUtils.compare_dicts(a, b)
+	
+	if not equal_diff.is_empty():
+		printerr("Got Results for equal dicts: ", equal_diff)
+		return false
+	
+	if ab_expected_diff.size() != ab_diff.size():
+		printerr("Unexpected diff '%s' != '%s'" % [ab_diff, ab_expected_diff])
+		return false
+	
+	for i in ab_expected_diff:
+		if not i in ab_diff:
+			printerr("Missing diff entry '%s'. \n'%s' != \n'%s'" % [i, ab_diff, ab_expected_diff])
+			return false
+	
+	return true
+
+func test_hash_dict() -> bool:
+	var lbl = Label.new()
+	created_nodes.append(lbl)
+	lbl.text = "Hello"
+	
+	# -- Unchanged -- #
+	
+	var h1 = main.node_sync.get_property_hash_dict(lbl)
+	var h1_unchanged = main.node_sync.get_property_hash_dict(lbl)
+	
+	var diff_unchanged = GDTNodeSync.get_property_diff(h1, h1_unchanged)
+	
+	if not diff_unchanged.is_empty():
+		printerr("Hashes differ without changes: %s", diff_unchanged)
+		return false
+	
+	# -- Changed -- #
+	
+	lbl.text = "Hello World"
+	lbl.visible = false
+	lbl.label_settings = LabelSettings.new()
+	
+	var h2 = main.node_sync.get_property_hash_dict(lbl)
+	
+	var diff2 = GDTNodeSync.get_property_diff(h1, h2)
+	var expected_diff2 = ["text", "visible", "label_settings"]
+	
+	if diff2.size() != expected_diff2.size():
+		printerr("Diff wrong: '%s' != '%s'" % [expected_diff2, diff2])
+		return false
+	
+	for i in expected_diff2:
+		if not i in diff2:
+			printerr("Missing '%s' in diff: '%s' != '%s'" % [i, expected_diff2, diff2])
+			return false
+	
+	# -- Object itself changed -- #
+	
+	lbl.label_settings = LabelSettings.new()
+	
+	var h3 = main.node_sync.get_property_hash_dict(lbl)
+	
+	var diff3 = GDTNodeSync.get_property_diff(h2, h3)
+	var expected_diff3 = ["label_settings:."]
+	
+	if diff3.size() != expected_diff3.size():
+		printerr("Diff wrong: '%s' != '%s'" % [expected_diff3, diff3])
+		return false
+	
+	for i in expected_diff3:
+		if not i in diff3:
+			printerr("Missing '%s' in diff: '%s' != '%s'" % [i, expected_diff3, diff3])
+			return false
+	
+	return true
+
+func test_setget_nested() -> bool:
+	var dict = {
+		"a": {
+			"b": null
+		}
+	}
+	
+	if not GDTUtils.set_nested(dict, "a/b", "c"):
+		printerr("set_nested() should return true")
+		return false
+	
+	var dict_val = GDTUtils.get_nested(dict, "a/b")
+	
+	if dict_val != "c":
+		printerr("Dict 'c' != '%s'" % dict_val)
+		return false
+	
+	var lbl = Label.new()
+	var lbl_settings = LabelSettings.new()
+	created_nodes.append(lbl)
+	lbl.label_settings = lbl_settings
+	
+	GDTUtils.set_nested(lbl, "label_settings/font_size", 17)
+	
+	var font_size = GDTUtils.get_nested(lbl, "label_settings/font_size")
+	
+	if font_size != 17:
+		printerr("font_size %s != %s" % [17, font_size])
+		return false
+	
+	return true
+
+func test_ignored_properties() -> bool:
+	var node3d = Node3D.new()
+	created_nodes.append(node3d)
+	
+	var ignored = main.node_sync.get_ignored_properties(node3d)
+	var expected = ["owner", "multiplayer"]
+	
+	for i in expected:
+		if not i in ignored:
+			printerr("%s not found: %s" % [i, ignored])
+			return false
+	
+	return true
+
+func test_property_keys() -> bool:
+	var node3d = Sprite2D.new()
+	created_nodes.append(node3d)
+	
+	var keys = main.node_sync.get_property_keys(node3d)
+	
+	var essentials = ["name", "position", "visible"]
+	var ignores = []
+	
+	for i in essentials:
+		if not i in keys:
+			printerr("%s not found in Node2D keys" % i)
+			return false
+	
+	for i in ignores:
+		if i in keys:
+			printerr("Ignored %s found in Node2D keys" % i)
+			return false
+	
+	for i in GDTNodeSync.IGNORED_PROPERTIES["Node"]:
+		if i in keys:
+			printerr("%s found" % i)
+			return false
+	
+	return true
+
+func test_setget_property_dict() -> bool:
+	const METHOD_KEYS = ["set", "get", "has", "reset"]
+	const ESSENTIALS = []
+	
+	for node_class in GDTNodeSync.SETGET_PROPERTIES.keys():
+		if not ClassDB.class_exists(node_class):
+			printerr("Class '%s' doesn't exist" % node_class)
+			return false
+		
+		var class_entry = GDTNodeSync.SETGET_PROPERTIES[node_class]
+		
+		if typeof(class_entry) == TYPE_STRING:
+			if not class_entry in GDTNodeSync.SETGET_PROPERTIES:
+				printerr("Duplicate setget entry %s not found" % class_entry)
+				return false
+			
+			continue
+		
+		for prop in class_entry.keys():
+			var prop_entry = class_entry[prop]
+			
+			for key in ESSENTIALS:
+				if not key in prop_entry:
+					printerr("Missing '%s' in %s of class %s" % [key, prop, node_class])
+					return false
+			
+			for method_key in METHOD_KEYS:
+				if not method_key in prop_entry:
+					continue
+				
+				var method_entry = prop_entry[method_key]
+				
+				if method_entry is String:
+					if not ClassDB.class_has_method(node_class, method_entry):
+						printerr("%s has no method '%s'" % [node_class, method_entry])
+						return false
+				elif method_entry is Dictionary:
+					var key_types = {
+						"func": TYPE_STRING,
+						"pre_args": TYPE_ARRAY,
+						"post_args": TYPE_ARRAY,
+						"target": TYPE_OBJECT
+					}
+					
+					if not "func" in method_entry:
+						printerr("Missing 'func' in '%s' of %s:%s" % [method_key, node_class, prop])
+						return false
+						
+					var func_val = method_entry["func"]
+					
+					if func_val is String:
+						if not "target" in method_entry:
+							if not ClassDB.class_has_method(node_class, func_val):
+								printerr("%s has no method '%s'" % [node_class, method_entry["func"]])
+								return false
+					
+					for key in method_entry.keys():
+						if not key in key_types:
+							printerr("Unexpected '%s' in %s '%s'" % [key, node_class, prop])
+							return false
+						
+						var res_type = typeof(method_entry[key])
+						var exp_type = key_types[key]
+						
+						if res_type != exp_type:
+							printerr(
+								"Type mismatch %s '%s' %s '%s' != %s" % 
+								[node_class, prop, key, type_string(res_type), type_string(exp_type)]
+							)
+							
+							return false
+					
+				else:
+					printerr("Invalid method entry type of '%s' in %s:%s" % [method_key, node_class, prop])
+					return false
+	
+	return true
+
+func test_basic_setget_props() -> bool:
+	var lbl = Label.new()
+	created_nodes.append(lbl)
+	
+	var non_setget = [
+		"text",
+		"label_settings:.",
+		"label_settings:font_size"
+	]
+	
+	for path in non_setget:
+		if main.node_sync.is_setget_property(lbl, path):
+			printerr("Should not be recognized as setget: %s" % path)
+			return false
+	
+	var h1 = main.node_sync.get_property_hash_dict(lbl)
+	
+	lbl.add_theme_font_size_override("font_size", 42)
+	
+	var h2 = main.node_sync.get_property_hash_dict(lbl)
+	var diff = GDTNodeSync.get_property_diff(h1, h2)
+	
+	if diff.size() != 1:
+		printerr("Diff wrong: %s" % diff)
+		return false
+	
+	var prop = diff[0]
+	const expected_prop = "theme_override_font_sizes/font_size"
+	
+	if prop != expected_prop:
+		printerr("'%s' != '%s'" % [prop, expected_prop])
+		return false
+	
+	if not main.node_sync.is_setget_property(lbl, prop):
+		printerr("Property not reported as setget")
+		return false
+	
+	main.node_sync.set_setget_property(lbl, prop, 19)
+	
+	var val = lbl.get_theme_font_size("font_size")
+	
+	if val != 19:
+		printerr("set failed: %s != %s" % [val, 19])
+		return false
+	
+	var def = lbl.get_theme_default_font_size()
+	
+	main.node_sync.set_setget_property(lbl, prop, def)
+	
+	# Godot seems to reset it on its own after a frame now.
+	# This doesn't seem important
+	
+	#if lbl.has_theme_font_size_override("font_size"):
+		#printerr("set didn't reset with default value")
+		#return false
+	
+	return true
+
+func test_setget_arg_extraction() -> bool:
+	var prop_dict = {
+		"theme_override_font_sizes/?": [
+			{
+				"path": "theme_override_font_sizes/font_size",
+				"res": ["font_size"]
+			}
+		],
+		
+		"occlusion_layer_?/light_mask": [
+			{
+				"path": "occlusion_layer_12/light_mask",
+				"res": ["12"]
+			}
+		]
+	}
+	
+	for source in prop_dict.keys():
+		for test in prop_dict[source]:
+			var path = test["path"]
+			var exp_res = test["res"]
+			
+			var res = main.node_sync.extract_setget_property_string_args(path, source)
+			
+			if res.size() != exp_res.size():
+				printerr("Mismatch: %s != %s" % [res, exp_res])
+				return false
+			
+			for i in exp_res.size():
+				if exp_res[i] != res[i]:
+					printerr("Mismatch: %s != %s" % [res, exp_res])
+					return false
+	
+	return true
+
+func test_setget_arg_processing() -> bool:
+	var prop_dict = {
+		"hello/?": {
+			"method": {
+				"pre_args": ["?int"]
+			},
+			"props": [
+				"hello/0",
+				"hello/1",
+				"hello/-5",
+				"hello/129"
+			],
+			"exp_args": [
+				[0],
+				[1],
+				[-5],
+				[129]
+			]
+		},
+		"thing/?_?": {
+			"method": {
+					"pre_args": ["?int"],
+					"post_args": ["?"]
+			},
+			"props": [
+				"thing/16_hello",
+				"thing/5_cuh",
+				"thing/123_45"
+			],
+			"exp_args": [
+				[16, "hello"],
+				[5, "cuh"],
+				[123, "45"]
+			]
+		},
+		"empty": {
+			"method": {},
+			"props": [
+				"empty"
+			],
+			"exp_args": [
+				[]
+			]
+		}
+	}
+	
+	for entry_name in prop_dict.keys():
+		var entry: Dictionary = prop_dict[entry_name]
+		var test_props: Array = entry["props"]
+		var exp_arg_list: Array = entry["exp_args"]
+		
+		for i in test_props.size():
+			var property = test_props[i]
+			var exp_args = exp_arg_list[i]
+			
+			var res_args = main.node_sync.get_setget_func_args(entry["method"], entry_name, property)
+			
+			if exp_args.size() != res_args.size():
+				printerr("Arg mismatch: '%s' %s != %s" % [property, res_args, exp_args])
+				return false
+			
+			for arg_i in res_args.size():
+				if res_args[arg_i] != exp_args[arg_i]:
+					printerr("Arg mismatch: '%s' %s != %s" % [property, res_args, exp_args])
+					return false
+	
+	return true
+
+func test_object_setget_props() -> bool:
+	var lbl = Label.new()
+	created_nodes.append(lbl)
+	
+	var h1 = main.node_sync.get_property_hash_dict(lbl)
+	
+	var style1 = StyleBoxFlat.new()
+	style1.bg_color = Color.RED
+	
+	lbl.add_theme_stylebox_override("normal", style1)
+	
+	var h2 = main.node_sync.get_property_hash_dict(lbl)
+	var diff = GDTNodeSync.get_property_diff(h1, h2)
+	
+	if diff.size() != 1:
+		printerr("Diff wrong: %s" % diff)
+		return false
+	
+	var prop = diff[0]
+	const expected_prop = "theme_override_styles/normal"
+	
+	if prop != expected_prop:
+		printerr("'%s' != '%s'" % [prop, expected_prop])
+		return false
+	
+	if not main.node_sync.is_setget_property(lbl, prop):
+		printerr("Property not reported as setget")
+		return false
+	
+	var style2 = StyleBoxFlat.new()
+	style2.bg_color = Color.BLUE
+	
+	main.node_sync.set_setget_property(lbl, prop, style2)
+	
+	var val = lbl.get_theme_stylebox("normal")
+	
+	if not val:
+		printerr("set failed. got null")
+		return false
+	
+	if val.bg_color != style2.bg_color:
+		printerr("set failed. bg_color: %s != BLUE" % val.bg_color)
+		return false
+	
+	return true
+
+func test_node_change_applying_deep_setget() -> bool:
+	var texture = load("res://icon.svg")
+	
+	if not texture:
+		push_warning("res://icon.svg doesn't exist in project. The test cannot continue")
+		return true
+	
+	var tmap = TileMapLayer.new()
+	var tset = TileSet.new()
+	
+	created_nodes.append(tmap)
+	tmap.tile_set = tset
+	
+	var h1 = main.node_sync.get_property_hash_dict(tmap)
+	
+	var source = TileSetAtlasSource.new()
+	source.texture = texture
+	tset.add_source(source)
+	
+	var h2 = main.node_sync.get_property_hash_dict(tmap)
+	
+	var diff = main.node_sync.get_property_diff(h1, h2)
+	
+	if not "tile_set:sources/0" in diff:
+		printerr("tile_set:sources/0 not found in diff")
+		return false
+	
+	var props = main.node_sync.get_select_property_dict(tmap, diff)
+	
+	var tmap_output = TileMapLayer.new()
+	tmap_output.tile_set = TileSet.new()
+	
+	created_nodes.append(tmap_output)
+	
+	main.node_sync.apply_property_dict(tmap_output, props)
+	
+	if not tmap_output.tile_set:
+		printerr("TileSet not set")
+		return false
+	
+	if tmap.tile_set.get_source_count() != 1:
+		printerr("TileSet source count %s != 1" % tmap.tile_set.get_source_count())
+		return false
+	
+	var source_output = tmap.tile_set.get_source(0)
+	
+	if not source_output:
+		printerr("Source is null")
+		return false
+		
+	if not source_output is TileSetAtlasSource:
+		printerr("Expected TileSetAtlasSource, got %s" % source_output.get_class())
+		return false
+	
+	source_output = source_output as TileSetAtlasSource
+	
+	if not source_output.texture:
+		printerr("Source texture not set")
+		return false
+	
+	if source_output.texture.resource_path != texture.resource_path:
+		printerr("Texture path '%s' != '%s'" % [source_output.texture.resource_path, texture.resource_path])
+		return false
+	
+	return true
+
+func test_setget_remove() -> bool:
+	var tmap = TileMap.new()
+	created_nodes.append(tmap)
+	tmap.tile_set = TileSet.new()
+	
+	tmap.tile_set.add_occlusion_layer(0)
+	tmap.tile_set.set_occlusion_layer_light_mask(0, 9)
+	
+	if tmap.tile_set.get_occlusion_layers_count() == 0:
+		printerr("Occlusion layer not initially added")
+		return false
+	
+	var prop = "tile_set:occlusion_layer_0/light_mask"
+	var sub_prop = prop.split(":")[1]
+	
+	if not main.node_sync.is_setget_property(tmap, prop):
+		printerr("Not recognized as setget: %s" % prop)
+		return false
+	
+	if not main.node_sync.is_setget_property(tmap.tile_set, sub_prop):
+		printerr("Not recognized as setget: %s" % sub_prop)
+		return false
+	
+	main.node_sync.apply_property_dict(tmap, {
+		prop: null
+	})
+	
+	if tmap.tile_set.get_occlusion_layers_count() != 0:
+		printerr("Occlusion layer not removed")
+		return false
+	
+	return true
+
+func test_setget_nullable_remove() -> bool:
+	var tmap = TileMap.new()
+	created_nodes.append(tmap)
+	
+	tmap.tile_set = TileSet.new()
+	
+	tmap.tile_set.add_physics_layer()
+	tmap.tile_set.set_physics_layer_physics_material(0, PhysicsMaterial.new())
+	tmap.tile_set.set_physics_layer_collision_mask(0, 2)
+	
+	tmap.tile_set.add_physics_layer()
+	tmap.tile_set.set_physics_layer_collision_mask(1, 7)
+	
+	# This is what happens when a physics layer gets removed
+	main.node_sync.apply_property_dict(tmap, {
+		"tile_set:physics_layer_0/collision_layer": null,
+		"tile_set:physics_layer_0/collision_mask": null,
+		"tile_set:physics_layer_0/collision_priority": null,
+		"tile_set:physics_layer_0/physics_material": null
+	})
+	
+	var layer_count = tmap.tile_set.get_physics_layers_count()
+	
+	if layer_count == 2:
+		printerr("Physics layer not removed")
+		printerr("Count:", tmap.tile_set.get_physics_layers_count())
+		printerr("Material:", tmap.tile_set.get_physics_layer_physics_material(0))
+		return false
+	
+	if layer_count < 1:
+		printerr("Too much layers removed")
+		return false
+		
+	if layer_count != 1:
+		printerr("Layers were added instead of removed")
+		return false
+	
+	var mask_val = tmap.tile_set.get_physics_layer_collision_mask(0)
+	
+	if mask_val != 7:
+		printerr("Collision mask %s != %s" % [mask_val, 7])
+		return false
+	
+	return true
+
+func test_node_change_applying() -> bool:
+	var lbl = Label.new()
+	created_nodes.append(lbl)
+	
+	lbl.label_settings = LabelSettings.new()
+	lbl.label_settings.font_size = 7
+	
+	var h1 = main.node_sync.get_property_hash_dict(lbl)
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color.RED
+	
+	lbl.add_theme_stylebox_override("normal", style)
+	lbl.text = "when the THE"
+	lbl.label_settings = LabelSettings.new()
+	lbl.label_settings.font_color = Color.RED
+	
+	var h2 = main.node_sync.get_property_hash_dict(lbl)
+	
+	var diff = GDTNodeSync.get_property_diff(h1, h2)
+	var props = main.node_sync.get_select_property_dict(lbl, diff)
+	
+	var lbl_output = Label.new()
+	created_nodes.append(lbl_output)
+	main.node_sync.apply_property_dict(lbl_output, props)
+	
+	var has_setget = false
+	
+	for i in diff:
+		if main.node_sync.is_setget_property(lbl, i):
+			has_setget = true
+			break
+	
+	if not has_setget:
+		printerr("The diff should include a setget property")
+		return false
+	
+	if lbl_output.text != lbl.text:
+		printerr("text wrong")
+		return false
+	
+	if not lbl_output.label_settings:
+		printerr("label_settings is null")
+		return false 
+	
+	if lbl_output.label_settings.font_color != lbl.label_settings.font_color:
+		printerr("font color wrong")
+		return false
+	
+	if lbl_output.label_settings.font_size != 16: # default font size
+		printerr("font size remained changed")
+		return false
+	
+	if not lbl_output.has_theme_stylebox_override("normal"):
+		printerr("'normal' stylebox override not set")
+		return false
+	
+	var style_output = main.node_sync.get_setget_property(lbl_output, "theme_override_styles/normal")
+	
+	if not style_output:
+		printerr("Stylebox is null")
+		return false
+	
+	if not style_output is StyleBoxFlat:
+		printerr("Stylebox class wrong: %s" % style_output.get_class())
+		return false
+	
+	if style_output.bg_color != style.bg_color:
+		printerr("Stylebox bg_color %s != %s" % [style_output.bg_color, style.bg_color])
+		return false
+	
+	return true
+
+func test_scenes() -> bool:
+	var scenes = [
+		GodotTogether.GUI_SCENE,
+		GodotTogether.CHAT_SCENE,
+		main.dual.avatar_2d_scene,
+		main.dual.avatar_2d_scene
+	]
+	
+	var ok = true
+	
+	for i in scenes.size():
+		var scene = scenes[i]
+		
+		if not scene:
+			printerr("Scene at %s didn't load" % i)
+			ok = false
+			continue
+		
+		var ins = scene.instantiate()
+		
+		if not ins:
+			printerr("Failed to instantiate scene at index %s" % i)
+			ok = false
+			continue
+		
+		ins.queue_free()
+	
+	return ok
+
+func test_path_validation() -> bool:
+	var safe = [
+		"res://",
+		"res://addon",
+		"res://scenes/game.tscn",
+	]
+	
+	var unsafe = [
+		"/usr/bin/res://",
+		"user://owies",
+		"res://../../thing",
+		"res://files/cool/../../../oopsie",
+		"res://addons/GodotTogether",
+		"/home/wolfyxon/addons/GodotTogether/secret.txt",
+		"C:\\Windows\\System32"
+	]
+	
+	for i in safe:
+		if not GDTValidator.is_path_safe(i):
+			printerr("%s got unsafe" % i)
+			return false
+	
+	for i in unsafe:
+		if GDTValidator.is_path_safe(i):
+			printerr("'%s' got safe" % i)
+	
+	return true
+
+func test_updater() -> bool:
+	if not main.updater:
+		printerr("Updater is null")
+		return false
+	
+	var url = main.updater.GITHUB_RELEASE_URL
+	
+	if not url.begins_with("https://"):
+		printerr("Invalid release URL")
+		return false
+	
+	if not url.contains("Wolfyxon"):
+		printerr("URL does not contain 'Wolfyxon'")
+		return false
+		
+	if not url.contains("GodotTogether"):
+		printerr("URL does not contain GodotTogether")
+		return false
+	
+	return true
+
+func test_updater_crypto() -> bool:
+	if not main.updater.get_key():
+		printerr("Public key does not load")
+		return false
+	
+	var data1 = "Hello there this is a test" # signed
+	var data2 = "Hello here is is a testy test"
+	
+	# Signature of utf8 buffer. DO NOT TOUCH!!!
+	var sig_text = "
+					0a0434f96cae41a59e8542ab741caab78b68fa90598ac200db1c33d7e59446d8a52ee48b3f480
+					eb55ce13344c61920eb844908ec9c0a6f6654104e7e677177435622d43e5330b9f3ce9114d96b
+					d4d7d85aaae4d139f3fb9bf77864739dd4ee29f12a1d595b58511c3d5a058a1eea2e921d8b374
+					de527baf321313c2af4adb85009902388f8cefc430ee06bc68245b65a6ff52e312098042cf3c9
+					e76af54d37d540ad615a926bbefc7ff6f84cacbbd29711fbf335df16b0f45ea62d9f5a4072f9e
+					5893155059feb3caa9edbc67848f55c7d1f86159aefc951e5ef5acf2e4b90ec8751a865d2a0bc
+					36e5af526a5aae030ed53dbb2036c42d15ade43802db23417bfafcb5f811ef2930845de22ec6f
+					2342ccc42045987abc47c4ab84c7fea97c1da61f7a47c2f52ab29590ff49cdc97545c87bd00b3
+					fbc6d04106210744d76b57ee7ff929d830e764c3ce7667e03710bdede062a4d46ceba173ac615
+					afb9bc80c56d66d1144f3f5f8ae5959be7dc2ad60c3c8bba47fe8bae34822067c88356f4ed0c2
+					0d311c9e2487587cc868bae0ad32f50550da699d99e008dd66c39bacd8548c07d4effc9a91abe
+					5f39d7935a18afd8b8fc0f2e205f09709a7c520ecb236ebcf59633d85174f98ae4a21cca16578
+					d873a3932d6b4aee5ebc0ec0b60e949ad95ee27d4f8ef7d594e86e813e88da48a5ebc8a263291
+					9328a27f4adacbb493df293"
+	
+	var sig = sig_text.remove_chars("\r\n\t\ufffd ").hex_decode()
+	
+	if not sig:
+		printerr("Unable to decode hex signature into buffer. Try restarting Godot")
+		return false
+	
+	if not main.updater.verify_data(data1.to_utf8_buffer(), sig):
+		printerr("data1 should match signature")
+		return false
+	
+	if main.updater.verify_data(data2.to_utf8_buffer(), sig):
+		printerr("data2 shouldn't match signature")
+		return false
+	
+	return true
+
+func test_update_multi_signature_set_get() -> bool:
+	var update = GDTUpdateCheckResult.new()
+	
+	for i in GDTUpdater.SIGNATURE_LENGTH:
+		update.signature_buf.append(1)
+	
+	# 111111111111
+	if update.get_signature_count() != 1:
+		printerr("Signature count after adding one %s != %s" % [update.get_signature_count(), 2])
+		return false
+	
+	# 222222222222
+	for i in GDTUpdater.SIGNATURE_LENGTH:
+		update.signature_buf.append(2)
+	
+	if update.get_signature_count() != 2:
+		printerr("Signature count after adding both %s != %s" % [update.get_signature_count(), 2])
+		return false
+	
+	var sig1 = update.get_signature(0)
+	var sig2 = update.get_signature(1)
+	var ln = GDTUpdater.SIGNATURE_LENGTH
+	
+	if sig1.size() != ln:
+		printerr("Signature 1 length %s != %s" % [sig1.size(), ln])
+		return false
+	
+	if sig2.size() != ln:
+		printerr("Signature 2 length %s != %s" % [sig2.size(), ln])
+		return false
+	
+	for i in sig1:
+		if i != 1:
+			printerr("Signature 1 is not all 0x1: %s" % sig1)
+			return false
+	
+	for i in sig2:
+		if i != 2:
+			printerr("Signature 2 is not all 0x2: %s" % sig1)
+			return false
+	
+	return true
+
+func test_runaway_keys() -> bool:
+	var tree = GDTFiles.get_file_tree("res://addons/GodotTogether", true)
+	var extensions = ["gd", "txt", "json", "md", "res", "tres", "tscn"]
+	
+	# Private key header encoded as bytes to not activate the detection
+	var header = PackedByteArray(
+		[
+			45, 45, 45, 45, 45, 66, 69, 71, 73, 78, 32, 82, 83, 65, 32, 80, 
+			82, 73, 86, 65, 84, 69, 32, 75, 69, 89, 45, 45, 45, 45, 45
+		]
+	).get_string_from_utf8()
+
+	var found = []
+	
+	for path in tree:
+		if not path.get_extension() in extensions and not path.contains("Makefile"):
+			continue
+		
+		var text = FileAccess.get_file_as_string(path)
+		
+		if not text:
+			printerr("Unable to open %s" % path)
+			continue
+			
+		if text.contains(header):
+			found.append(path)
+	
+	if not found.is_empty():
+		printerr("PRIVATE KEY FOUND IN THE FOLLOWING FILES:")
+		
+		for path in found:
+			printerr(path)
+		
+		printerr("DO NOT COMMIT OR PUSH!!!")
+		
+		return false
+	
+	return true
+	
+func test_root_finding() -> bool:
+	var data = {
+		"store_format": {
+			"paths": [
+				"addons/GodotTogether/src/",
+				"addons/GodotTogether/src/script.gd",
+				"addons/GodotTogether/plugin.cfg"
+			],
+			"res": "addons/GodotTogether/"
+		},
+		
+		"rootless_format": {
+			"paths": [
+				"plugin.cfg",
+				"src/",
+				"src/script.gd"
+			],
+			"res": ""
+		},
+		
+		"one_root_format": {
+			"paths": [
+				"GodotTogether/plugin.cfg",
+				"GodotTogether/src/",
+				"GodotTogether/src/script.gd"
+			],
+			"res": "GodotTogether/"
+		}
+	}
+	
+	for key in data.keys():
+		var entry = data[key]
+		var expected = entry["res"]
+		var paths: Array = entry["paths"]
+		
+		var normal = GDTUpdateInstaller.get_root_of_paths(paths)
+		
+		paths.reverse()
+		var reversed = GDTUpdateInstaller.get_root_of_paths(paths)
+		
+		if normal != expected:
+			printerr("%s [normal] '%s' != '%s'" % [key, normal, expected])
+			return false
+			
+		if reversed != expected:
+			printerr("%s [reversed] '%s' != '%s'" % [key, reversed, expected])
+			return false
+		
+		for i in 10:
+			paths.shuffle()
+			var shuffled = GDTUpdateInstaller.get_root_of_paths(paths)
+			
+			if shuffled != expected:
+				printerr("%s [shuffled] '%s' != '%s'" % [key, shuffled, expected])
+				return false
+	
+	return true
+
+static func test_detool() -> bool:
+	var scripts = [
+		[
+			"@tool",
+			"func hi"
+		],
+		[
+			"",
+			"\t",
+			"@tool ",
+			"@tool",
+			"@tool # burh",
+			"extends Node"
+		],
+		[
+			"#@tool",
+			"tool"
+		]
+	]
+	
+	for script_lines in scripts:
+		var script = GDTUtils.join(script_lines, "\n")
+		var sanitized = GDTScriptSecurity.detool_code(script)
+		var sanitized_lines = sanitized.split("\n")
+		
+		var dump_result = func():
+			printerr("-- Original --")
+			printerr(script)
+			printerr("-- Sanitized --")
+			printerr(sanitized)
+		
+		if script_lines.size() != sanitized_lines.size():
+			printerr("Line count mismatch:")
+			dump_result.call()
+			return false
+		
+		for line in sanitized_lines:
+			if line.begins_with("@tool"):
+				printerr("Sanitization failed. @tool still found")
+				dump_result.call()
+				return false
+				
+			if line.begins_with("##@tool"):
+				printerr("Already disabled @tool was sanitized")
+				dump_result.call()
+				return false
+				
+			if line.begins_with("#@tool@tool") or line.begins_with("#@tool#@tool"):
+				printerr("Broken sanitization")
+				dump_result.call()
+				return false
+	
+	return true
+
+func test_wrappers() -> bool:
+	var wrappers = [
+		main.get_gui().scene_tree_editor
+	]
+	
+	for i: GDTNodeWrapper in wrappers:
+		var node = i.get_wrapped_node()
+		
+		if not node:
+			printerr("Wrapped node not found")
+			return false
+	
+	return true
+
+func test_settings() -> bool:
+	if GDTUtils.has_readonly(GDTSettings.get_default_data()):
+		printerr("Default settings are read only")
+		return false
+	
+	if GDTUtils.has_readonly(main.settings.data):
+		printerr("Loaded settings are read only")
+		return false
+	
+	return true
+
+func test_data_encoding() -> bool:
+	var jd1 = GDTJoinData.new()
+	jd1.username = "Hello There"
+	jd1.password = "123"
+	jd1.rpc_checksum = 4256
+	jd1.protocol_version = GodotTogether.PROTOCOL_VERSION
+	
+	var jd_dict = jd1.to_dict()
+	
+	if not jd_dict:
+		printerr("Got empty or null dict")
+		return false
+	
+	var jd2 = GDTJoinData.from_dict(jd_dict)
+	
+	if not jd2:
+		printerr("Got null join data")
+		return false
+	
+	if jd1.username != jd2.username:
+		printerr("Username mismatch")
+		return false
+		
+	if jd1.password != jd2.password:
+		printerr("Password mismatch")
+		return false
+	
+	if jd1.rpc_checksum != jd2.rpc_checksum:
+		printerr("RPC checksum mismatch")
+		return false
+	
+	return true
+
+func test_fs_tree() -> bool:
+	var unsafe_paths = GDTFiles.get_file_tree("res://", true)
+	var safe_paths = GDTFiles.get_file_tree("res://", false)
+	
+	var unsafe_check_paths = [
+		get_script().resource_path,
+		"res://addons/GodotTogether/src/scripts/net/data/join_data.gd"
+	]
+	
+	var safe_check_paths = [
+		"res://project.godot"
+	]
+	
+	for i in unsafe_check_paths:
+		if not i in unsafe_paths:
+			printerr("Missing in unsafe paths: %s. Full: %s" % [i, unsafe_paths])
+			return false
+			
+		if i in safe_paths:
+			printerr("Unsafe found in safe paths: %s. Full: %s" % [i, safe_paths])
+			return false
+	
+	for i in safe_check_paths:
+		if not i in unsafe_paths:
+			printerr("Safe not found in safe paths: %s. Full: %s" % [i, safe_paths])
+	
+		if not i in safe_paths:
+			printerr("Safe not found in unsafe paths: %s. Full: %s" % [i, unsafe_paths])
+	
+	return true
+
+func test_file_chunking() -> bool:
+	var path = get_script().resource_path
+	
+	var whole_buf = FileAccess.get_file_as_bytes(path)
+	var constructed_buf = []
+	
+	GDTFileSync.read_chunks_callback(path, func(buf: PackedByteArray, _i: int):
+		constructed_buf.append_array(buf)
+	, 16)
+	
+	if whole_buf.size() != constructed_buf.size():
+		printerr("Buffer length: %s != %s" % [whole_buf.size(), constructed_buf.size()])
+		return false
+	
+	for i in whole_buf.size():
+		if whole_buf[i] != constructed_buf[i]:
+			printerr("Buffers don't match")
+			return false
+	
+	return true
+
+static func _dummy_function(data: String = "") -> String:
+	return data

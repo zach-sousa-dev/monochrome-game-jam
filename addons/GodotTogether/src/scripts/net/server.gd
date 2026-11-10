@@ -1,0 +1,353 @@
+@tool
+extends GDTComponent
+class_name GDTServer
+
+signal hosting_started
+
+const JOIN_DELAY: float = 1.0
+const APPROVE_TIMEOUT: float = 30.0
+
+const LOCALHOST := [
+	"0:0:0:0:0:0:0:1", 
+	"127.0.0.1", 
+	":1", 
+	"localhost"
+]
+
+var server_peer = ENetMultiplayerPeer.new()
+var ip_join_times = {}
+
+func _ready() -> void:
+	multiplayer.peer_connected.connect(_peer_connected)
+	multiplayer.peer_disconnected.connect(_peer_disconnected)
+	report_ready()
+
+func _process(_delta: float) -> void:
+	if not main: return
+	if not main.is_session_active(): return
+	
+	var now = Time.get_unix_time_from_system()
+	
+	for user: GDTUser in main.dual.users:
+		if not user.was_ever_authenticated() and now > user.joined_at + APPROVE_TIMEOUT:
+			user.reject(GDTUser.DisconnectReason.APPROVE_TIMEOUT)
+
+func _peer_connected(id: int) -> void:
+	if not multiplayer.is_server(): 
+		return
+
+	var now = Time.get_unix_time_from_system()
+	var peer = server_peer.get_peer(id)
+	var user = GDTUser.new(id, peer, main)
+	var ip = peer.get_remote_address()
+
+	print("New connection from %s ID: %d" % [peer.get_remote_address(), id])
+
+	if get_users_with_address(ip) and not main.get_settings().get_setting("server/allow_multiple_users_from_same_address"):
+		user.kick(GDTUser.DisconnectReason.ADDRESS_IN_USE)
+		print("Address already used, refusing connection")
+		return
+	
+	if ip in ip_join_times:
+		var last_join = ip_join_times[ip]
+		prints(last_join, now, last_join + JOIN_DELAY, JOIN_DELAY)
+
+		if now < last_join + JOIN_DELAY:
+			print("User joined too quickly, refusing connection")
+			user.kick(GDTUser.DisconnectReason.JOINING_TOO_FAST)
+
+			ip_join_times[ip] = now
+			return
+		
+	ip_join_times[ip] = now
+	
+	# The user needs to be added early
+	main.dual.users.append(user)
+	
+	main.client._s2c_connection_ack.rpc_id(id)
+ 
+func _peer_disconnected(id: int) -> void:
+	if not multiplayer.is_server(): return
+
+	var user = main.dual.get_user_by_id(id)
+	
+	if not user:
+		print("User %d disconnected" % id)
+		return
+	
+	print("User %s (%d) disconnected" % [user.name, id])
+	
+	var user_dict = user.to_dict()
+
+	auth_rpc(main.client._s2c_user_disconnected, [user_dict])
+	main.dual._user_disconnected(user)
+
+func _user_authenticated(user: GDTUser) -> void:
+	if not user:
+		GDTUtils.printerr_stack("User is null")
+		return
+	
+	var user_dict = user.to_dict()
+	var server_data = GDTServerAuthResponse.create(main)
+	
+	main.client._s2c_auth_successful.rpc_id(user.id, server_data.to_dict())
+	main.server.auth_rpc(main.client._s2c_user_connected, [user_dict], [user.id])
+	main.dual._user_connected(user)
+
+func create_server_user() -> GDTUser:
+	var user = GDTUser.new(1, null)
+	
+	user.name = main.settings.get_setting("username")
+	user.type = GDTUser.Type.HOST
+	user.main = main
+	user.id = 1
+
+	user.auth()
+
+	return user
+
+func get_users_with_address(ip: String) -> Array:
+	var res = []
+	
+	ip = GDTUser.normalize_address(ip)
+	
+	for i: GDTUser in main.dual.users:
+		if i.get_address() == ip:
+			res.append(i)
+	
+	return res
+
+func get_authenticated_users(include_server := true) -> Array[GDTUser]:
+	var res: Array[GDTUser] = []
+
+	for i in main.dual.users:
+		if i.authenticated and (include_server or i.type != GDTUser.Type.HOST) and (not i.peer or i.is_peer_connected()):
+			res.append(i)
+
+	return res
+
+func get_authenticated_ids(include_server := true) -> Array[int]:
+	var res: Array[int] = []
+
+	for i in get_authenticated_users(include_server):
+		res.append(i.id)
+
+	return res
+
+func start_hosting(port: int, max_clients := 10) -> int:
+	main.prepare_session()
+
+	var err = server_peer.create_server(port, max_clients)
+	
+	if err:
+		push_error("Failed to start server: %d" % err)
+		return err
+
+	print("Server started. Port: %s Max clients: %s" % [port, max_clients])
+
+	multiplayer.multiplayer_peer = server_peer
+
+	main.dual._users_listed([
+		create_server_user()
+	])
+
+	_post_start()
+
+	return err
+
+func validate_c2s() -> bool:
+	if not is_active():
+		GDTUtils.printerr_stack("Attempt to call client-to-server RPC when server isn't active")
+		return false
+	
+	return true
+
+func get_calling_user() -> GDTUser:
+	var id = multiplayer.get_remote_sender_id()
+	if id < 1: return
+	
+	return main.dual.get_user_by_id(id)
+
+func caller_has_permission(permission: GodotTogether.Permission) -> bool:
+	var id = multiplayer.get_remote_sender_id()
+	
+	if id < 1: 
+		return false
+	
+	return id_has_permission(id, permission)
+
+func _post_start() -> void:
+	main.file_sync.resume()
+	main.session_start()
+	
+	await get_tree().process_frame
+
+	main.button.set_session_icon(GDTMenuButton.ICON_SERVER)
+	hosting_started.emit()
+
+func id_has_permission(peer_id: int, permission: GodotTogether.Permission) -> bool:
+	var user = main.dual.get_user_by_id(peer_id)
+
+	return user != null and user.has_permission(permission)
+
+func get_user_dicts() -> Array[Dictionary]:
+	var dicts: Array[Dictionary] = []
+
+	for user in get_authenticated_users():
+		dicts.append(user.to_dict())
+
+	return dicts
+
+@rpc("any_peer", "reliable")
+func _c2s_chat_request(text: String) -> void:
+	if not validate_c2s(): return
+	
+	var id = multiplayer.get_remote_sender_id()
+	var user = main.dual.get_user_by_id(id)
+
+	if not user: return
+	if not user.authenticated: return
+
+	if not GDTChat.validate_message(text): return
+	
+	broadcast_chat_user_message(id, text)
+	main.get_chat().add_user_message(text, user)
+
+func broadcast_chat_user_message(user_id: int, text: String) -> void:
+	auth_rpc(main.client._s2c_receive_chat_message, [text, user_id])
+
+@rpc("any_peer", "call_remote", "reliable")
+func _c2s_receive_join_data(data_dict: Dictionary) -> void:
+	var id = multiplayer.get_remote_sender_id()
+	var user = main.dual.get_user_by_id(id)
+	
+	if not user:
+		GDTUtils.printerr_stack("Got user data from id %s but the user doesn't exist" % id) 
+		return
+	
+	if user.authenticated:
+		GDTUtils.printerr_stack("Got join data, but %s is already authenticated" % id)
+		return
+	
+	var data = GDTJoinData.from_dict(data_dict)
+	
+	if not data:
+		GDTUtils.printerr_stack("Invalid join data from %s" % id)
+		user.kick(GDTUser.DisconnectReason.INVALID)
+		return
+	
+	var server_password = main.get_settings().get_setting("server/password")
+	var rpc_checksum = main.get_global_rpc_checksum()
+	
+	if data.password != server_password:
+		print("Invalid password for user %d" % id)
+		user.kick(GDTUser.DisconnectReason.PASSWORD_INVALID)
+		return
+
+	if data.protocol_version != GodotTogether.PROTOCOL_VERSION:
+		print("protocol version mismatch %s != %s" % [GodotTogether.PROTOCOL_VERSION, data.protocol_version])
+	
+	if data.protocol_version < GodotTogether.PROTOCOL_VERSION:
+		user.kick(GDTUser.DisconnectReason.CLIENT_OUTDATED)
+		return
+	
+	if data.protocol_version > GodotTogether.PROTOCOL_VERSION:
+		user.kick(GDTUser.DisconnectReason.SERVER_OUTDATED)
+		return
+	
+	if rpc_checksum != data.rpc_checksum:
+		printerr("RPC checksum mismatch. %s != %s" % [data.rpc_checksum, rpc_checksum])
+		user.kick(GDTUser.DisconnectReason.RPC_CHECKSUM_MISMATCH)
+		return
+	
+	user.name = data.username
+	
+	if main.get_settings().get_setting("server/require_approval"):
+		user.pending = true
+		main.dual._user_pending(user)
+		
+		var ip = user.get_address()
+		main.toaster.push_toast("User %s (%s) wants to join. Check Pending Users tab." % [user.name, ip])
+		return
+	
+	user.auth()
+
+@rpc("any_peer", "call_remote", "reliable")
+func _c2s_file_request(path: String) -> void:
+	var id = multiplayer.get_remote_sender_id()
+	var user = main.dual.get_user_by_id(id)
+
+	if not validate_c2s():
+		return
+	
+	if not user: return
+	if not user.authenticated: return
+	
+	if not GDTValidator.is_path_safe(path):
+		GDTUtils.printerr_stack(
+			"User %s (%s) tried to request file at unsafe path: %s" %
+			[user.name, user.id, path]
+		)
+		return
+	
+	if not FileAccess.file_exists(path):
+		return
+	
+	GDTFileSync.read_chunks_callback(path, func(buf: PackedByteArray, cursor: int):
+		main.client.receive_file.rpc_id(
+			id, 
+			path, 
+			buf, 
+			cursor, 
+			cursor == 0
+		)
+	)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func broadcast_restart():
+	if not main.get_settings().get_setting("dev/restart_broadcast"):
+		return
+
+	for user in main.dual.users:
+		main.dual.restart.rpc_id(user.id)
+	
+	await get_tree().create_timer(0.5).timeout
+	
+	main.dual.restart()
+
+func auth_rpc(fn: Callable, args: Array, exclude_ids: Array[int] = []) -> void:
+	for i in get_authenticated_ids(false):
+		if not i in exclude_ids:
+			fn.rpc_id.callv([i] + args)
+
+func is_active() -> bool:
+	return server_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED
+
+static func is_local(ip: String) -> bool:
+	if ip in LOCALHOST: return true
+	
+	var split = ip.split(".")
+	if split.size() != 4:
+		push_error(ip + " doesn't seem to be a valid IP address: size not equal to 4. Assuming this is not a local address.")
+		return false
+	
+	var a = int(split[0])
+	var b = int(split[1])
+	#var c = int(split[2])
+	#var d = int(split[3])
+	
+	if a == 127: return true
+	if a == 172 and b >= 16 and b <= 31: return true
+	if a == 192 and b == 168: return true
+	
+	return false
+
+func get_pending_users() -> Array[GDTUser]:
+	var res: Array[GDTUser] = []
+	
+	for i in main.dual.users:
+		if i.pending and (not i.peer or i.is_peer_connected()):
+			res.append(i)
+	
+	return res

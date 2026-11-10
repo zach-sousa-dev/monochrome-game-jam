@@ -1,0 +1,102 @@
+@tool
+extends PopupPanel
+class_name GDTMenuWindow
+
+var main: GodotTogether
+var gui: GodotTogetherGUI
+
+var triggered_reflows := 0
+
+func _ready() -> void:
+	await get_tree().physics_frame
+	
+	if main:
+		var version = main.get_plugin_version()
+		
+		if version != "unreleased":
+			title = "GodotTogether v. %s" % version
+		
+		$about/main/scroll/vbox/version.text = "Version: %s" % version
+
+	if gui.visuals_available():
+		var settings = main.get_settings()
+		var error_gui: GDTSettingsErrorGUI = get_settings_error_gui()
+		var settings_gui: GDTSettingsGUI = get_settings_gui()
+		var menu = get_menu()
+		
+		get_error_gui().visible = false
+		settings_gui.visible = false
+		
+		if not GDTSettings.settings_exist() or (not settings.has_error()):
+			error_gui.visible = false
+			
+			var seen_disclaimer = settings.get_setting("seen/disclaimer")
+			menu.visible = seen_disclaimer
+			get_disclaimer().visible = not seen_disclaimer
+			
+			settings_gui.gui = gui as GodotTogetherGUI
+		else:
+			menu.visible = false
+			error_gui.gui = gui
+			error_gui.update()
+			error_gui.visible = true
+
+func checked_reflow() -> void:
+	if triggered_reflows < 3:
+		reflow()
+
+# Sometimes using expanding controls causes the UI to overflow
+# Resizing the window fixes that
+func reflow() -> void:
+	triggered_reflows += 1
+	
+	await get_tree().process_frame
+	await get_tree().process_frame
+	
+	position += Vector2i(1, 1)
+	size += Vector2i(1, 1)
+
+func hide_all_guis() -> void:
+	for i in get_children():
+		if i is Control:
+			i.visible = false
+
+func set_error_of_death(error_title: String, error_description: String) -> void:
+	triggered_reflows = 0
+	
+	if not is_node_ready():
+		await ready
+	
+	await get_tree().process_frame
+	hide_all_guis()
+	
+	await get_tree().process_frame
+	hide_all_guis()
+	
+	$error.show()
+	$error/header.text = error_title
+	$error/description.text = error_description
+
+func get_settings_gui() -> GDTSettingsGUI:
+	return $settings
+
+func get_menu() -> GDTMenu:
+	return $main
+
+func get_disclaimer() -> GDTDisclaimer:
+	return $disclaimer
+
+func get_settings_error_gui() -> GDTSettingsErrorGUI:
+	return $settingsError
+
+func get_error_gui() -> Control:
+	return $error
+
+func _on_btn_restart_pressed() -> void:
+	main.restart()
+
+func _on_btn_restart_godot_pressed() -> void:
+	EditorInterface.restart_editor()
+
+func _on_settings_settings_changed() -> void:
+	$main/topBar/devMenu.visible = main.get_settings().get_setting("dev/menu_button")

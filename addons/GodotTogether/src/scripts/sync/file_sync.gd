@@ -1,0 +1,456 @@
+@tool
+extends GDTComponent
+class_name GDTFileSync
+
+signal scan_started
+signal scan_complete
+signal received_file(path: String, size: int, position: int)
+
+const CHUNK_SIZE = 1024 * 100 # 100 kB
+const MAX_SCRIPT_SIZE = 1024 * 1024 * 3 # 3 MB
+
+var scan_timer = Timer.new()
+var file_mod_times := {}
+
+var total_received_bytes: int = 0
+var last_received_file: String = ""
+
+func _ready() -> void:
+	update_timer_wait_times()
+	main.get_settings().settings_changed.connect(update_timer_wait_times)
+	
+	scan_timer.timeout.connect(scan_files)
+	add_child(scan_timer)
+	scan_timer.start()
+	
+	EditorInterface.get_resource_filesystem().filesystem_changed.connect(scan_files)
+	main.get_gui().external_file_change_dialog.got_external_changes.connect(_gd_got_external_changes)
+	
+	ignore_last_changes()
+	report_ready()
+
+func update_timer_wait_times() -> void:
+	scan_timer.wait_time = main.get_settings().get_setting("sync/file_refresh_rate")
+
+func ignore_last_changes() -> void:
+	file_mod_times = GDTFiles.get_file_modification_times()
+
+func reset() -> void:
+	total_received_bytes = 0
+	last_received_file = ""
+
+func update_file(path: String) -> void:
+	if not FileAccess.file_exists(path):
+		file_mod_times.erase(path)
+		return
+	
+	file_mod_times[path] = FileAccess.get_modified_time(path)
+
+func pause() -> void:
+	scan_timer.paused = true
+	
+func resume() -> void:
+	ignore_last_changes()
+	scan_timer.paused = false
+
+func scan_files() -> void:
+	if not can_sync_files(): return
+	
+	if main.get_settings().get_setting("dev/log_file_scans"):
+		print("Scanning files...")
+	
+	scan_started.emit()
+	
+	var new_times = GDTFiles.get_file_modification_times()
+	
+	for path in new_times:
+		# (New file) or (File changed)
+		if (not path in file_mod_times) or (file_mod_times[path] < new_times[path]):
+			_file_changed(path)
+	
+	for path in file_mod_times:
+		if not path in new_times:
+			_file_removed(path)
+	
+	file_mod_times = new_times
+	scan_complete.emit()
+
+func can_sync_files() -> bool:
+	return (
+		main != null and
+		not scan_timer.paused and 
+		(
+			(main.client.is_active() and main.client.is_fully_synced)
+			or
+			main.server.is_active()
+		) and
+		not main.get_settings().get_setting("dev/disable_real_time_file_sync")
+	)
+
+func is_change_logging_enabled() -> bool:
+	return (
+		main and main.get_settings() and
+		main.get_settings().get_setting("dev/log_file_changes")
+	)
+
+func is_file_net_logging_enabled() -> bool:
+	return main.settings.get_setting("dev/log_file_net")
+
+func _gd_got_external_changes(_paths: Array) -> void:
+	if not main: return
+	
+	var settings = main.get_settings()
+	if not settings: return
+	
+	if not main.is_session_active() and not settings.get_setting("dev/allow_file_reload_outside_sessions"):
+		return
+	
+	if not settings.get_setting("files/auto_reload_files"):
+		return
+	
+	main.get_gui().external_file_change_dialog.reload()
+
+func _file_changed(path: String) -> void:
+	if is_change_logging_enabled():
+		print("File changed: %s" % path)
+	
+	if main.client.is_active():
+		client_send_file_to_server(path)
+	
+	elif main.server.is_active():
+		server_broadcast_file_at_path(path)
+
+func _file_removed(path: String) -> void:
+	if is_change_logging_enabled():
+		print("File removed: %s" % path)
+	
+	if main.client.is_active():
+		_c2s_request_file_delete.rpc_id(1, path)
+
+	elif main.server.is_active():
+		server_broadcast_file_delete(path)
+
+func download_project_files(server_info: GDTServerAuthResponse) -> void:
+	var tree = get_tree()
+	var paths = server_info.get_files_to_download()
+	
+	if is_file_net_logging_enabled():
+		print("Requesting download of %s files" % paths.size())
+	
+	var download_size = server_info.get_project_download_size()
+	
+	for i in paths.size():
+		if not main.is_session_active():
+			return
+		
+		var path = paths[i]
+		var file_size = server_info.get_file_size(path)
+		var current_downloaded_bytes = total_received_bytes
+		
+		client_request_file(path)
+		
+		while (
+			main and main.is_session_active() and
+			total_received_bytes - current_downloaded_bytes < file_size and
+			total_received_bytes < download_size
+		):
+			await tree.process_frame
+		
+		if i % 16 == 0:
+			await tree.create_timer(0.05).timeout
+
+static func read_chunks_callback(
+	path: String, 
+	fn: Callable, 
+	chunk_size := CHUNK_SIZE
+) -> void:
+	var file = FileAccess.open(path, FileAccess.READ)
+	
+	if not file:
+		GDTUtils.printerr_stack(
+			"Unable to open file: '%s': %s" % 
+			[path, error_string(FileAccess.get_open_error())]
+		)
+		return
+	
+	var current_pos = 0
+	
+	while true:
+		var buf = file.get_buffer(chunk_size)
+		var size = buf.size()
+		
+		if size <= 0:
+			break
+		
+		var res = await fn.call(buf, current_pos)
+		current_pos += size
+		
+		if res == false: # Must be explicit == false
+			break
+	
+	file.close()
+
+@rpc("authority", "reliable")
+func write_file(
+	path: String, 
+	buffer: PackedByteArray,
+	offset: int = 0,
+	truncate := true
+) -> void:
+	var buf_size = buffer.size()
+	
+	if buf_size > CHUNK_SIZE:
+		GDTUtils.printerr_stack("Buffer is greater than chunk size. This will cause problems")
+	
+	if offset < 0:
+		GDTUtils.printerr_stack("File offset cannot be negative")
+		return
+	
+	if offset != 0 and truncate:
+		GDTUtils.printerr_stack(
+			"Offset only supported with truncate off. Offset: %s Truncate: %s Path: %s" %
+			[offset, truncate, path]
+		)
+		
+		return
+	
+	if not GDTValidator.is_path_safe(path):
+		printerr("Server tried to write at unsafe location: %s" % path)
+		return
+	
+	if is_file_net_logging_enabled():
+		print("Received file %s pos: %s len: %s" % [path, offset, buf_size])
+	
+	GDTFiles.ensure_dir_exists(path)
+	
+	if path.get_extension() == "gd":
+		if offset > MAX_SCRIPT_SIZE or buf_size > MAX_SCRIPT_SIZE:
+			GDTUtils.printerr_stack("File %s exceeds the maximum script size" % path)
+			return
+		
+		if offset != 0:
+			var f = FileAccess.open(path, FileAccess.READ)
+			
+			if not f:
+				GDTUtils.printerr_stack(
+					"Unable to read %s for chunk sanitization: %s" % 
+					[path, error_string(FileAccess.get_open_error())]
+				)
+				
+				return
+			
+			var pre_buffer = f.get_buffer(offset)
+			var post_buffer = buffer.duplicate()
+			
+			buffer = []
+			buffer.append_array(pre_buffer)
+			buffer.append_array(post_buffer)
+			
+			truncate = true
+			offset = 0
+		
+		buffer = main.script_security.sanitize_buffer(buffer)
+	
+	var mode = FileAccess.WRITE
+	
+	if not truncate:
+		mode = FileAccess.READ_WRITE
+	
+	received_file.emit(path, buf_size, offset)
+	total_received_bytes += buf_size
+	last_received_file = path
+	
+	var file = FileAccess.open(path, mode)
+	var err = FileAccess.get_open_error()
+
+	if err != OK:
+		GDTUtils.printerr_stack(
+			"Failed to open %s: %s\nOffset: %s Truncate: %s" % 
+			[path, error_string(err), offset, truncate]
+		)
+		return
+	
+	if offset != 0:
+		var file_len = file.get_length()
+		
+		if file_len < offset:
+			GDTUtils.printerr_stack("Offset (%s) greater than file length (%s): %s" % [offset, file_len, path])
+			file.close()
+			return
+		
+		file.seek(offset)
+	
+	pause()
+	
+	file.store_buffer(buffer)
+	file.close()
+	
+	resume.call_deferred()
+	
+	if path.get_extension() == "gd":
+		EditorInterface.get_script_editor().reload_open_files.call_deferred()
+		main.script_security.check_for_tool_script(path, buffer)
+	else:
+		EditorInterface.get_resource_filesystem().scan.call_deferred()
+
+@rpc("authority", "reliable")
+func delete_file(path: String) -> void:
+	if not GDTValidator.is_path_safe(path):
+		printerr("Server tried to delete file at unsafe location: %s" % path)
+		return
+	
+	var dir = DirAccess.open("res://")
+	
+	if not dir:
+		printerr("Unable to acces project directory for file removal")
+		return
+		
+	var err = dir.remove(path)
+	
+	if err != OK:
+		printerr("Error code %s removing file %s" % [err, path])
+		return
+	
+	update_file(path)
+
+func server_broadcast_file_write(
+	path: String, 
+	buffer: PackedByteArray, 
+	offset: int = 0,
+	truncate := true,
+	sender := 0
+) -> void:
+	main.server.auth_rpc(write_file, [path, buffer, offset, truncate], [sender])
+
+func server_broadcast_file_at_path(path: String, sender := 0) -> void:
+	read_chunks_callback(path, func(buf: PackedByteArray, i: int):
+		server_broadcast_file_write(
+			path, 
+			buf, 
+			i,
+			i == 0,
+			sender
+		)
+	)
+
+func server_broadcast_file_delete(path: String, sender := 0) -> void:
+	main.server.auth_rpc(delete_file, [path], [sender])
+
+func server_send_file(peer_id: int, path: String) -> void:
+	var data = {"i": 0}
+	var tree = get_tree()
+	
+	read_chunks_callback(path, func(buf: PackedByteArray, cursor: int):
+		if not main.server.is_active():
+			return false
+		
+		var user = main.dual.get_user_by_id(peer_id)
+		
+		if not user: return false
+		if not user.authenticated: return false
+		if not user.is_peer_connected(): return false
+		
+		if is_file_net_logging_enabled():
+			print("Sending chunk to client: %s %s pos: %s" % [peer_id, path, cursor])
+		
+		write_file.rpc_id(
+			peer_id, 
+			path, 
+			buf, 
+			cursor, 
+			cursor == 0
+		)
+		
+		if data.i % 16 == 0:
+			await tree.create_timer(0.5).timeout
+		
+		if data.i % 64 == 0:
+			await tree.create_timer(1).timeout
+		
+		data.i += 1
+	)
+
+func client_send_file_to_server(path: String) -> void:
+	read_chunks_callback(path, func(buf: PackedByteArray, i: int):
+		_c2s_request_file_write.rpc_id(
+			1, 
+			path, 
+			buf, 
+			i, 
+			i == 0
+		)
+	)
+	
+func client_request_file(path: String) -> void:
+	if is_file_net_logging_enabled():
+		print("Requesting file from server: %s" % path)
+	
+	_c2s_request_file.rpc_id(1, path)
+
+@rpc("any_peer", "call_remote", "reliable")
+func _c2s_request_file(path: String) -> void:
+	var id = multiplayer.get_remote_sender_id()
+	var user = main.dual.get_user_by_id(id)
+
+	if not main.server.validate_c2s():
+		return
+	
+	if not user:
+		GDTUtils.printerr_stack("Got file request from peer without user: %s" % id) 
+		return
+	
+	if not user.authenticated: 
+		GDTUtils.printerr_stack("File request from unauthenticated user: %s (%s)" % [user.name, id])
+		return
+	
+	if not GDTValidator.is_path_safe(path):
+		GDTUtils.printerr_stack(
+			"User %s (%s) tried to request file at unsafe path: %s" %
+			[user.name, id, path]
+		)
+		return
+	
+	if not FileAccess.file_exists(path):
+		return
+	
+	server_send_file(id, path)
+
+@rpc("any_peer", "reliable")
+func _c2s_request_file_write(
+	path: String, 
+	buffer: PackedByteArray, 
+	offset: int = 0,
+	truncate := true
+) -> void:
+	if not main.server.is_active(): return
+	
+	var id = multiplayer.get_remote_sender_id()
+	
+	if not main.server.caller_has_permission(GodotTogether.Permission.MODIFY_CUSTOM_FILES):
+		return
+	
+	if not GDTValidator.is_path_safe(path): 
+		printerr("User %s tried to write file at unsafe location: %s" % [id, path])
+		return
+	
+	if is_file_net_logging_enabled():
+		print("Got file from client: %s %s pos: %s len: %s" % [id, path, offset, buffer.size()])
+	
+	write_file(path, buffer, offset, true)
+	server_broadcast_file_write(path, buffer, offset, truncate, id)
+
+@rpc("any_peer", "reliable")
+func _c2s_request_file_delete(path: String) -> void:
+	if not main.server.is_active(): return
+	
+	var id = multiplayer.get_remote_sender_id()
+	
+	if not main.server.caller_has_permission(GodotTogether.Permission.MODIFY_CUSTOM_FILES):
+		return
+	
+	if not GDTValidator.is_path_safe(path): 
+		printerr("User %s tried to delete file at unsafe location: %s" % [id, path])
+		return
+	
+	delete_file(path)
+	server_broadcast_file_delete(path, id)

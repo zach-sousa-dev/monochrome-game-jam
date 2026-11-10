@@ -1,0 +1,353 @@
+[gd_scene format=3 uid="uid://dmv34kynftxx5"]
+
+[ext_resource type="Script" uid="uid://c5i5er1t8sb34" path="res://addons/GodotTogether/src/scenes/GUI/settings/settings_gui.gd" id="1_b5wo4"]
+[ext_resource type="Texture2D" uid="uid://ca0d07y80h41v" path="res://addons/GodotTogether/src/img/play.svg" id="2_847fc"]
+[ext_resource type="Texture2D" uid="uid://doipv6fg6us5n" path="res://addons/GodotTogether/src/img/tools.svg" id="3_33enj"]
+[ext_resource type="Texture2D" uid="uid://dqcpfgtyhqwwq" path="res://addons/GodotTogether/src/img/reload.svg" id="4_r5h7c"]
+[ext_resource type="Texture2D" uid="uid://byk4whu37edh8" path="res://addons/GodotTogether/src/img/extLink.svg" id="5_8ebed"]
+[ext_resource type="Texture2D" uid="uid://b7n2dtrqvhajk" path="res://addons/GodotTogether/src/img/x.svg" id="6_8so7w"]
+
+[node name="settings" type="PopupPanel" unique_id=1835564117]
+oversampling_override = 1.0
+title = "GodotTogether - settings"
+initial_position = 4
+size = Vector2i(800, 700)
+visible = true
+unresizable = false
+borderless = false
+script = ExtResource("1_b5wo4")
+
+[node name="main" type="VBoxContainer" parent="." unique_id=1100841752]
+offset_left = 25.0
+offset_top = 25.0
+offset_right = 775.0
+offset_bottom = 675.0
+
+[node name="scroll" type="ScrollContainer" parent="main" unique_id=1872551780]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="vbox" type="VBoxContainer" parent="main/scroll" unique_id=2043902136]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HSeparator" type="HSeparator" parent="main/scroll/vbox" unique_id=1352497342]
+layout_mode = 2
+
+[node name="lblGeneral" type="Label" parent="main/scroll/vbox" unique_id=1349616593]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "General"
+
+[node name="userNotif" type="CheckButton" parent="main/scroll/vbox" unique_id=1881905859]
+layout_mode = 2
+tooltip_text = "Show a notification when a user leaves or joins the session."
+button_pressed = true
+text = "User join/leave notifications"
+metadata/setting = "notifications/users"
+
+[node name="selUserDock" type="CheckButton" parent="main/scroll/vbox" unique_id=731431506]
+layout_mode = 2
+button_pressed = true
+text = "Go to inspector when a node is selected while in user dock"
+metadata/setting = "ui/show_inspector_on_select_while_in_user_dock"
+
+[node name="fileReload" type="CheckButton" parent="main/scroll/vbox" unique_id=1351632974]
+layout_mode = 2
+tooltip_text = "Automatically reload files (including project settings and scenes) upon change.
+Turn this off if you experience Godot freezing or crashing."
+button_pressed = true
+text = "Auto reload files, skipping Godot's the external changes dialog"
+metadata/setting = "files/auto_reload_files"
+
+[node name="HSeparator6" type="HSeparator" parent="main/scroll/vbox" unique_id=1690028581]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="lblPerformance" type="Label" parent="main/scroll/vbox" unique_id=1129346244]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "Performance"
+
+[node name="noUnfocusedScan" type="CheckButton" parent="main/scroll/vbox" unique_id=671651738]
+layout_mode = 2
+tooltip_text = "Pause scanning nodes for changes when the Godot window is unfocused."
+button_pressed = true
+text = "Pause node scanning when unfocused"
+metadata/setting = "sync/node_scan_pause_unfocused"
+
+[node name="adaptiveNodeScan" type="CheckButton" parent="main/scroll/vbox" unique_id=497487816]
+layout_mode = 2
+tooltip_text = "Dynamically adjust the interval based on the amount of changes to reduce CPU usage.
+Disable this if you experience changes replicating slowly."
+button_pressed = true
+text = "Adaptive node scan interval"
+metadata/setting = "sync/node_adaptive_scan_interval"
+
+[node name="nodeScanMode" type="HBoxContainer" parent="main/scroll/vbox" unique_id=442367942]
+layout_mode = 2
+
+[node name="label" type="Label" parent="main/scroll/vbox/nodeScanMode" unique_id=425634599]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Node scan mode"
+
+[node name="value" type="OptionButton" parent="main/scroll/vbox/nodeScanMode" unique_id=489959020]
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 0
+item_count = 2
+popup/item_0/text = "Continuous"
+popup/item_0/id = 0
+popup/item_1/text = "On change (performance)"
+popup/item_1/id = 1
+metadata/setting = "sync/node_scan_mode"
+
+[node name="nodeScanInterval" type="HBoxContainer" parent="main/scroll/vbox" unique_id=641348456]
+layout_mode = 2
+
+[node name="label" type="Label" parent="main/scroll/vbox/nodeScanInterval" unique_id=751089060]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Node scan interval"
+
+[node name="value" type="SpinBox" parent="main/scroll/vbox/nodeScanInterval" unique_id=169913795]
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "How often to check for node changes (in seconds). Lower = faster syncing, higher = better performance on complex scenes. Default: 0.025"
+min_value = 0.01
+max_value = 5.0
+step = 0.001
+value = 0.01
+metadata/setting = "sync/node_refresh_rate"
+
+[node name="fileScanInterval" type="HBoxContainer" parent="main/scroll/vbox" unique_id=1794905470]
+layout_mode = 2
+tooltip_text = "How often to check for node changes (in seconds). Lower = faster syncing, higher = better performance on complex scenes. Default: 0.1"
+
+[node name="label" type="Label" parent="main/scroll/vbox/fileScanInterval" unique_id=541592061]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "File scan interval"
+
+[node name="value" type="SpinBox" parent="main/scroll/vbox/fileScanInterval" unique_id=1580941394]
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "How often to check for file changes (in seconds). Lower = faster syncing, higher = better performance.
+Default: 1
+"
+min_value = 0.01
+max_value = 30.0
+step = 0.01
+value = 1.0
+metadata/setting = "sync/file_refresh_rate"
+
+[node name="HSeparator2" type="HSeparator" parent="main/scroll/vbox" unique_id=868740692]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="lblSecurity" type="Label" parent="main/scroll/vbox" unique_id=963114312]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "Security"
+
+[node name="sanitizeToolScripts" type="CheckButton" parent="main/scroll/vbox" unique_id=1755650218]
+layout_mode = 2
+tooltip_text = "Removes the @tool annotation from scripts, preventing them from running in your editor.
+Disabling this setting makes you vulnerable to remote execution without even running the game!"
+button_pressed = true
+text = "Turn tool scripts into regular scripts"
+icon_alignment = 2
+expand_icon = true
+metadata/setting = "security/sanitize_tool_scripts"
+metadata/warn_when = false
+
+[node name="HSeparator3" type="HSeparator" parent="main/scroll/vbox" unique_id=1857855180]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="lblUpdate" type="Label" parent="main/scroll/vbox" unique_id=249030983]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "Updates"
+
+[node name="autoCheckUpdates" type="CheckButton" parent="main/scroll/vbox" unique_id=1131273041]
+layout_mode = 2
+tooltip_text = "Should the plugin automatically check for updates."
+button_pressed = true
+text = "Automatically check for updates"
+metadata/setting = "update/auto_check_enabled"
+
+[node name="updateCheckInterval" type="HBoxContainer" parent="main/scroll/vbox" unique_id=1248529237]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="main/scroll/vbox/updateCheckInterval" unique_id=402855329]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Check interval"
+
+[node name="value" type="OptionButton" parent="main/scroll/vbox/updateCheckInterval" unique_id=1476942475]
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 4
+item_count = 5
+popup/item_0/text = "On every launch"
+popup/item_0/id = 0
+popup/item_1/text = "Daily"
+popup/item_1/id = 12
+popup/item_2/text = "3 days"
+popup/item_2/id = 72
+popup/item_3/text = "Weekly"
+popup/item_3/id = 168
+popup/item_4/text = "Monthly (30 days)"
+popup/item_4/id = 720
+metadata/setting = "update/check_interval_hours"
+metadata/enabled_by_node = NodePath("../../autoCheckUpdates")
+
+[node name="updateCheckTimeHbox" type="HBoxContainer" parent="main/scroll/vbox" unique_id=1139326799]
+layout_mode = 2
+
+[node name="lblLastCheck" type="Label" parent="main/scroll/vbox/updateCheckTimeHbox" unique_id=359876519]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Last check: error"
+metadata/setting = "update/last_check"
+metadata/format = "Last check: <date>"
+
+[node name="btnCheckUpdateNow" type="Button" parent="main/scroll/vbox/updateCheckTimeHbox" unique_id=1428251515]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Check for updates now"
+icon = ExtResource("2_847fc")
+
+[node name="lblUpdateDisclaimer" type="Label" parent="main/scroll/vbox" unique_id=814006868]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "GodotTogether will never install anything without your approval."
+vertical_alignment = 2
+
+[node name="HSeparator5" type="HSeparator" parent="main/scroll/vbox" unique_id=1492413944]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="lblDev" type="Label" parent="main/scroll/vbox" unique_id=1573509755]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "Developer"
+
+[node name="unitTests" type="CheckButton" parent="main/scroll/vbox" unique_id=951601083]
+layout_mode = 2
+tooltip_text = "Tests internal plugin's features on start and prints the results in the console"
+text = "Run unit tests on start"
+metadata/setting = "dev/run_tests_on_start"
+
+[node name="devMenuButton" type="CheckButton" parent="main/scroll/vbox" unique_id=198184511]
+layout_mode = 2
+tooltip_text = "Show developer menu button next to the settings button"
+text = "Show dev menu button on top"
+metadata/setting = "dev/menu_button"
+
+[node name="devActions" type="HBoxContainer" parent="main/scroll/vbox" unique_id=559797859]
+layout_mode = 2
+tooltip_text = "Do not use when using the plugin normally. This is meant for easier development. 
+Enable sending and receiving a restart signal that restarts the plugin for everyone in the server with this setting enabled.
+"
+
+[node name="btnRunTests" type="Button" parent="main/scroll/vbox/devActions" unique_id=1196763569]
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Run internal logic tests.
+You will see results in the output console.
+
+Always use this if you're contributing to the plugin."
+text = "Run unit tests now"
+icon = ExtResource("2_847fc")
+flat = true
+
+[node name="btnDevMenu" type="Button" parent="main/scroll/vbox/devActions" unique_id=17930845]
+layout_mode = 2
+size_flags_horizontal = 4
+tooltip_text = "Open developer menu with advanced settings and other features for developers."
+text = "Open dev menu"
+icon = ExtResource("3_33enj")
+flat = true
+
+[node name="HSeparator4" type="HSeparator" parent="main/scroll/vbox" unique_id=1013103455]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="lblActions" type="Label" parent="main/scroll/vbox" unique_id=2106971306]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "Actions"
+
+[node name="btnReload" type="Button" parent="main/scroll/vbox" unique_id=346251827]
+layout_mode = 2
+text = "Reload settings"
+icon = ExtResource("4_r5h7c")
+
+[node name="actions" type="GridContainer" parent="main/scroll/vbox" unique_id=1099110496]
+layout_mode = 2
+columns = 2
+
+[node name="reset" type="Button" parent="main/scroll/vbox/actions" unique_id=1504373122]
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Reset all settings."
+text = "Factory reset"
+icon = ExtResource("4_r5h7c")
+
+[node name="showFile" type="Button" parent="main/scroll/vbox/actions" unique_id=838231293]
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Show where the settings.json file is."
+text = "Show settings file"
+icon = ExtResource("5_8ebed")
+
+[node name="shutdown" type="Button" parent="main/scroll/vbox/actions" unique_id=644066193]
+layout_mode = 2
+tooltip_text = "Shut down and disable the plugin. You'll have to reenable it manually."
+text = "Shutdown plugin"
+icon = ExtResource("6_8so7w")
+
+[node name="restart" type="Button" parent="main/scroll/vbox/actions" unique_id=1556368600]
+layout_mode = 2
+tooltip_text = "Shut down and restart the plugin. Useful for development."
+text = "Restart plugin"
+icon = ExtResource("4_r5h7c")
+
+[node name="sandwichSpace" type="Control" parent="main/scroll/vbox" unique_id=1957905972]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="sandwichTitle" type="Label" parent="main/scroll/vbox" unique_id=1778509890]
+layout_mode = 2
+text = "Your sandwich is ready 🥪"
+horizontal_alignment = 1
+
+[node name="sandwichBtn" type="Button" parent="main/scroll/vbox" unique_id=1655330918]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "Sandwich 🥪"
+
+[node name="Label" type="Label" parent="main" unique_id=2096724086]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Hover over a setting to see what it does."
+
+[node name="close" type="Button" parent="main" unique_id=1338306759]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Close"
+icon = ExtResource("6_8so7w")
+
+[connection signal="pressed" from="main/scroll/vbox/updateCheckTimeHbox/btnCheckUpdateNow" to="." method="_on_btn_check_update_now_pressed"]
+[connection signal="pressed" from="main/scroll/vbox/btnReload" to="." method="_on_btn_reload_pressed"]
+[connection signal="pressed" from="main/scroll/vbox/actions/reset" to="." method="_on_reset_pressed"]
+[connection signal="pressed" from="main/scroll/vbox/actions/showFile" to="." method="_on_show_file_pressed"]
+[connection signal="pressed" from="main/scroll/vbox/actions/shutdown" to="." method="_on_shutdown_pressed"]
+[connection signal="pressed" from="main/scroll/vbox/actions/restart" to="." method="_on_restart_pressed"]
+[connection signal="pressed" from="main/scroll/vbox/sandwichBtn" to="." method="_on_sandwich_btn_pressed"]
+[connection signal="pressed" from="main/close" to="." method="hide"]
