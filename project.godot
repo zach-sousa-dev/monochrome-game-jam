@@ -11,13 +11,15 @@ config_version=5
 [application]
 
 config/name="monochrome"
+run/main_scene="uid://dd4d7wdo1184u"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [display]
 
+window/size/viewport_width=640
+window/size/viewport_height=360
 window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
 
 [editor_plugins]
 
