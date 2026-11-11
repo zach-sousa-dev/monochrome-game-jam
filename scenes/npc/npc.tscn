@@ -21,6 +21,9 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q4mm8"]
 size = Vector2(32, 29)
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_dpyoa"]
+light_mode = 1
+
 [sub_resource type="LabelSettings" id="LabelSettings_dpyoa"]
 font_size = 10
 
@@ -46,13 +49,12 @@ offset_top = -27.0
 offset_right = 58.0
 offset_bottom = -13.0
 
-[node name="CanvasLayer" type="CanvasLayer" parent="Control" unique_id=1692192767]
-
-[node name="Label" type="Label" parent="Control/CanvasLayer" unique_id=2034346182]
-offset_left = -55.0
-offset_top = -27.0
-offset_right = 55.0
-offset_bottom = -13.0
+[node name="Label" type="Label" parent="Control" unique_id=2034346182]
+material = SubResource("CanvasItemMaterial_dpyoa")
+layout_mode = 0
+offset_left = 3.0
+offset_right = 113.0
+offset_bottom = 14.0
 text = "[E] Talk"
 label_settings = SubResource("LabelSettings_dpyoa")
 horizontal_alignment = 1

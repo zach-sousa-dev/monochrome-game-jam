@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://gao4s5yay046"]
+
+[node name="DialogBox" type="Control" unique_id=1060565242]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=565916103]
+layout_mode = 0
+offset_top = 224.0
+offset_right = 640.0
+offset_bottom = 360.0
+
+[node name="RichTextLabel" type="RichTextLabel" parent="PanelContainer" unique_id=1918968700]
+layout_mode = 2
+text = "Ah, fella, don't hate me 'cause I'm beautiful, fella
+Maybe if you got rid of that old yee-yee ass haircut you got you'd get some bitches on your dick
+Oh, better yet, maybe Tanisha'll call your dog-ass if she ever stop fuckin' with that brain surgeon or lawyer she fucking with
+Fella..."
+fit_content = true
+scroll_active = false
