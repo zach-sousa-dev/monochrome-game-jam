@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://dd4d7wdo1184u" path="res://scenes/player/player.tscn" id="1_ia4q5"]
 [ext_resource type="Texture2D" uid="uid://cpi7kaxfadgg2" path="res://assets/sprites/player/placeholder/vignette.png" id="2_ocyxy"]
+[ext_resource type="PackedScene" uid="uid://di5cl76maifjy" path="res://scenes/npc/npc.tscn" id="3_qlt7d"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_qlt7d"]
 
@@ -45,6 +46,11 @@ color = Color(0, 0, 0, 1)
 position = Vector2(1, 0)
 scale = Vector2(2.0234375, 1.4355469)
 texture = SubResource("NoiseTexture2D_ocyxy")
+
+[node name="Npc" parent="." unique_id=1249647520 instance=ExtResource("3_qlt7d")]
+position = Vector2(196, 80)
+player_group = "player"
+label_text = "Hi. I am Eli!!!"
 
 [node name="Environment" type="Node2D" parent="." unique_id=1869862551]
 
