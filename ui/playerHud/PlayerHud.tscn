@@ -1,0 +1,91 @@
+[gd_scene format=3 uid="uid://dnot073ibmb2j"]
+
+[ext_resource type="Texture2D" uid="uid://byxsnjvpuaxuj" path="res://assets/ui_assets/Lighter.png" id="1_4qq7d"]
+[ext_resource type="Script" uid="uid://cosxf3q14hdu6" path="res://ui/playerHud/player_hud.gd" id="1_i11o4"]
+[ext_resource type="Texture2D" uid="uid://kee6vj1kpctn" path="res://assets/ui_assets/laturnExample.png" id="2_i11o4"]
+[ext_resource type="Shader" uid="uid://c1pblfgw3u4bw" path="res://shaders/fuel_fill.gdshader" id="3_uwl7a"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uwl7a"]
+shader = ExtResource("3_uwl7a")
+shader_parameter/progress = 1.0
+shader_parameter/fill_from_bottom = true
+shader_parameter/edge_softness = 0.01
+shader_parameter/empty_brightness = 0.6
+
+[node name="PlayerHud" type="CanvasLayer" unique_id=868017095]
+script = ExtResource("1_i11o4")
+
+[node name="Control" type="Control" parent="." unique_id=1963150982]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -180.0
+offset_right = 320.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ItemsBarContainer" type="HBoxContainer" parent="Control" unique_id=1712083530]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -69.25
+offset_top = 120.0
+offset_right = 69.25
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 9
+alignment = 1
+
+[node name="ItemPanel" type="Panel" parent="Control/ItemsBarContainer" unique_id=2044956887]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+
+[node name="ItemNumber" type="Label" parent="Control/ItemsBarContainer/ItemPanel" unique_id=1679104783]
+layout_mode = 0
+offset_left = 2.25
+offset_right = 8.25
+offset_bottom = 11.0
+theme_override_font_sizes/font_size = 7
+text = "1"
+
+[node name="TextureRect" type="TextureRect" parent="Control/ItemsBarContainer/ItemPanel" unique_id=1583939062]
+layout_mode = 0
+offset_top = 3.0
+offset_right = 40.0
+offset_bottom = 37.0
+texture = ExtResource("1_4qq7d")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ItemButton" type="Button" parent="Control/ItemsBarContainer/ItemPanel" unique_id=377778890]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="FualBarContainer" type="Control" parent="Control" unique_id=672650082]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 517.0
+offset_top = 213.0
+offset_right = 597.0
+offset_bottom = 333.0
+
+[node name="ItemTexture" type="TextureRect" parent="Control/FualBarContainer" unique_id=1496404403]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_uwl7a")
+layout_mode = 0
+offset_right = 80.0
+offset_bottom = 120.0
+texture = ExtResource("2_i11o4")
+expand_mode = 4
