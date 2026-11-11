@@ -3,10 +3,10 @@
 [ext_resource type="PackedScene" uid="uid://dd4d7wdo1184u" path="res://scenes/player/player.tscn" id="1_ia4q5"]
 [ext_resource type="Texture2D" uid="uid://cpi7kaxfadgg2" path="res://assets/sprites/player/placeholder/vignette.png" id="2_ocyxy"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_qlt7d"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ocyxy"]
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ocyxy"]
-noise = SubResource("FastNoiseLite_qlt7d")
+noise = SubResource("FastNoiseLite_ocyxy")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oiw2g"]
 size = Vector2(40, 16)

@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="monochrome"
-run/main_scene="uid://dywlmpj2bq55s"
+run/main_scene="uid://ly6sm5smerbw"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 

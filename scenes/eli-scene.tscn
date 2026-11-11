@@ -1,7 +1,14 @@
 [gd_scene format=3 uid="uid://ly6sm5smerbw"]
 
 [ext_resource type="PackedScene" uid="uid://dd4d7wdo1184u" path="res://scenes/player/player.tscn" id="1_d0ra6"]
+[ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://scenes/shaders/clamp.gdshader" id="1_gi8eg"]
 [ext_resource type="Texture2D" uid="uid://cpi7kaxfadgg2" path="res://assets/sprites/player/placeholder/vignette.png" id="2_gi8eg"]
+[ext_resource type="Texture2D" uid="uid://cq7mpq2o63f3b" path="res://assets/sprites/player/placeholder/eli.jpg" id="2_uiwrj"]
+[ext_resource type="Shader" uid="uid://1p3yx37wwnye" path="res://scenes/shaders/posterization.gdshader" id="4_5011q"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1ydht"]
+shader = ExtResource("1_gi8eg")
+shader_parameter/colour = Color(0, 0, 0, 1)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5011q"]
 size = Vector2(40, 16)
@@ -31,10 +38,24 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0.8521739, 0.17826086)
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7g6oh"]
+shader = ExtResource("1_gi8eg")
+shader_parameter/colour = Color(0, 1, 0.66666675, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5011q"]
+shader = ExtResource("4_5011q")
+shader_parameter/size = Vector2(32, 28)
+
 [node name="EliScene" type="Node2D" unique_id=1366947214]
+material = SubResource("ShaderMaterial_1ydht")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1015420312]
 color = Color(0, 0, 0, 1)
+
+[node name="Backdrop" type="Sprite2D" parent="." unique_id=107408518]
+position = Vector2(1, 0)
+scale = Vector2(2.0234375, 1.4355469)
+texture = ExtResource("2_uiwrj")
 
 [node name="Environment" type="Node2D" parent="." unique_id=357269498]
 
@@ -137,5 +158,36 @@ texture = ExtResource("2_gi8eg")
 
 [node name="PointLight2D" type="PointLight2D" parent="Player" unique_id=576487711]
 position = Vector2(-2, 1)
+color = Color(0.41000003, 1, 0.67550004, 1)
+energy = 2.0
 texture = SubResource("GradientTexture2D_7g6oh")
-texture_scale = 1.93
+texture_scale = 4.81
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1484889600]
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer" unique_id=1853059257]
+material = SubResource("ShaderMaterial_7g6oh")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -742.0
+offset_top = -444.0
+offset_right = 219.0
+offset_bottom = 238.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CanvasLayer2" type="CanvasLayer" parent="." unique_id=1313702084]
+visible = false
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer2" unique_id=1209809950]
+material = SubResource("ShaderMaterial_5011q")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -742.0
+offset_top = -444.0
+offset_right = 219.0
+offset_bottom = 238.0
+grow_horizontal = 2
+grow_vertical = 2
