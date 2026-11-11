@@ -27,6 +27,7 @@ var has_started_timer: bool = false
 @onready var animated_sprite: AnimatedSprite2D = $"AnimatedSprite2D"
 @onready var coyote_timer: Timer = $"CoyoteTimer"
 @onready var camera: Camera2D = self.get_node(cam_path)
+@onready var jump_sound_player: AudioStreamPlayer2D = $"JumpSound"
 
 
 
@@ -54,6 +55,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("jump") and (is_on_floor() or coyote_timer.time_left > 0):
 		velocity.y = jump_velocity
 		coyote_timer.stop()
+		jump_sound_player.play()
 		has_jumped = true	# You can only use coyote time once per jump
 
 	# Get the input direction and handle the movement/deceleration.
