@@ -110,13 +110,13 @@ mesh = SubResource("BoxMesh_q4mm8")
 position = Vector2(1, 0)
 zoom = Vector2(2.5, 2.5)
 
-[node name="CharacterBody2D" parent="." unique_id=1818162535 instance=ExtResource("1_ia4q5")]
+[node name="Player" parent="." unique_id=1818162535 instance=ExtResource("1_ia4q5")]
 floor_max_angle = 1.0471976
 floor_snap_length = 8.0
 cam_path = NodePath("../Camera2D")
 cam_speed = 0.1
 
-[node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D" unique_id=682674969]
+[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=682674969]
 position = Vector2(7.6293945e-06, 3.8146973e-06)
 scale = Vector2(0.3273148, 0.3273148)
 texture = ExtResource("2_ocyxy")
