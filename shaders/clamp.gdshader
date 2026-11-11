@@ -71,10 +71,6 @@ vec3 rgb_to_hsv(vec3 rgb){
 	return vec3(hue, sat, value);
 }
 
-void vertex() {
-	// Called for every vertex the material is visible on.
-}
-
 void fragment() {
 	vec4 original_sc = texture(SCREEN_TEXTURE, SCREEN_UV);
 	

@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://ly6sm5smerbw"]
 
 [ext_resource type="PackedScene" uid="uid://dd4d7wdo1184u" path="res://scenes/player/player.tscn" id="1_d0ra6"]
-[ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://scenes/shaders/clamp.gdshader" id="1_gi8eg"]
+[ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://shaders/clamp.gdshader" id="1_gi8eg"]
 [ext_resource type="Texture2D" uid="uid://cpi7kaxfadgg2" path="res://assets/sprites/player/placeholder/vignette.png" id="2_gi8eg"]
 [ext_resource type="Texture2D" uid="uid://cq7mpq2o63f3b" path="res://assets/sprites/player/placeholder/eli.jpg" id="2_uiwrj"]
-[ext_resource type="Shader" uid="uid://1p3yx37wwnye" path="res://scenes/shaders/posterization.gdshader" id="4_5011q"]
+[ext_resource type="Shader" uid="uid://1p3yx37wwnye" path="res://shaders/posterization.gdshader" id="4_5011q"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1ydht"]
 shader = ExtResource("1_gi8eg")
@@ -44,7 +44,7 @@ shader_parameter/colour = Color(0, 1, 0.66666675, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_5011q"]
 shader = ExtResource("4_5011q")
-shader_parameter/size = Vector2(32, 28)
+shader_parameter/step_count = 4
 
 [node name="EliScene" type="Node2D" unique_id=1366947214]
 material = SubResource("ShaderMaterial_1ydht")
@@ -178,7 +178,6 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="CanvasLayer2" type="CanvasLayer" parent="." unique_id=1313702084]
-visible = false
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer2" unique_id=1209809950]
 material = SubResource("ShaderMaterial_5011q")
