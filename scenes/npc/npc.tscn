@@ -26,15 +26,13 @@ font_size = 10
 
 [node name="Npc" type="Area2D" unique_id=71207571]
 script = ExtResource("1_r4bp4")
-player_group = null
-label_text = null
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=9266485]
 texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_2vina")
 animation = &"idle"
 autoplay = "idle"
-frame_progress = 0.84633666
+frame_progress = 0.11661904
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1584941531]
 position = Vector2(0, 1.5)
