@@ -5,11 +5,11 @@
 [ext_resource type="Texture2D" uid="uid://kee6vj1kpctn" path="res://assets/ui_assets/laturnExample.png" id="2_i11o4"]
 [ext_resource type="Shader" uid="uid://c1pblfgw3u4bw" path="res://shaders/fuel_fill.gdshader" id="3_uwl7a"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_i11o4"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uwl7a"]
 shader = ExtResource("3_uwl7a")
 shader_parameter/progress = 1.0
 shader_parameter/fill_from_bottom = true
-shader_parameter/edge_softness = 0.03200000152
+shader_parameter/edge_softness = 0.01
 shader_parameter/empty_brightness = 0.6
 
 [node name="PlayerHud" type="CanvasLayer" unique_id=868017095]
@@ -83,7 +83,7 @@ offset_bottom = 333.0
 
 [node name="ItemTexture" type="TextureRect" parent="Control/FualBarContainer" unique_id=1496404403]
 unique_name_in_owner = true
-material = SubResource("ShaderMaterial_i11o4")
+material = SubResource("ShaderMaterial_uwl7a")
 layout_mode = 0
 offset_right = 80.0
 offset_bottom = 120.0
