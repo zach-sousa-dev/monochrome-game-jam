@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://diofht7bvvgxp" path="res://assets/sprites/player/placeholder/run9.png" id="9_myrg7"]
 [ext_resource type="Texture2D" uid="uid://kvcq2iycoaft" path="res://assets/sprites/player/placeholder/run10.png" id="10_kvlxm"]
 [ext_resource type="Texture2D" uid="uid://bnohvrb24sjkc" path="res://assets/sprites/player/placeholder/stand.png" id="11_je7p5"]
+[ext_resource type="AudioStream" uid="uid://birtlg78gxn0e" path="res://assets/sounds/player/placeholder/jump.wav" id="13_gx1jg"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_x7p2l"]
 animations = [{
@@ -91,3 +92,6 @@ frame_progress = 0.031095108
 shape = SubResource("RectangleShape2D_x7p2l")
 
 [node name="CoyoteTimer" type="Timer" parent="." unique_id=120348269]
+
+[node name="JumpSound" type="AudioStreamPlayer2D" parent="." unique_id=1474954606]
+stream = ExtResource("13_gx1jg")
