@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://dywlmpj2bq55s"]
+
+[ext_resource type="PackedScene" uid="uid://dd4d7wdo1184u" path="res://scenes/player/player.tscn" id="1_ia4q5"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oiw2g"]
+size = Vector2(40, 16)
+
+[sub_resource type="BoxMesh" id="BoxMesh_q4mm8"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ocyxy"]
+size = Vector2(72, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ia4q5"]
+size = Vector2(640, 20)
+
+[node name="ZachScene" type="Node2D" unique_id=783727970]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=651167167]
+
+[node name="CharacterBody2D" parent="." unique_id=1818162535 instance=ExtResource("1_ia4q5")]
+position = Vector2(0, -19)
+horizontal_max_velocity = 100.0
+horizontal_acceleration = 900.0
+horizontal_decceleration = 300.0
+jump_velocity = -250.0
+debug_mode = true
+
+[node name="Environment" type="Node2D" parent="." unique_id=1869862551]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Environment" unique_id=848652026]
+
+[node name="Platform4" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=846574327]
+position = Vector2(196, -24)
+shape = SubResource("RectangleShape2D_oiw2g")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform4" unique_id=750902923]
+scale = Vector2(40, 15.999999)
+mesh = SubResource("BoxMesh_q4mm8")
+
+[node name="Platform3" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=242519108]
+position = Vector2(196, -8)
+shape = SubResource("RectangleShape2D_ocyxy")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform3" unique_id=488931627]
+scale = Vector2(72.00001, 15.999999)
+mesh = SubResource("BoxMesh_q4mm8")
+
+[node name="Platform2" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=555866414]
+position = Vector2(116, -24)
+shape = SubResource("RectangleShape2D_oiw2g")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform2" unique_id=807760893]
+scale = Vector2(40, 15.999999)
+mesh = SubResource("BoxMesh_q4mm8")
+
+[node name="Platform" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=346618050]
+position = Vector2(76, -8)
+shape = SubResource("RectangleShape2D_oiw2g")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform" unique_id=1695265586]
+scale = Vector2(40, 15.999999)
+mesh = SubResource("BoxMesh_q4mm8")
+
+[node name="Ground" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=850970559]
+position = Vector2(0, 10)
+shape = SubResource("RectangleShape2D_ia4q5")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Ground" unique_id=30297883]
+position = Vector2(-9.094947e-13, -2)
+scale = Vector2(640.00006, 15.999999)
+mesh = SubResource("BoxMesh_q4mm8")
