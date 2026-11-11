@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dd4d7wdo1184u"]
 
 [ext_resource type="Texture2D" uid="uid://fu7401kyu3jd" path="res://assets/sprites/player/placeholder/run1.png" id="1_dovo2"]
+[ext_resource type="Script" uid="uid://l78j261ijlh6" path="res://scenes/player/player.gd" id="1_fm80t"]
 [ext_resource type="Texture2D" uid="uid://duidwdtk7ijff" path="res://assets/sprites/player/placeholder/run2.png" id="2_gmlin"]
 [ext_resource type="Texture2D" uid="uid://dbvbgxqos02fl" path="res://assets/sprites/player/placeholder/run3.png" id="3_h17s1"]
 [ext_resource type="Texture2D" uid="uid://ci37jhlmvhl4g" path="res://assets/sprites/player/placeholder/run4.png" id="4_je7p5"]
@@ -69,15 +70,24 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x7p2l"]
 size = Vector2(30, 38)
 
-[node name="CharacterBody2D" type="CharacterBody2D" unique_id=1818162535]
+[node name="Player" type="CharacterBody2D" unique_id=1818162535]
+slide_on_ceiling = false
+script = ExtResource("1_fm80t")
+horizontal_max_velocity = 90.0
+horizontal_acceleration = 900.0
+horizontal_decceleration = 300.0
+jump_velocity = -250.0
+coyote_time_duration_seconds = 0.05
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1561572402]
 texture_filter = 1
 position = Vector2(0, -0.5)
 sprite_frames = SubResource("SpriteFrames_x7p2l")
 animation = &"run"
-frame = 1
-frame_progress = 0.68332124
+frame = 8
+frame_progress = 0.031095108
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2058630931]
 shape = SubResource("RectangleShape2D_x7p2l")
+
+[node name="CoyoteTimer" type="Timer" parent="." unique_id=120348269]

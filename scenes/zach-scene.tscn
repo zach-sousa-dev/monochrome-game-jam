@@ -1,28 +1,51 @@
 [gd_scene format=3 uid="uid://dywlmpj2bq55s"]
 
 [ext_resource type="PackedScene" uid="uid://dd4d7wdo1184u" path="res://scenes/player/player.tscn" id="1_ia4q5"]
+[ext_resource type="Texture2D" uid="uid://cpi7kaxfadgg2" path="res://assets/sprites/player/placeholder/vignette.png" id="2_ocyxy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oiw2g"]
 size = Vector2(40, 16)
 
 [sub_resource type="BoxMesh" id="BoxMesh_q4mm8"]
 
-[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_q4mm8"]
-distance = -1.5
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ocyxy"]
+size = Vector2(72, 16)
+
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_ocyxy"]
+points = PackedVector2Array(-177, 7, -48, -110, -25, -110, 108, 9)
+
+[sub_resource type="PrismMesh" id="PrismMesh_q4mm8"]
+subdivide_width = 1
+
+[sub_resource type="BoxMesh" id="BoxMesh_0sqs7"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ia4q5"]
+size = Vector2(640, 20)
 
 [node name="ZachScene" type="Node2D" unique_id=783727970]
-
-[node name="Camera2D" type="Camera2D" parent="." unique_id=651167167]
-
-[node name="CharacterBody2D" parent="." unique_id=1818162535 instance=ExtResource("1_ia4q5")]
-position = Vector2(0, -19)
 
 [node name="Environment" type="Node2D" parent="." unique_id=1869862551]
 
 [node name="StaticBody2D" type="StaticBody2D" parent="Environment" unique_id=848652026]
 
+[node name="Platform4" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=846574327]
+position = Vector2(196, 104)
+shape = SubResource("RectangleShape2D_oiw2g")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform4" unique_id=750902923]
+scale = Vector2(40, 15.999999)
+mesh = SubResource("BoxMesh_q4mm8")
+
+[node name="Platform3" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=242519108]
+position = Vector2(196, 120)
+shape = SubResource("RectangleShape2D_ocyxy")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform3" unique_id=488931627]
+scale = Vector2(72.00001, 15.999999)
+mesh = SubResource("BoxMesh_q4mm8")
+
 [node name="Platform2" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=555866414]
-position = Vector2(156, -30)
+position = Vector2(116, 104)
 shape = SubResource("RectangleShape2D_oiw2g")
 
 [node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform2" unique_id=807760893]
@@ -30,17 +53,70 @@ scale = Vector2(40, 15.999999)
 mesh = SubResource("BoxMesh_q4mm8")
 
 [node name="Platform" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=346618050]
-position = Vector2(76, -30)
+position = Vector2(76, 120)
 shape = SubResource("RectangleShape2D_oiw2g")
 
 [node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform" unique_id=1695265586]
 scale = Vector2(40, 15.999999)
 mesh = SubResource("BoxMesh_q4mm8")
 
+[node name="Platform6" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=533251019]
+position = Vector2(-30, 14.999998)
+rotation = 0.5235988
+shape = SubResource("RectangleShape2D_oiw2g")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform6" unique_id=334270393]
+scale = Vector2(40, 15.999999)
+mesh = SubResource("BoxMesh_q4mm8")
+
+[node name="Platform7" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=745556684]
+position = Vector2(-245, 6)
+rotation = -0.5235988
+shape = SubResource("RectangleShape2D_oiw2g")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform7" unique_id=2016740582]
+scale = Vector2(40, 15.999999)
+mesh = SubResource("BoxMesh_q4mm8")
+
+[node name="Platform5" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=2133784315]
+position = Vector2(-104, 120)
+shape = SubResource("ConvexPolygonShape2D_ocyxy")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform5" unique_id=1548267327]
+position = Vector2(-46.874992, -51.999992)
+scale = Vector2(259.75, -118)
+mesh = SubResource("PrismMesh_q4mm8")
+
+[node name="MeshInstance2D3" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform5" unique_id=458336113]
+position = Vector2(-35.5, -92)
+scale = Vector2(20.999992, -35.99999)
+mesh = SubResource("BoxMesh_0sqs7")
+
+[node name="MeshInstance2D2" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform5" unique_id=1109113125]
+position = Vector2(-24.875, -51.999992)
+scale = Vector2(259.75, -118)
+mesh = SubResource("PrismMesh_q4mm8")
+
 [node name="Ground" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=850970559]
-shape = SubResource("WorldBoundaryShape2D_q4mm8")
+position = Vector2(0, 136)
+shape = SubResource("RectangleShape2D_ia4q5")
 
 [node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Ground" unique_id=30297883]
-position = Vector2(0, 8)
-scale = Vector2(641.60004, 15.999999)
+position = Vector2(0, -2)
+scale = Vector2(640.00006, 15.999999)
 mesh = SubResource("BoxMesh_q4mm8")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=651167167]
+position = Vector2(1, 0)
+zoom = Vector2(2.5, 2.5)
+
+[node name="CharacterBody2D" parent="." unique_id=1818162535 instance=ExtResource("1_ia4q5")]
+floor_max_angle = 1.0471976
+floor_snap_length = 8.0
+cam_path = NodePath("../Camera2D")
+cam_speed = 0.1
+
+[node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D" unique_id=682674969]
+position = Vector2(7.6293945e-06, 3.8146973e-06)
+scale = Vector2(0.3273148, 0.3273148)
+texture = ExtResource("2_ocyxy")
