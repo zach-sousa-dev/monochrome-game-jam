@@ -151,7 +151,7 @@ fill_from = Vector2(0.5, 0.5)
 
 [node name="ZachScene" type="Node2D" unique_id=783727970]
 
-[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1864745391]
+[node name="Darkness" type="CanvasModulate" parent="." unique_id=1864745391]
 color = Color(0, 0, 0, 1)
 
 [node name="Backdrop" type="Sprite2D" parent="." unique_id=1954023383]
@@ -185,7 +185,7 @@ frame_progress = 0.0
 [node name="CollisionShape2D" parent="Sign" index="1" unique_id=1584941531]
 shape = SubResource("RectangleShape2D_ibh68")
 
-[node name="InteractLabel" parent="Sign" index="2" unique_id=325016164]
+[node name="InteractLabel" parent="Sign/CanvasLayer" parent_id_path=PackedInt32Array(1423285122, 1612832722) index="0" unique_id=325016164]
 offset_top = -46.0
 offset_bottom = -30.0
 
@@ -299,5 +299,12 @@ visible = false
 position = Vector2(7.6293945e-06, 3.8146973e-06)
 scale = Vector2(0.3273148, 0.3273148)
 texture = ExtResource("2_ocyxy")
+
+[node name="NPC2" parent="." unique_id=1375960341 instance=ExtResource("3_qlt7d")]
+position = Vector2(-138, -6)
+player_group = "player"
+interact_label_text = "E"
+scene_node = NodePath("..")
+speeches = Array[ExtResource("2_hrqc2")]([])
 
 [editable path="Sign"]

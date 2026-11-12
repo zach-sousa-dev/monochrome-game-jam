@@ -34,6 +34,9 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q4mm8"]
 size = Vector2(32, 29)
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_rx80j"]
+light_mode = 1
+
 [node name="NPC" type="Area2D" unique_id=71207571]
 process_mode = 3
 script = ExtResource("1_r4bp4")
@@ -51,11 +54,17 @@ frame_progress = 0.11661904
 position = Vector2(0, 1.5)
 shape = SubResource("RectangleShape2D_q4mm8")
 
-[node name="InteractLabel" type="RichTextLabel" parent="." unique_id=325016164]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1612832722]
+layer = 346
+visible = false
+follow_viewport_enabled = true
+
+[node name="InteractLabel" type="RichTextLabel" parent="CanvasLayer" unique_id=325016164]
+material = SubResource("CanvasItemMaterial_rx80j")
 offset_left = -51.0
-offset_top = -31.0
+offset_top = -29.0
 offset_right = 51.0
-offset_bottom = -15.0
+offset_bottom = -13.0
 theme_override_fonts/normal_font = ExtResource("6_ay68w")
 text = "Talk"
 fit_content = true

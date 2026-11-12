@@ -18,7 +18,8 @@ extends Node2D
 @export var voice_sound: AudioStream
 @export var speeches: Array[Speech]
 
-@onready var label: RichTextLabel = $InteractLabel
+#@onready var label: RichTextLabel = $CanvasLayer/InteractLabel
+#@onready var canvas_layer: CanvasLayer = $CanvasLayer
 
 var touching_player: bool = false
 var current_speech_index: int = 0
@@ -28,8 +29,8 @@ signal dialog_complete
 func _ready() -> void:
 	connect("body_entered", _on_body_entered)
 	connect("body_exited", _on_body_exited)
-	label.text = interact_label_text
-	label.visible = false
+	#label.text = interact_label_text
+	#canvas_layer.visible = false
 
 
 
@@ -45,6 +46,7 @@ func _process(delta: float) -> void:
 			current_speech_index = 0 
 			get_tree().paused = false
 			dialog_complete.emit()
+			print("dialog complete")
 			return
 		
 		# construct new dialog box
@@ -56,14 +58,14 @@ func _process(delta: float) -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if not body.is_in_group(player_group): return
-	label.visible = true
+	#canvas_layer.visible = true
 	touching_player = true
-	label.reparent(get_node(scene_node))
+	#canvas_layer.reparent(get_node(scene_node))
 
 
 
 func _on_body_exited(body: Node2D) -> void:
 	if not body.is_in_group(player_group): return
-	label.visible = false
+	#canvas_layer.visible = false
 	touching_player = false
-	label.reparent(self)
+	#canvas_layer.reparent(self)
