@@ -13,6 +13,8 @@
 [ext_resource type="Texture2D" uid="uid://kvcq2iycoaft" path="res://assets/sprites/player/placeholder/run10.png" id="10_kvlxm"]
 [ext_resource type="Texture2D" uid="uid://bnohvrb24sjkc" path="res://assets/sprites/player/placeholder/stand.png" id="11_je7p5"]
 [ext_resource type="AudioStream" uid="uid://birtlg78gxn0e" path="res://assets/sounds/player/placeholder/jump.wav" id="13_gx1jg"]
+[ext_resource type="PackedScene" uid="uid://dnot073ibmb2j" path="res://ui/playerHud/PlayerHud.tscn" id="14_ugbui"]
+[ext_resource type="PackedScene" uid="uid://d12s8pxdl381h" path="res://scenes/player/tool.tscn" id="15_fcs02"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_x7p2l"]
 animations = [{
@@ -71,7 +73,7 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x7p2l"]
 size = Vector2(30, 38)
 
-[node name="Player" type="CharacterBody2D" unique_id=1818162535]
+[node name="Player" type="CharacterBody2D" unique_id=1818162535 groups=["player"]]
 slide_on_ceiling = false
 script = ExtResource("1_fm80t")
 horizontal_max_velocity = 90.0
@@ -79,6 +81,8 @@ horizontal_acceleration = 900.0
 horizontal_decceleration = 300.0
 jump_velocity = -250.0
 coyote_time_duration_seconds = 0.05
+
+[node name="Tool" parent="." unique_id=1965235933 instance=ExtResource("15_fcs02")]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1561572402]
 texture_filter = 1
@@ -95,3 +99,5 @@ shape = SubResource("RectangleShape2D_x7p2l")
 
 [node name="JumpSound" type="AudioStreamPlayer2D" parent="." unique_id=1474954606]
 stream = ExtResource("13_gx1jg")
+
+[node name="PlayerHud" parent="." unique_id=868017095 instance=ExtResource("14_ugbui")]

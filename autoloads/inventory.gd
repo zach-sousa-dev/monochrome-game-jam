@@ -20,6 +20,11 @@ func _unhandled_input(event: InputEvent):
 		cycle(1)
 	elif event.is_action_pressed("item_prev"):
 		cycle(-1)
+	
+	for i in max_slots:
+		if event.is_action_pressed("slot_" + str(i+1)):
+			select(i)
+	
 
 # -- adds an item if there is room picks if nothing is picked yet
 func add_item(item: ItemData) -> bool:

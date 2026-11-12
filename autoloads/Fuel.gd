@@ -9,7 +9,7 @@ signal died
 # -- full tank
 @export var max_fuel: float = 100.0
 # -- fuel lost  every second
-@export var drain_per_second: float = 1.0
+@export var drain_per_second: float = 0.2
 
 # -- curent fuel 
 var fuel: float = 0.0
