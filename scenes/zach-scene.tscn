@@ -1,11 +1,124 @@
 [gd_scene format=3 uid="uid://dywlmpj2bq55s"]
 
 [ext_resource type="PackedScene" uid="uid://dd4d7wdo1184u" path="res://scenes/player/player.tscn" id="1_ia4q5"]
+[ext_resource type="Script" uid="uid://c66jua0epg6uf" path="res://scenes/npc/speech.gd" id="2_hrqc2"]
+[ext_resource type="PackedScene" uid="uid://di5cl76maifjy" path="res://scenes/npc/npc.tscn" id="3_qlt7d"]
+[ext_resource type="Texture2D" uid="uid://sqgomagrdbto" path="res://assets/sprites/npcs/placeholder/sign.png" id="3_rx80j"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_qlt7d"]
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ocyxy"]
 noise = SubResource("FastNoiseLite_qlt7d")
+
+[sub_resource type="Resource" id="Resource_hrqc2"]
+script = ExtResource("2_hrqc2")
+name = "Ile"
+dialog = "That guy over there reeks of..."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_ga1ex"]
+script = ExtResource("2_hrqc2")
+name = "Ile"
+dialog = "..."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_o3oms"]
+script = ExtResource("2_hrqc2")
+name = "Ile"
+dialog = "..................."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_ar3ua"]
+script = ExtResource("2_hrqc2")
+name = "Ile"
+dialog = "........................................."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_c1iva"]
+script = ExtResource("2_hrqc2")
+name = "You"
+dialog = "Bro what."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_061we"]
+script = ExtResource("2_hrqc2")
+name = "Ile"
+dialog = "...cheese."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_rx80j"]
+script = ExtResource("2_hrqc2")
+name = "Sign"
+dialog = "NOTICE"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_0vcjt"]
+script = ExtResource("2_hrqc2")
+name = "Sign"
+dialog = "Know dis dick in yo mouth!"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_grteb"]
+script = ExtResource("2_hrqc2")
+name = "Sign"
+dialog = "..."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_nc6ft"]
+script = ExtResource("2_hrqc2")
+name = "Sign"
+dialog = "Hah, gottem."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qlt7d"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_rx80j")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hrqc2"]
+size = Vector2(60, 62)
+
+[sub_resource type="Resource" id="Resource_6nf5r"]
+script = ExtResource("2_hrqc2")
+name = "Eli"
+dialog = "...I hate the smell"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_bl2hb"]
+script = ExtResource("2_hrqc2")
+name = "Eli"
+dialog = "I just think of anesthesia"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_ibh68"]
+script = ExtResource("2_hrqc2")
+name = "Eli"
+dialog = "..."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_fiaps"]
+script = ExtResource("2_hrqc2")
+name = "Eli"
+dialog = "reminds me of when I got tubes in my ears"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_0oo3m"]
+script = ExtResource("2_hrqc2")
+name = "Eli"
+dialog = "the smell was disgusting and the experience was unpleasant"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_15swg"]
+script = ExtResource("2_hrqc2")
+name = "Eli"
+dialog = "(painful)"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oiw2g"]
 size = Vector2(40, 16)
@@ -28,13 +141,47 @@ size = Vector2(640, 20)
 
 [node name="ZachScene" type="Node2D" unique_id=783727970]
 
-[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1864745391]
+[node name="Darkness" type="CanvasModulate" parent="." unique_id=1864745391]
 color = Color(0, 0, 0, 1)
 
 [node name="Backdrop" type="Sprite2D" parent="." unique_id=1954023383]
 position = Vector2(1, 0)
 scale = Vector2(2.0234375, 1.4355469)
 texture = SubResource("NoiseTexture2D_ocyxy")
+
+[node name="UselessNPC" parent="." unique_id=71207571 instance=ExtResource("3_qlt7d")]
+position = Vector2(274, 112)
+player_group = "player"
+interact_label_text = "E - Talk"
+scene_node = NodePath("..")
+seconds_per_letter = 0.05
+speeches = Array[ExtResource("2_hrqc2")]([SubResource("Resource_hrqc2"), SubResource("Resource_ga1ex"), SubResource("Resource_o3oms"), SubResource("Resource_ar3ua"), SubResource("Resource_c1iva"), SubResource("Resource_061we")])
+
+[node name="Sign" parent="." unique_id=1423285122 instance=ExtResource("3_qlt7d")]
+position = Vector2(116, 64)
+player_group = "player"
+interact_label_text = "E - Read"
+scene_node = NodePath("..")
+seconds_per_letter = 0.05
+voice_sound = null
+speeches = Array[ExtResource("2_hrqc2")]([SubResource("Resource_rx80j"), SubResource("Resource_0vcjt"), SubResource("Resource_grteb"), SubResource("Resource_nc6ft")])
+
+[node name="AnimatedSprite2D" parent="Sign" index="0" unique_id=9266485]
+sprite_frames = SubResource("SpriteFrames_qlt7d")
+autoplay = "default"
+frame_progress = 0.0
+
+[node name="CollisionShape2D" parent="Sign" index="1" unique_id=1584941531]
+position = Vector2(0, 1)
+shape = SubResource("RectangleShape2D_hrqc2")
+
+[node name="NPC" parent="." unique_id=1249647520 instance=ExtResource("3_qlt7d")]
+position = Vector2(196, 80)
+player_group = "player"
+interact_label_text = "E - Talk"
+scene_node = NodePath("..")
+seconds_per_letter = 0.05
+speeches = Array[ExtResource("2_hrqc2")]([SubResource("Resource_6nf5r"), SubResource("Resource_bl2hb"), SubResource("Resource_ibh68"), SubResource("Resource_fiaps"), SubResource("Resource_0oo3m"), SubResource("Resource_15swg")])
 
 [node name="Environment" type="Node2D" parent="." unique_id=1869862551]
 
@@ -127,3 +274,5 @@ floor_max_angle = 1.0471976
 floor_snap_length = 8.0
 cam_path = NodePath("../Camera2D")
 cam_speed = 0.1
+
+[editable path="Sign"]

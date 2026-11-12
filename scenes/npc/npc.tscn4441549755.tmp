@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://di5cl76maifjy"]
+
+[ext_resource type="Texture2D" uid="uid://hvsf8phswr3l" path="res://assets/sprites/npcs/placeholder/eli1.png" id="1_dpyoa"]
+[ext_resource type="Script" uid="uid://bcw7uxrh0f60n" path="res://scenes/npc/npc.gd" id="1_r4bp4"]
+[ext_resource type="Texture2D" uid="uid://raeuda7gos8x" path="res://assets/sprites/npcs/placeholder/eli2.png" id="2_r4bp4"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_2vina"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_dpyoa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_r4bp4")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 2.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_q4mm8"]
+size = Vector2(32, 29)
+
+[sub_resource type="LabelSettings" id="LabelSettings_dpyoa"]
+font_size = 10
+
+[node name="Npc" type="Area2D" unique_id=71207571]
+script = ExtResource("1_r4bp4")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=9266485]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_2vina")
+animation = &"idle"
+autoplay = "idle"
+frame_progress = 0.045547836
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1584941531]
+position = Vector2(0, 1.5)
+shape = SubResource("RectangleShape2D_q4mm8")
+
+[node name="Control" type="Control" parent="." unique_id=1637792268]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -58.0
+offset_top = -27.0
+offset_right = 58.0
+offset_bottom = -13.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="Control" unique_id=1692192767]
+
+[node name="Label" type="Label" parent="Control/CanvasLayer" unique_id=2034346182]
+offset_left = -55.0
+offset_top = -27.0
+offset_right = 55.0
+offset_bottom = -13.0
+text = "[E] Talk"
+label_settings = SubResource("LabelSettings_dpyoa")
+horizontal_alignment = 1
+vertical_alignment = 1
