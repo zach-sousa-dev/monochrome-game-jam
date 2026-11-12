@@ -25,6 +25,8 @@ var has_started_timer: bool = false
 @export var test_speed: float = 30.0
 @export var auto_drain: bool = true
 
+@onready var tool = $Tool
+
 @export_category("Debug")
 @export var debug_mode: bool = false
 @export var debug_coyote: bool = false
@@ -39,6 +41,9 @@ var has_started_timer: bool = false
 
 
 func _ready() -> void:
+	
+	add_to_group("player") # so projectile knows its the player
+	
 	if PlayerInventory.items.is_empty():
 		for item_id in starting_items:
 			PlayerInventory.add_item(ItemDB.create(item_id))
@@ -58,6 +63,13 @@ func _physics_process(delta: float) -> void:
 		
 	if Input.is_physical_key_pressed(KEY_R):
 		Fuel.refuel(test_speed * delta)
+	
+	if Input.is_action_pressed("shoot"): # shoot a fella
+		tool.shoot()
+	
+	if Input.is_action_just_pressed("cycle_fire"): #cycle between items
+		tool.cycle_projectile(1)
+	
 	
 	# Add the gravity.
 	if not is_on_floor():

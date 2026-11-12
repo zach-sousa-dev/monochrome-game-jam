@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://dywlmpj2bq55s"]
 
 [ext_resource type="PackedScene" uid="uid://dd4d7wdo1184u" path="res://scenes/player/player.tscn" id="1_ia4q5"]
-[ext_resource type="Texture2D" uid="uid://cpi7kaxfadgg2" path="res://assets/sprites/player/placeholder/vignette.png" id="2_ocyxy"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_qlt7d"]
 
@@ -26,15 +25,6 @@ subdivide_width = 1
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ia4q5"]
 size = Vector2(640, 20)
-
-[sub_resource type="Gradient" id="Gradient_ocyxy"]
-offsets = PackedFloat32Array(0, 0.6689189)
-colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_gx1jg"]
-gradient = SubResource("Gradient_ocyxy")
-fill = 1
-fill_from = Vector2(0.5, 0.5)
 
 [node name="ZachScene" type="Node2D" unique_id=783727970]
 
@@ -137,14 +127,3 @@ floor_max_angle = 1.0471976
 floor_snap_length = 8.0
 cam_path = NodePath("../Camera2D")
 cam_speed = 0.1
-
-[node name="PointLight2D" type="PointLight2D" parent="Player" unique_id=2095817610]
-position = Vector2(1, 0)
-scale = Vector2(2.421875, 2.421875)
-texture = SubResource("GradientTexture2D_gx1jg")
-
-[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=682674969]
-visible = false
-position = Vector2(7.6293945e-06, 3.8146973e-06)
-scale = Vector2(0.3273148, 0.3273148)
-texture = ExtResource("2_ocyxy")
