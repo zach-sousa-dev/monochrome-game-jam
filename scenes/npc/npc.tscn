@@ -2,7 +2,20 @@
 
 [ext_resource type="Texture2D" uid="uid://hvsf8phswr3l" path="res://assets/sprites/npcs/placeholder/eli1.png" id="1_dpyoa"]
 [ext_resource type="Script" uid="uid://bcw7uxrh0f60n" path="res://scenes/npc/npc.gd" id="1_r4bp4"]
+[ext_resource type="AudioStream" uid="uid://b7eah2nxpvxa1" path="res://assets/sounds/npc/placeholder/talk.wav" id="2_ay68w"]
 [ext_resource type="Texture2D" uid="uid://raeuda7gos8x" path="res://assets/sprites/npcs/placeholder/eli2.png" id="2_r4bp4"]
+[ext_resource type="Script" uid="uid://c66jua0epg6uf" path="res://scenes/npc/speech.gd" id="2_woxlu"]
+[ext_resource type="FontFile" uid="uid://dm1a5r2el8jk0" path="res://assets/ui_assets/placeholder/omelette_font/ttf/om_small_plain.ttf" id="6_ay68w"]
+
+[sub_resource type="Resource" id="Resource_dpyoa"]
+script = ExtResource("2_woxlu")
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_r4bp4"]
+script = ExtResource("2_woxlu")
+name = "Lamar"
+dialog = "Ah, fella, don't hate me 'cause I'm beautiful, fella"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_2vina"]
 animations = [{
@@ -21,14 +34,11 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q4mm8"]
 size = Vector2(32, 29)
 
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_dpyoa"]
-light_mode = 1
-
-[sub_resource type="LabelSettings" id="LabelSettings_dpyoa"]
-font_size = 10
-
-[node name="Npc" type="Area2D" unique_id=71207571]
+[node name="NPC" type="Area2D" unique_id=71207571]
+process_mode = 3
 script = ExtResource("1_r4bp4")
+voice_sound = ExtResource("2_ay68w")
+speeches = Array[ExtResource("2_woxlu")]([SubResource("Resource_dpyoa"), SubResource("Resource_r4bp4")])
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=9266485]
 texture_filter = 1
@@ -41,21 +51,14 @@ frame_progress = 0.11661904
 position = Vector2(0, 1.5)
 shape = SubResource("RectangleShape2D_q4mm8")
 
-[node name="Control" type="Control" parent="." unique_id=1637792268]
-layout_mode = 3
-anchors_preset = 0
-offset_left = -58.0
-offset_top = -27.0
-offset_right = 58.0
-offset_bottom = -13.0
-
-[node name="Label" type="Label" parent="Control" unique_id=2034346182]
-material = SubResource("CanvasItemMaterial_dpyoa")
-layout_mode = 0
-offset_left = 3.0
-offset_right = 113.0
-offset_bottom = 14.0
-text = "[E] Talk"
-label_settings = SubResource("LabelSettings_dpyoa")
+[node name="InteractLabel" type="RichTextLabel" parent="." unique_id=325016164]
+offset_left = -51.0
+offset_top = -31.0
+offset_right = 51.0
+offset_bottom = -15.0
+theme_override_fonts/normal_font = ExtResource("6_ay68w")
+text = "Talk"
+fit_content = true
+scroll_active = false
 horizontal_alignment = 1
 vertical_alignment = 1

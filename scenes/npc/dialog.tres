@@ -1,0 +1,21 @@
+[gd_resource type="Theme" format=3 uid="uid://x1haa1fvyc6g"]
+
+[ext_resource type="Texture2D" uid="uid://54cqe6q2g1kr" path="res://assets/ui_assets/placeholder/dialog-box.png" id="1_gapo3"]
+[ext_resource type="FontFile" uid="uid://pfugmateh8a0" path="res://assets/ui_assets/placeholder/omelette_font/ttf/om_large_plain.ttf" id="2_oklal"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_0pea5"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+texture = ExtResource("1_gapo3")
+texture_margin_left = 13.0
+texture_margin_top = 13.0
+texture_margin_right = 13.0
+texture_margin_bottom = 13.0
+region_rect = Rect2(0, 0, 32, 32)
+
+[resource]
+default_font = ExtResource("2_oklal")
+default_font_size = 0
+Panel/styles/panel = SubResource("StyleBoxTexture_0pea5")
