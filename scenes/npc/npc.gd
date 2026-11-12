@@ -46,7 +46,7 @@ func _process(delta: float) -> void:
 			current_speech_index = 0 
 			get_tree().paused = false
 			dialog_complete.emit()
-			print("dialog complete")
+			#print("dialog complete")
 			return
 		
 		# construct new dialog box
