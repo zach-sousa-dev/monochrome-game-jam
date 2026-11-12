@@ -18,12 +18,19 @@ const FUEL_FILL = preload("uid://c1pblfgw3u4bw")
 @onready var fuel_bar_container = %FualBarContainer
 @onready var fuel_texture = %ItemTexture
 
+# -- Tween vars
+@onready var bar_home_pos: Vector2 = fuel_bar_container.position
+var bar_tween: Tween
+var can_amimate := false
+
 # -- the slot copeies in the hotbar
 var _slots: Array[Control] = []
 
 
 # -- sets up the sharder, listens to inventory and fuel
 func _ready():
+	await get_tree().process_frame
+	
 	slot_template.visible = false
 	
 	var mat := ShaderMaterial.new()
@@ -37,6 +44,8 @@ func _ready():
 	_rebuild_slots()
 	_on_selected_changed(inventory.get_selected())
 	_set_progress(fuel.get_fuel_ratio())
+	
+	can_amimate = true
 
 # -- removes old slots and makes new ones items
 func _rebuild_slots():
@@ -61,10 +70,28 @@ func _rebuild_slots():
 # -- swaps the big image to selected item
 func _on_selected_changed(item: ItemData):
 	var tex : Texture2D = default_texture
+	
 	if item: 
 		tex = item.get_hud_texture()
-	fuel_bar_container.visible = tex != null
-	fuel_texture.texture = tex
+	
+	if bar_tween:
+		bar_tween.kill()
+	
+	if not can_amimate:
+		fuel_texture.texture = tex
+		fuel_bar_container.visible = tex != null
+		return
+	
+	bar_tween = get_tree().create_tween()
+	bar_tween.tween_property(fuel_bar_container, "position", bar_home_pos + Vector2(0, 200), 0.1)
+	bar_tween.tween_callback(func():
+		fuel_texture.texture = tex
+		fuel_bar_container.visible = tex != null
+	)
+	
+	bar_tween.tween_interval(0.1)
+	if tex != null:
+		bar_tween.tween_property(fuel_bar_container, "position", bar_home_pos, 0.1)
 
 # -- sens the fuel amount
 func _set_progress(ratio: float):

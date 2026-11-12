@@ -2,9 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://dd4d7wdo1184u" path="res://scenes/player/player.tscn" id="1_ia4q5"]
 [ext_resource type="Script" uid="uid://c66jua0epg6uf" path="res://scenes/npc/speech.gd" id="2_hrqc2"]
-[ext_resource type="Texture2D" uid="uid://cpi7kaxfadgg2" path="res://assets/sprites/player/placeholder/vignette.png" id="2_ocyxy"]
 [ext_resource type="PackedScene" uid="uid://di5cl76maifjy" path="res://scenes/npc/npc.tscn" id="3_qlt7d"]
-[ext_resource type="Texture2D" uid="uid://sqgomagrdbto" path="res://assets/sprites/npcs/placeholder/sign.png" id="3_rx80j"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_qlt7d"]
 
@@ -71,20 +69,6 @@ name = "Sign"
 dialog = "Hah, gottem."
 metadata/_custom_type_script = "uid://c66jua0epg6uf"
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_hrqc2"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("3_rx80j")
-}],
-"loop": 1,
-"name": &"default",
-"speed": 5.0
-}]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_ibh68"]
-size = Vector2(60, 63)
-
 [sub_resource type="Resource" id="Resource_6nf5r"]
 script = ExtResource("2_hrqc2")
 name = "Eli"
@@ -140,15 +124,6 @@ subdivide_width = 1
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ia4q5"]
 size = Vector2(640, 20)
 
-[sub_resource type="Gradient" id="Gradient_ocyxy"]
-offsets = PackedFloat32Array(0, 0.6689189)
-colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_gx1jg"]
-gradient = SubResource("Gradient_ocyxy")
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-
 [node name="ZachScene" type="Node2D" unique_id=783727970]
 
 [node name="Darkness" type="CanvasModulate" parent="." unique_id=1864745391]
@@ -175,19 +150,6 @@ scene_node = NodePath("..")
 seconds_per_letter = 0.05
 voice_sound = null
 speeches = Array[ExtResource("2_hrqc2")]([SubResource("Resource_rx80j"), SubResource("Resource_0vcjt"), SubResource("Resource_grteb"), SubResource("Resource_nc6ft")])
-
-[node name="AnimatedSprite2D" parent="Sign" index="0" unique_id=9266485]
-sprite_frames = SubResource("SpriteFrames_hrqc2")
-animation = &"default"
-autoplay = ""
-frame_progress = 0.0
-
-[node name="CollisionShape2D" parent="Sign" index="1" unique_id=1584941531]
-shape = SubResource("RectangleShape2D_ibh68")
-
-[node name="InteractLabel" parent="Sign/CanvasLayer" parent_id_path=PackedInt32Array(1423285122, 1612832722) index="0" unique_id=325016164]
-offset_top = -46.0
-offset_bottom = -30.0
 
 [node name="NPC" parent="." unique_id=1249647520 instance=ExtResource("3_qlt7d")]
 position = Vector2(196, 80)
@@ -288,23 +250,3 @@ floor_max_angle = 1.0471976
 floor_snap_length = 8.0
 cam_path = NodePath("../Camera2D")
 cam_speed = 0.1
-
-[node name="PointLight2D" type="PointLight2D" parent="Player" unique_id=2095817610]
-position = Vector2(1, 0)
-scale = Vector2(2.421875, 2.421875)
-texture = SubResource("GradientTexture2D_gx1jg")
-
-[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=682674969]
-visible = false
-position = Vector2(7.6293945e-06, 3.8146973e-06)
-scale = Vector2(0.3273148, 0.3273148)
-texture = ExtResource("2_ocyxy")
-
-[node name="NPC2" parent="." unique_id=1375960341 instance=ExtResource("3_qlt7d")]
-position = Vector2(-138, -6)
-player_group = "player"
-interact_label_text = "E"
-scene_node = NodePath("..")
-speeches = Array[ExtResource("2_hrqc2")]([])
-
-[editable path="Sign"]

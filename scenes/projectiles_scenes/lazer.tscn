@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://b5sdqg7frwtd4"]
+
+[ext_resource type="Script" uid="uid://cki1x2l337gnd" path="res://scenes/projectiles_scenes/lazer.gd" id="1_r7oxx"]
+[ext_resource type="Texture2D" uid="uid://c58trb3d62n3o" path="res://assets/projectiles_images/lazer.png" id="2_v16ax"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bwooc"]
+size = Vector2(79, 8)
+
+[node name="Lazer" type="Area2D" unique_id=1143992300]
+script = ExtResource("1_r7oxx")
+
+[node name="Lazer" type="Sprite2D" parent="." unique_id=1077711344]
+position = Vector2(-1.8189894e-12, -5.9604645e-08)
+scale = Vector2(0.206, 0.11)
+texture = ExtResource("2_v16ax")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1394731974]
+position = Vector2(-12.5, 0)
+shape = SubResource("RectangleShape2D_bwooc")
