@@ -10,7 +10,7 @@ func _init():
 	drain_multiplier = 2
 	
 	# -- tool
-	#weapon_frames = preload()
+	weapon_frames = preload("res://assets/animations/weapons/hold_lantern.tres")
 	shooting_pos = Vector2.ZERO
 	light_brightness = 1.2
 	light_range = 4.0
