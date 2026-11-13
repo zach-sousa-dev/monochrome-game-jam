@@ -1,0 +1,291 @@
+[gd_scene format=3 uid="uid://ly6sm5smerbw"]
+
+[ext_resource type="PackedScene" uid="uid://dd4d7wdo1184u" path="res://scenes/player/player.tscn" id="1_d0ra6"]
+[ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://shaders/clamp.gdshader" id="1_gi8eg"]
+[ext_resource type="Texture2D" uid="uid://cpi7kaxfadgg2" path="res://assets/sprites/player/placeholder/vignette.png" id="2_gi8eg"]
+[ext_resource type="Texture2D" uid="uid://cq7mpq2o63f3b" path="res://assets/sprites/player/placeholder/eli.jpg" id="2_uiwrj"]
+[ext_resource type="PackedScene" uid="uid://di5cl76maifjy" path="res://scenes/npc/npc.tscn" id="3_rkgdp"]
+[ext_resource type="Shader" uid="uid://1p3yx37wwnye" path="res://shaders/posterization.gdshader" id="4_5011q"]
+[ext_resource type="Script" uid="uid://c66jua0epg6uf" path="res://scenes/npc/speech.gd" id="4_wviax"]
+[ext_resource type="Texture2D" uid="uid://dtwjoqjkwptfo" path="res://assets/sprites/player/fancy/imp_idle0000.png" id="5_wc5o2"]
+[ext_resource type="Texture2D" uid="uid://bupit6mu0iv1r" path="res://assets/sprites/player/fancy/imp_idle0001.png" id="6_ihrbm"]
+[ext_resource type="Texture2D" uid="uid://dh46cqc1yx5xo" path="res://assets/sprites/player/fancy/imp_idle0002.png" id="7_wy0kv"]
+[ext_resource type="Texture2D" uid="uid://2u1pdt0cemnj" path="res://assets/sprites/player/fancy/imp_idle0003.png" id="8_erg3u"]
+[ext_resource type="Texture2D" uid="uid://453w4at2v7k3" path="res://assets/sprites/player/fancy/imp_idle0004.png" id="9_5eu0b"]
+[ext_resource type="Texture2D" uid="uid://bmq03yof0psvl" path="res://assets/sprites/player/fancy/imp_idle0005.png" id="10_vmxbn"]
+[ext_resource type="Texture2D" uid="uid://dnwjqfpe6b06a" path="res://assets/sprites/player/fancy/imp_idle0006.png" id="11_k8ye3"]
+[ext_resource type="Texture2D" uid="uid://3knt2n0ou46x" path="res://assets/sprites/player/fancy/imp_idle0007.png" id="12_w0xj2"]
+[ext_resource type="Texture2D" uid="uid://y62yg4gfibfp" path="res://assets/sprites/player/fancy/imp_idle0008.png" id="13_e3ssk"]
+[ext_resource type="Texture2D" uid="uid://bp7sg5yypjn5r" path="res://assets/sprites/player/fancy/imp_idle0009.png" id="14_52eq8"]
+[ext_resource type="Texture2D" uid="uid://dp551an15bytk" path="res://assets/sprites/player/fancy/imp_idle0010.png" id="15_jv8fe"]
+[ext_resource type="Texture2D" uid="uid://b5hgkaux5asdm" path="res://shaders/shader-palette.png" id="19_wviax"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1ydht"]
+shader = ExtResource("1_gi8eg")
+shader_parameter/colour = Color(0, 0, 0, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5011q"]
+size = Vector2(40, 16)
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_1ydht"]
+polygon = PackedVector2Array(-20, -8, 20, -8, 20, 8, -20, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ip6iq"]
+size = Vector2(72, 16)
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_7g6oh"]
+polygon = PackedVector2Array(-0.5, -0.5, -0.5, 0.375, 0.5, 0.375, 0.5, -0.5)
+
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_5e5u1"]
+points = PackedVector2Array(-177, 7, -48, -110, -25, -110, 108, 9)
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_cgh76"]
+polygon = PackedVector2Array(-176, 6, -48, -110, -25, -110, 104, 6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sy1jg"]
+size = Vector2(640, 20)
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_om3do"]
+polygon = PackedVector2Array(-320, -10, -320, 10, 320, 10, 320, -10)
+
+[sub_resource type="Resource" id="Resource_6nf5r"]
+script = ExtResource("4_wviax")
+name = "Eli"
+dialog = "...I hate the smell"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_bl2hb"]
+script = ExtResource("4_wviax")
+name = "Eli"
+dialog = "I just think of anesthesia"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_ibh68"]
+script = ExtResource("4_wviax")
+name = "Eli"
+dialog = "..."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_fiaps"]
+script = ExtResource("4_wviax")
+name = "Eli"
+dialog = "reminds me of when I got tubes in my ears"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_0oo3m"]
+script = ExtResource("4_wviax")
+name = "Eli"
+dialog = "the smell was disgusting and the experience was unpleasant"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_15swg"]
+script = ExtResource("4_wviax")
+name = "Eli"
+dialog = "(painful)"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_wc5o2"]
+light_mode = 1
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_oklal"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_wc5o2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_ihrbm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_wy0kv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_erg3u")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_5eu0b")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_vmxbn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_k8ye3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_w0xj2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_e3ssk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_52eq8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_jv8fe")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 12.0
+}]
+
+[sub_resource type="Gradient" id="Gradient_d0ra6"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_7g6oh"]
+gradient = SubResource("Gradient_d0ra6")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.8521739, 0.17826086)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7g6oh"]
+shader = ExtResource("1_gi8eg")
+shader_parameter/colour = Color(0.68235296, 0.8980392, 0.83137256, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5011q"]
+shader = ExtResource("4_5011q")
+shader_parameter/palette = ExtResource("19_wviax")
+
+[node name="EliScene" type="Node2D" unique_id=1366947214]
+material = SubResource("ShaderMaterial_1ydht")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1015420312]
+color = Color(0, 0, 0, 1)
+
+[node name="Backdrop" type="Sprite2D" parent="." unique_id=107408518]
+position = Vector2(1, 0)
+scale = Vector2(2.0234375, 1.4355469)
+texture = ExtResource("2_uiwrj")
+
+[node name="Environment" type="Node2D" parent="." unique_id=357269498]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Environment" unique_id=134418465]
+
+[node name="Platform4" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=1229601900]
+position = Vector2(196, 104)
+shape = SubResource("RectangleShape2D_5011q")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Environment/StaticBody2D/Platform4" unique_id=657856620]
+occluder = SubResource("OccluderPolygon2D_1ydht")
+
+[node name="Platform3" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=1777157835]
+position = Vector2(196, 120)
+shape = SubResource("RectangleShape2D_ip6iq")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Environment/StaticBody2D/Platform3" unique_id=49300521]
+scale = Vector2(72.00001, 15.999999)
+occluder = SubResource("OccluderPolygon2D_7g6oh")
+
+[node name="Platform2" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=528326678]
+position = Vector2(116, 104)
+shape = SubResource("RectangleShape2D_5011q")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Environment/StaticBody2D/Platform2" unique_id=2030967072]
+occluder = SubResource("OccluderPolygon2D_1ydht")
+
+[node name="Platform" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=1723396193]
+position = Vector2(76, 120)
+shape = SubResource("RectangleShape2D_5011q")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Environment/StaticBody2D/Platform" unique_id=667548848]
+occluder = SubResource("OccluderPolygon2D_1ydht")
+
+[node name="Platform6" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=1813093273]
+position = Vector2(-30, 14.999998)
+rotation = 0.5235988
+shape = SubResource("RectangleShape2D_5011q")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Environment/StaticBody2D/Platform6" unique_id=1175775491]
+occluder = SubResource("OccluderPolygon2D_1ydht")
+
+[node name="Platform7" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=336485176]
+position = Vector2(-245, 6)
+rotation = -0.5235988
+shape = SubResource("RectangleShape2D_5011q")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Environment/StaticBody2D/Platform7" unique_id=1029262341]
+occluder = SubResource("OccluderPolygon2D_1ydht")
+
+[node name="Platform5" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=1497281769]
+position = Vector2(-104, 120)
+shape = SubResource("ConvexPolygonShape2D_5e5u1")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Environment/StaticBody2D/Platform5" unique_id=1697389913]
+occluder = SubResource("OccluderPolygon2D_cgh76")
+
+[node name="Ground" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=2141789901]
+position = Vector2(0, 136)
+shape = SubResource("RectangleShape2D_sy1jg")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Environment/StaticBody2D/Ground" unique_id=1318287508]
+occluder = SubResource("OccluderPolygon2D_om3do")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=906906192]
+position = Vector2(1, 0)
+zoom = Vector2(2.5, 2.5)
+
+[node name="NPC" parent="." unique_id=71207571 instance=ExtResource("3_rkgdp")]
+position = Vector2(192, 75)
+player_group = "player"
+interact_label_text = "E - Talk"
+scene_node = NodePath("../Player/Sprite2D")
+seconds_per_letter = 0.05
+speeches = Array[ExtResource("4_wviax")]([SubResource("Resource_6nf5r"), SubResource("Resource_bl2hb"), SubResource("Resource_ibh68"), SubResource("Resource_fiaps"), SubResource("Resource_0oo3m"), SubResource("Resource_15swg")])
+
+[node name="AnimatedSprite2D" parent="NPC" index="0" unique_id=9266485]
+material = SubResource("CanvasItemMaterial_wc5o2")
+sprite_frames = SubResource("SpriteFrames_oklal")
+animation = &"default"
+autoplay = "default"
+frame_progress = 0.0
+
+[node name="Player" parent="." unique_id=1818162535 instance=ExtResource("1_d0ra6")]
+floor_max_angle = 1.0471976
+floor_snap_length = 8.0
+cam_path = NodePath("../Camera2D")
+cam_speed = 0.1
+debug_velocity = true
+
+[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=519715087]
+visible = false
+position = Vector2(7.6293945e-06, 3.8146973e-06)
+scale = Vector2(0.3273148, 0.3273148)
+texture = ExtResource("2_gi8eg")
+
+[node name="PointLight2D" type="PointLight2D" parent="Player" unique_id=576487711]
+visible = false
+position = Vector2(-2, 1)
+color = Color(0.41000003, 1, 0.67550004, 1)
+energy = 2.0
+shadow_enabled = true
+texture = SubResource("GradientTexture2D_7g6oh")
+texture_scale = 4.81
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1484889600]
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer" unique_id=1853059257]
+material = SubResource("ShaderMaterial_7g6oh")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -742.0
+offset_top = -444.0
+offset_right = 219.0
+offset_bottom = 238.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CanvasLayer2" type="CanvasLayer" parent="." unique_id=1313702084]
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer2" unique_id=1209809950]
+material = SubResource("ShaderMaterial_5011q")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -778.0
+offset_top = -430.0
+offset_right = 183.0
+offset_bottom = 252.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[editable path="NPC"]

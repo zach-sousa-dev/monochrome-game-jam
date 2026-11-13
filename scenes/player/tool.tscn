@@ -83,6 +83,7 @@ script = ExtResource("1_eklfw")
 unique_name_in_owner = true
 scale = Vector2(0.673, 1)
 energy = 2.0
+shadow_enabled = true
 texture = SubResource("GradientTexture2D_in0jd")
 
 [node name="ToolSprite2D" type="AnimatedSprite2D" parent="." unique_id=783287713]
