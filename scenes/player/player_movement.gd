@@ -18,6 +18,15 @@ var has_started_timer: bool = false
 @export var cam_path: NodePath
 @export var cam_speed: float = 1
 
+@export_category("Items")
+@export var starting_items: Array[ItemDB.Id] = [ItemDB.Id.LIGHTER, ItemDB.Id.LANTERN]
+
+@export_category("Fuel")
+@export var test_speed: float = 30.0
+@export var auto_drain: bool = true
+
+@onready var tool = $Tool
+
 @export_category("Debug")
 @export var debug_mode: bool = false
 @export var debug_coyote: bool = false
@@ -32,11 +41,36 @@ var has_started_timer: bool = false
 
 
 func _ready() -> void:
+	
+	add_to_group("player") # so projectile knows its the player
+	
+	if PlayerInventory.items.is_empty():
+		for item_id in starting_items:
+			PlayerInventory.add_item(ItemDB.create(item_id))
+	
+	Fuel.draining = auto_drain
+	Fuel.died.connect(_on_died)
+	
 	coyote_timer.timeout.connect(coyote_timer.stop)  # Apparently timers don't stop when they reach zero automatically (they just restart) so this makes it do that
 
 
 
 func _physics_process(delta: float) -> void:
+	
+	if Input.is_physical_key_pressed(KEY_Q):
+		print("q pressed")
+		Fuel.take_damage( Fuel.get_drain_rate() * test_speed * delta)
+		
+	if Input.is_physical_key_pressed(KEY_R):
+		Fuel.refuel(test_speed * delta)
+	
+	if Input.is_action_pressed("shoot"): # shoot a fella
+		tool.shoot()
+	
+	if Input.is_action_just_pressed("cycle_fire"): #cycle between items
+		tool.cycle_projectile(1)
+	
+	
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta
@@ -111,3 +145,8 @@ func _print_debug() -> void:
 		print("\n")
 		print(format_string % ["h_vel:", velocity.x])
 		print(format_string % ["y_vel:", velocity.y])
+
+
+func _on_died():
+	print("Died - refilling fuel")
+	Fuel.reset_fuel()

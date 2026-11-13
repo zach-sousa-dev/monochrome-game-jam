@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 [gd_scene format=3 uid="uid://cnbjlghsyps40"]
 
 [ext_resource type="Script" path="res://scenes/player/tool.gd" id="1_eklfw"]
+=======
+[gd_scene format=3 uid="uid://d12s8pxdl381h"]
+
+[ext_resource type="Script" uid="uid://b15n5aiplg35p" path="res://scenes/player/tool.gd" id="1_eklfw"]
+>>>>>>> b18ad0bb6f0a36d0cc28bd3b7a87776d92e1bd69
 [ext_resource type="Texture2D" uid="uid://fu7401kyu3jd" path="res://assets/sprites/player/placeholder/run1.png" id="2_pcrlx"]
 [ext_resource type="Texture2D" uid="uid://duidwdtk7ijff" path="res://assets/sprites/player/placeholder/run2.png" id="3_whxtt"]
 [ext_resource type="Texture2D" uid="uid://dbvbgxqos02fl" path="res://assets/sprites/player/placeholder/run3.png" id="4_flwx8"]

@@ -1,0 +1,93 @@
+[gd_scene format=3 uid="uid://gao4s5yay046"]
+
+[ext_resource type="Theme" uid="uid://x1haa1fvyc6g" path="res://scenes/npc/dialog.tres" id="1_1fjcx"]
+[ext_resource type="Script" uid="uid://c27lusxxfhtmm" path="res://scenes/npc/dialog_box.gd" id="1_6nf5r"]
+
+[node name="DialogBox" type="Control" unique_id=1060565242]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6nf5r")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=453013195]
+layer = 5
+
+[node name="DialogPanel" type="Panel" parent="CanvasLayer" unique_id=780452119]
+texture_filter = 1
+offset_top = 248.0
+offset_right = 640.0
+offset_bottom = 333.0
+theme = ExtResource("1_1fjcx")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/DialogPanel" unique_id=1043559877]
+layout_mode = 0
+offset_right = 640.0
+offset_bottom = 85.0
+theme_override_constants/margin_left = 13
+theme_override_constants/margin_top = 13
+theme_override_constants/margin_right = 13
+theme_override_constants/margin_bottom = 13
+
+[node name="DialogLabel" type="RichTextLabel" parent="CanvasLayer/DialogPanel/MarginContainer" unique_id=1918968700]
+layout_mode = 2
+offset_transform_enabled = true
+text = "Ah, fella, don't hate me 'cause I'm beautiful, fella. Ah, fella, don't hate me 'cause I'm beautiful, fella.
+"
+fit_content = true
+scroll_active = false
+vertical_alignment = 1
+
+[node name="NamePanel" type="Panel" parent="CanvasLayer" unique_id=1737369776]
+texture_filter = 1
+offset_top = 209.0
+offset_right = 207.0
+offset_bottom = 249.0
+theme = ExtResource("1_1fjcx")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/NamePanel" unique_id=1044478138]
+layout_mode = 0
+offset_right = 207.0
+offset_bottom = 42.0
+theme_override_constants/margin_left = 13
+theme_override_constants/margin_top = 13
+theme_override_constants/margin_right = 13
+theme_override_constants/margin_bottom = 13
+
+[node name="NameLabel" type="RichTextLabel" parent="CanvasLayer/NamePanel/MarginContainer" unique_id=497292155]
+layout_mode = 2
+offset_transform_enabled = true
+text = "Lamar"
+fit_content = true
+scroll_active = false
+vertical_alignment = 1
+
+[node name="ButtonPrompt" type="Panel" parent="CanvasLayer" unique_id=893822745]
+texture_filter = 1
+offset_left = 562.0
+offset_top = 320.0
+offset_right = 602.0
+offset_bottom = 360.0
+theme = ExtResource("1_1fjcx")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/ButtonPrompt" unique_id=664003579]
+layout_mode = 0
+offset_left = -1.0
+offset_right = 41.0
+offset_bottom = 42.0
+theme_override_constants/margin_left = 13
+theme_override_constants/margin_top = 13
+theme_override_constants/margin_right = 13
+theme_override_constants/margin_bottom = 13
+
+[node name="NameLabel" type="RichTextLabel" parent="CanvasLayer/ButtonPrompt/MarginContainer" unique_id=1166145751]
+layout_mode = 2
+offset_transform_enabled = true
+text = "E"
+fit_content = true
+scroll_active = false
+vertical_alignment = 1
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=394093675]
