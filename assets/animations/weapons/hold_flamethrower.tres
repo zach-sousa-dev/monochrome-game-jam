@@ -1,3 +1,14 @@
 [gd_resource type="SpriteFrames" format=3 uid="uid://da6diqr5o8nw0"]
 
+[ext_resource type="Texture2D" uid="uid://do07e2dcge5wm" path="res://assets/sprites/player/fancy/weapons/hold_flamethrower.png" id="1_texvh"]
+
 [resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_texvh")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}]

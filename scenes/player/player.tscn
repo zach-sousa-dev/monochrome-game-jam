@@ -37,6 +37,6 @@ shape = SubResource("RectangleShape2D_x7p2l")
 stream = ExtResource("13_gx1jg")
 
 [node name="Tool" parent="." unique_id=1965235933 instance=ExtResource("15_fcs02")]
-position = Vector2(27, 0)
+position = Vector2(27.5, 0.5)
 
 [node name="PlayerHud" parent="." unique_id=868017095 instance=ExtResource("14_ugbui")]

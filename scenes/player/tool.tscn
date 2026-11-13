@@ -17,6 +17,7 @@ script = ExtResource("1_eklfw")
 
 [node name="ToolPointLight2D" type="PointLight2D" parent="." unique_id=1557680071]
 unique_name_in_owner = true
+position = Vector2(-7, 0)
 scale = Vector2(0.673, 1)
 energy = 2.0
 range_item_cull_mask = 3
@@ -27,9 +28,7 @@ texture = SubResource("GradientTexture2D_in0jd")
 [node name="ToolSprite2D" type="AnimatedSprite2D" parent="." unique_id=783287713]
 unique_name_in_owner = true
 texture_filter = 1
-position = Vector2(0.5, 0.5)
 sprite_frames = ExtResource("2_1ahuj")
 
 [node name="ToolMarker2D" type="Marker2D" parent="." unique_id=1013744363]
 unique_name_in_owner = true
-position = Vector2(0, -5)

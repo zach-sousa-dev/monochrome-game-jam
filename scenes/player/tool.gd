@@ -18,6 +18,11 @@ var item: ItemData = null
 # -- cooldown on tool
 var _cooldown: float = 0.0
 
+# for some reason the sprite is offset by 1 pixel when flipped to the left
+# so I'm just manually adjusting for that and need to store the original position. 
+# This is a bad solution but it works for now.
+@onready var tool_sprite_2d_original_position: Vector2 = tool_sprite_2d.position
+
 func _ready():
 	PlayerInventory.selected_changed.connect(_on_selected_tool_changed)
 	Fuel.fuel_changed.connect(_on_fuel_changed)
@@ -69,9 +74,16 @@ func _sync_to_body():
 
 # -- copies players flip and mirroirs the marker
 func _update_filp():
-	tool_sprite_2d.flip_h = body_sprite.flip_h
-	if item:
-		tool_marker_2d.position = Vector2(item.shooting_pos.x * get_facing(), item.shooting_pos.y)
+	# by mirroring the scale we can flip the local position of the light, marker, and sprite
+	# (local position inside of tool)
+	self.scale = Vector2(get_facing(), 1)
+	# then we can flip the position of the whole tool to the other side of the player
+	position.x = (abs(position.x) * get_facing())
+	
+	# old code
+	#tool_sprite_2d.flip_h = body_sprite.flip_h
+	#if item:
+	#	tool_marker_2d.position = Vector2(item.shooting_pos.x * get_facing(), item.shooting_pos.y)
 
 # -- 1 = facing right, -1 = facing left (from player sprite)
 func get_facing() -> int:
