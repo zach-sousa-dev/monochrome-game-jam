@@ -1,136 +1,195 @@
-[gd_scene format=3 uid="uid://dywlmpj2bq55s"]
+[gd_scene format=4 uid="uid://dywlmpj2bq55s"]
 
 [ext_resource type="PackedScene" uid="uid://dd4d7wdo1184u" path="res://scenes/player/player.tscn" id="1_ia4q5"]
+[ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://shaders/clamp.gdshader" id="1_nej6s"]
+[ext_resource type="Script" uid="uid://c66jua0epg6uf" path="res://scenes/npc/speech.gd" id="2_hrqc2"]
 [ext_resource type="Texture2D" uid="uid://cpi7kaxfadgg2" path="res://assets/sprites/player/placeholder/vignette.png" id="2_ocyxy"]
+[ext_resource type="PackedScene" uid="uid://di5cl76maifjy" path="res://scenes/npc/npc.tscn" id="3_qlt7d"]
+[ext_resource type="Texture2D" uid="uid://dtwjoqjkwptfo" path="res://assets/sprites/player/fancy/idle/imp_idle0000.png" id="5_slj1a"]
+[ext_resource type="Texture2D" uid="uid://bupit6mu0iv1r" path="res://assets/sprites/player/fancy/idle/imp_idle0001.png" id="6_jid7r"]
+[ext_resource type="Texture2D" uid="uid://dh46cqc1yx5xo" path="res://assets/sprites/player/fancy/idle/imp_idle0002.png" id="7_fq37q"]
+[ext_resource type="Texture2D" uid="uid://2u1pdt0cemnj" path="res://assets/sprites/player/fancy/idle/imp_idle0003.png" id="8_0vjil"]
+[ext_resource type="Texture2D" uid="uid://453w4at2v7k3" path="res://assets/sprites/player/fancy/idle/imp_idle0004.png" id="9_vq2at"]
+[ext_resource type="Texture2D" uid="uid://bmq03yof0psvl" path="res://assets/sprites/player/fancy/idle/imp_idle0005.png" id="10_ood2b"]
+[ext_resource type="Texture2D" uid="uid://dnwjqfpe6b06a" path="res://assets/sprites/player/fancy/idle/imp_idle0006.png" id="11_81d1s"]
+[ext_resource type="Texture2D" uid="uid://3knt2n0ou46x" path="res://assets/sprites/player/fancy/idle/imp_idle0007.png" id="12_tug5u"]
+[ext_resource type="Texture2D" uid="uid://y62yg4gfibfp" path="res://assets/sprites/player/fancy/idle/imp_idle0008.png" id="13_qsjqj"]
+[ext_resource type="Texture2D" uid="uid://bp7sg5yypjn5r" path="res://assets/sprites/player/fancy/idle/imp_idle0009.png" id="14_frenu"]
+[ext_resource type="Texture2D" uid="uid://dp551an15bytk" path="res://assets/sprites/player/fancy/idle/imp_idle0010.png" id="15_7y6o2"]
+[ext_resource type="Texture2D" uid="uid://b6kfg6jyjcht0" path="res://assets/sprites/a_burger.png" id="16_bobjc"]
+[ext_resource type="Shader" uid="uid://1p3yx37wwnye" path="res://shaders/posterization.gdshader" id="18_qo24a"]
+[ext_resource type="Texture2D" uid="uid://b5hgkaux5asdm" path="res://shaders/shader-palette.png" id="19_07j5v"]
+[ext_resource type="TileSet" uid="uid://dk5q18pf5ttvy" path="res://assets/tile-maps/environment.tres" id="20_bobjc"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_ocyxy"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1ydht"]
+shader = ExtResource("1_nej6s")
+shader_parameter/colour = Color(0, 0, 0, 1)
 
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ocyxy"]
-noise = SubResource("FastNoiseLite_ocyxy")
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_slj1a"]
+noise_type = 3
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_oiw2g"]
-size = Vector2(40, 16)
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_bobjc"]
+noise = SubResource("FastNoiseLite_slj1a")
 
-[sub_resource type="BoxMesh" id="BoxMesh_q4mm8"]
+[sub_resource type="Resource" id="Resource_6nf5r"]
+script = ExtResource("2_hrqc2")
+name = "Eli"
+dialog = "...I hate the smell"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_ocyxy"]
-size = Vector2(72, 16)
+[sub_resource type="Resource" id="Resource_bl2hb"]
+script = ExtResource("2_hrqc2")
+name = "Eli"
+dialog = "I just think of anesthesia"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
 
-[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_ocyxy"]
-points = PackedVector2Array(-177, 7, -48, -110, -25, -110, 108, 9)
+[sub_resource type="Resource" id="Resource_ibh68"]
+script = ExtResource("2_hrqc2")
+name = "Eli"
+dialog = "..."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
 
-[sub_resource type="PrismMesh" id="PrismMesh_q4mm8"]
-subdivide_width = 1
+[sub_resource type="Resource" id="Resource_fiaps"]
+script = ExtResource("2_hrqc2")
+name = "Eli"
+dialog = "reminds me of when I got tubes in my ears"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
 
-[sub_resource type="BoxMesh" id="BoxMesh_0sqs7"]
+[sub_resource type="Resource" id="Resource_0oo3m"]
+script = ExtResource("2_hrqc2")
+name = "Eli"
+dialog = "the smell was disgusting and the experience was unpleasant"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_ia4q5"]
-size = Vector2(640, 20)
+[sub_resource type="Resource" id="Resource_15swg"]
+script = ExtResource("2_hrqc2")
+name = "Eli"
+dialog = "(painful)"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
 
-[sub_resource type="Gradient" id="Gradient_ocyxy"]
-offsets = PackedFloat32Array(0, 0.6689189)
+[sub_resource type="SpriteFrames" id="SpriteFrames_oklal"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_slj1a")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_jid7r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_fq37q")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_0vjil")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_vq2at")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_ood2b")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_81d1s")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_tug5u")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_qsjqj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_frenu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_7y6o2")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 12.0
+}]
+
+[sub_resource type="Resource" id="Resource_bobjc"]
+script = ExtResource("2_hrqc2")
+name = "burger"
+dialog = "cheeseburger..."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_nej6s"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("16_bobjc")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="Gradient" id="Gradient_d0ra6"]
 colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_gx1jg"]
-gradient = SubResource("Gradient_ocyxy")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_7g6oh"]
+gradient = SubResource("Gradient_d0ra6")
 fill = 1
 fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.8521739, 0.17826086)
 
-[node name="ZachScene" type="Node2D" unique_id=783727970]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7g6oh"]
+shader = ExtResource("1_nej6s")
+shader_parameter/colour = Color(0.68235296, 0.8980392, 0.83137256, 1)
 
-[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1864745391]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5011q"]
+shader = ExtResource("18_qo24a")
+shader_parameter/palette = ExtResource("19_07j5v")
+
+[node name="ZachScene" type="Node2D" unique_id=1366947214]
+material = SubResource("ShaderMaterial_1ydht")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1015420312]
 color = Color(0, 0, 0, 1)
 
-[node name="Backdrop" type="Sprite2D" parent="." unique_id=1954023383]
+[node name="Backdrop" type="Sprite2D" parent="." unique_id=107408518]
 position = Vector2(1, 0)
 scale = Vector2(2.0234375, 1.4355469)
-texture = SubResource("NoiseTexture2D_ocyxy")
+texture = SubResource("NoiseTexture2D_bobjc")
 
-[node name="Environment" type="Node2D" parent="." unique_id=1869862551]
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=968897521]
+light_mask = 2
+texture_filter = 1
+position = Vector2(-120, 0)
+tile_map_data = PackedByteArray("AAD//wIAAAAFAAAAAAAAAAIAAAABAAAAAAABAAIAAAAAAAEAAAD9/wIAAAABAAEAAAD+/wIAAAAEAAAAAAD9/wMAAAAEAAAAAAD+/wMAAAAEAAAAAAD//wMAAAAEAAAAAAAAAAMAAAAEAAAAAAABAAMAAAAEAAAAAAD9/wQAAAAEAAAAAAD+/wQAAAADAAAAAAD//wQAAAAEAAAAAAAAAAQAAAADAAAAAAABAAQAAAAEAAAAAAAAAAUAAAAEAAAAAAD//wUAAAAEAAAAAAD+/wUAAAADAAAAAAD9/wUAAAADAAAAAAABAAUAAAAEAAAAAAD9/wYAAAADAAAAAAD+/wYAAAADAAAAAAD//wYAAAADAAAAAAAAAAYAAAAEAAAAAAABAAYAAAAEAAAAAAACAAYAAAAFAAAAAAADAAYAAAABAAAAAAAEAAYAAAAFAAAAAAAFAAYAAAABAAAAAAAGAAYAAAAFAAAAAAAHAAYAAAAFAAAAAAAIAAYAAAABAAAAAAAJAAYAAAAFAAAAAAD9/wcAAAADAAAAAAD+/wcAAAAEAAAAAAD//wcAAAADAAAAAAAAAAcAAAAEAAAAAAABAAcAAAAEAAAAAAACAAcAAAAEAAAAAAADAAcAAAAEAAAAAAAEAAcAAAAEAAAAAAAFAAcAAAAEAAAAAAAGAAcAAAAEAAAAAAAHAAcAAAAEAAAAAAAIAAcAAAADAAAAAAAJAAcAAAAEAAAAAAAIAAgAAAAEAAAAAAAHAAgAAAADAAAAAAAGAAgAAAAEAAAAAAAFAAgAAAADAAAAAAAEAAgAAAAEAAAAAAADAAgAAAADAAAAAAACAAgAAAAEAAAAAAABAAgAAAADAAAAAAAAAAgAAAAEAAAAAAD//wgAAAAEAAAAAAD+/wgAAAAEAAAAAAD9/wgAAAAEAAAAAAADAAMAAAADAAMAAAAEAAMAAAAEAAMAAAAFAAMAAAAFAAMAAAAGAAMAAAAEAAMAAAAHAAMAAAAFAAMAAAAIAAMAAAAAAAQAAAADAAQAAAACAAMAAAADAAUAAAACAAQAAAAIAAQAAAACAAMAAAAIAAUAAAACAAMAAAAFAAUAAAACAAMAAAAFAAQAAAADAAQAAAAGAAUAAAACAAQAAAAKAAYAAAAEAAQAAAALAAcAAAAEAAQAAAAMAAgAAAAEAAQAAAAKAAcAAAAEAAAAAAAKAAgAAAADAAAAAAALAAgAAAAEAAAAAAAJAAgAAAAEAAAAAAANAAkAAAAFAAAAAAAOAAkAAAAFAAAAAAAPAAkAAAAFAAAAAAAQAAkAAAAFAAAAAAAMAAkAAAACAAEAAAALAAkAAAACAAEAAAAKAAkAAAACAAEAAAAJAAkAAAACAAEAAAAIAAkAAAACAAEAAAAHAAkAAAACAAEAAAAGAAkAAAACAAEAAAAFAAkAAAACAAEAAAAEAAkAAAACAAEAAAADAAkAAAACAAEAAAACAAkAAAACAAEAAAABAAkAAAACAAEAAAAAAAkAAAACAAEAAAD//wkAAAACAAEAAAD+/wkAAAACAAEAAAD9/wkAAAADAAEAAAANAAoAAAADAAEAAAAOAAoAAAACAAEAAAAPAAoAAAACAAEAAAAQAAoAAAAEAAEAAAAOAAgAAAABAAMAAAAPAAgAAAAAAAMAAAAQAAgAAAAAAAMAAAD9/wEAAAACAAQAAAD+/wEAAAAEAAAAAAABAAEAAAAAAAMAAAAAAAEAAAAAAAMAAAACAAQAAAACAAQAAAACAAUAAAACAAQAAAD+/wAAAAAEAAAAAAD+////AAAEAAAAAAD+//7/AAABAAQAAAA=")
+tile_set = ExtResource("20_bobjc")
 
-[node name="StaticBody2D" type="StaticBody2D" parent="Environment" unique_id=848652026]
-
-[node name="Platform4" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=846574327]
-position = Vector2(196, 104)
-shape = SubResource("RectangleShape2D_oiw2g")
-
-[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform4" unique_id=750902923]
-scale = Vector2(40, 15.999999)
-mesh = SubResource("BoxMesh_q4mm8")
-
-[node name="Platform3" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=242519108]
-position = Vector2(196, 120)
-shape = SubResource("RectangleShape2D_ocyxy")
-
-[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform3" unique_id=488931627]
-scale = Vector2(72.00001, 15.999999)
-mesh = SubResource("BoxMesh_q4mm8")
-
-[node name="Platform2" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=555866414]
-position = Vector2(116, 104)
-shape = SubResource("RectangleShape2D_oiw2g")
-
-[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform2" unique_id=807760893]
-scale = Vector2(40, 15.999999)
-mesh = SubResource("BoxMesh_q4mm8")
-
-[node name="Platform" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=346618050]
-position = Vector2(76, 120)
-shape = SubResource("RectangleShape2D_oiw2g")
-
-[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform" unique_id=1695265586]
-scale = Vector2(40, 15.999999)
-mesh = SubResource("BoxMesh_q4mm8")
-
-[node name="Platform6" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=533251019]
-position = Vector2(-30, 14.999998)
-rotation = 0.5235988
-shape = SubResource("RectangleShape2D_oiw2g")
-
-[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform6" unique_id=334270393]
-scale = Vector2(40, 15.999999)
-mesh = SubResource("BoxMesh_q4mm8")
-
-[node name="Platform7" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=745556684]
-position = Vector2(-245, 6)
-rotation = -0.5235988
-shape = SubResource("RectangleShape2D_oiw2g")
-
-[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform7" unique_id=2016740582]
-scale = Vector2(40, 15.999999)
-mesh = SubResource("BoxMesh_q4mm8")
-
-[node name="Platform5" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=2133784315]
-position = Vector2(-104, 120)
-shape = SubResource("ConvexPolygonShape2D_ocyxy")
-
-[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform5" unique_id=1548267327]
-position = Vector2(-46.874992, -51.999992)
-scale = Vector2(259.75, -118)
-mesh = SubResource("PrismMesh_q4mm8")
-
-[node name="MeshInstance2D3" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform5" unique_id=458336113]
-position = Vector2(-35.5, -92)
-scale = Vector2(20.999992, -35.99999)
-mesh = SubResource("BoxMesh_0sqs7")
-
-[node name="MeshInstance2D2" type="MeshInstance2D" parent="Environment/StaticBody2D/Platform5" unique_id=1109113125]
-position = Vector2(-24.875, -51.999992)
-scale = Vector2(259.75, -118)
-mesh = SubResource("PrismMesh_q4mm8")
-
-[node name="Ground" type="CollisionShape2D" parent="Environment/StaticBody2D" unique_id=850970559]
-position = Vector2(0, 136)
-shape = SubResource("RectangleShape2D_ia4q5")
-
-[node name="MeshInstance2D" type="MeshInstance2D" parent="Environment/StaticBody2D/Ground" unique_id=30297883]
-position = Vector2(0, -2)
-scale = Vector2(640.00006, 15.999999)
-mesh = SubResource("BoxMesh_q4mm8")
-
-[node name="Camera2D" type="Camera2D" parent="." unique_id=651167167]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=906906192]
 position = Vector2(1, 0)
 zoom = Vector2(2.5, 2.5)
+
+[node name="NPC" parent="." unique_id=71207571 instance=ExtResource("3_qlt7d")]
+position = Vector2(193, 159)
+player_group = "player"
+interact_label_text = "E - Talk"
+scene_node = NodePath("../Player/Sprite2D")
+seconds_per_letter = 0.05
+speeches = Array[ExtResource("2_hrqc2")]([SubResource("Resource_6nf5r"), SubResource("Resource_bl2hb"), SubResource("Resource_ibh68"), SubResource("Resource_fiaps"), SubResource("Resource_0oo3m"), SubResource("Resource_15swg")])
+
+[node name="AnimatedSprite2D" parent="NPC" index="0" unique_id=9266485]
+sprite_frames = SubResource("SpriteFrames_oklal")
+animation = &"default"
+autoplay = "default"
+frame_progress = 0.0
+
+[node name="Burger NPC" parent="." unique_id=608656700 instance=ExtResource("3_qlt7d")]
+position = Vector2(-101, 21)
+player_group = "player"
+interact_label_text = "E - Talk"
+seconds_per_letter = 0.05
+speeches = Array[ExtResource("2_hrqc2")]([SubResource("Resource_bobjc")])
+
+[node name="AnimatedSprite2D" parent="Burger NPC" index="0" unique_id=9266485]
+sprite_frames = SubResource("SpriteFrames_nej6s")
+animation = &"default"
+autoplay = "default"
+frame_progress = 0.0
 
 [node name="Player" parent="." unique_id=1818162535 instance=ExtResource("1_ia4q5")]
 floor_max_angle = 1.0471976
@@ -139,13 +198,48 @@ cam_path = NodePath("../Camera2D")
 cam_speed = 0.1
 debug_velocity = true
 
-[node name="PointLight2D" type="PointLight2D" parent="Player" unique_id=2095817610]
-position = Vector2(1, 0)
-scale = Vector2(2.421875, 2.421875)
-texture = SubResource("GradientTexture2D_gx1jg")
-
-[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=682674969]
+[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=519715087]
 visible = false
 position = Vector2(7.6293945e-06, 3.8146973e-06)
 scale = Vector2(0.3273148, 0.3273148)
 texture = ExtResource("2_ocyxy")
+
+[node name="PointLight2D" type="PointLight2D" parent="Player" unique_id=576487711]
+visible = false
+position = Vector2(-2, 1)
+color = Color(0.41000003, 1, 0.67550004, 1)
+energy = 2.0
+shadow_enabled = true
+texture = SubResource("GradientTexture2D_7g6oh")
+texture_scale = 4.81
+
+[node name="Clamp Shader" type="CanvasLayer" parent="." unique_id=1484889600]
+
+[node name="ColorRect" type="ColorRect" parent="Clamp Shader" unique_id=1853059257]
+material = SubResource("ShaderMaterial_7g6oh")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -742.0
+offset_top = -444.0
+offset_right = 219.0
+offset_bottom = 238.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Posterize Shader" type="CanvasLayer" parent="." unique_id=1313702084]
+
+[node name="ColorRect" type="ColorRect" parent="Posterize Shader" unique_id=1209809950]
+material = SubResource("ShaderMaterial_5011q")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -778.0
+offset_top = -430.0
+offset_right = 183.0
+offset_bottom = 252.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[editable path="NPC"]
+[editable path="Burger NPC"]
