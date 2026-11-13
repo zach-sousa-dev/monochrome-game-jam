@@ -17,6 +17,7 @@
 [ext_resource type="Texture2D" uid="uid://bp7sg5yypjn5r" path="res://assets/sprites/player/fancy/idle/imp_idle0009.png" id="14_frenu"]
 [ext_resource type="Texture2D" uid="uid://dp551an15bytk" path="res://assets/sprites/player/fancy/idle/imp_idle0010.png" id="15_7y6o2"]
 [ext_resource type="Texture2D" uid="uid://b6kfg6jyjcht0" path="res://assets/sprites/a_burger.png" id="16_bobjc"]
+[ext_resource type="AudioStream" uid="uid://de8hvim1y04q" path="res://assets/sounds/npc/placeholder/josh.wav" id="16_slj1a"]
 [ext_resource type="Shader" uid="uid://1p3yx37wwnye" path="res://shaders/posterization.gdshader" id="18_qo24a"]
 [ext_resource type="Texture2D" uid="uid://b5hgkaux5asdm" path="res://shaders/shader-palette.png" id="19_07j5v"]
 [ext_resource type="TileSet" uid="uid://dk5q18pf5ttvy" path="res://assets/tile-maps/environment.tres" id="20_bobjc"]
@@ -183,6 +184,7 @@ position = Vector2(-101, 21)
 player_group = "player"
 interact_label_text = "E - Talk"
 seconds_per_letter = 0.05
+voice_sound = ExtResource("16_slj1a")
 speeches = Array[ExtResource("2_hrqc2")]([SubResource("Resource_bobjc")])
 
 [node name="AnimatedSprite2D" parent="Burger NPC" index="0" unique_id=9266485]
