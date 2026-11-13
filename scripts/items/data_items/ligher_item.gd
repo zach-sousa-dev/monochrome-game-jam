@@ -5,12 +5,12 @@ extends ItemData
 func _init():
 	id = "lighter"
 	display_name = "Lighter"
-	icon = preload("res://assets/ui_assets/Lighter.png")
+	icon = preload("res://assets/ui_assets/placeholder/small-weapons/lighter.png")
 	hud_texture = icon # CHANGE LATER TO ASSET (big verison) -----
 	drain_multiplier = 5
 	
 	# -- tool
-	#weapon_frames = preload()
+	weapon_frames = preload("res://assets/animations/weapons/hold_lighter.tres")
 	shooting_pos = Vector2.ZERO
 	light_brightness = 1.2
 	light_range = 4.0

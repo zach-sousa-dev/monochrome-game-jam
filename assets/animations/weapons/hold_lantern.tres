@@ -1,0 +1,14 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://dyw3dd5d0mya2"]
+
+[ext_resource type="Texture2D" uid="uid://cwjjbbg8f66tt" path="res://assets/sprites/player/fancy/weapons/hold_lantern.png" id="1_4qo0e"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_4qo0e")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}]

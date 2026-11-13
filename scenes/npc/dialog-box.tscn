@@ -2,6 +2,17 @@
 
 [ext_resource type="Theme" uid="uid://x1haa1fvyc6g" path="res://scenes/npc/dialog.tres" id="1_1fjcx"]
 [ext_resource type="Script" uid="uid://c27lusxxfhtmm" path="res://scenes/npc/dialog_box.gd" id="1_6nf5r"]
+[ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://shaders/clamp.gdshader" id="3_5s0s5"]
+[ext_resource type="Shader" uid="uid://1p3yx37wwnye" path="res://shaders/posterization.gdshader" id="4_ykjlx"]
+[ext_resource type="Texture2D" uid="uid://b5hgkaux5asdm" path="res://shaders/shader-palette.png" id="5_c8ub0"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gspri"]
+shader = ExtResource("3_5s0s5")
+shader_parameter/colour = Color(0.68235296, 0.8980392, 0.83137256, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yhndi"]
+shader = ExtResource("4_ykjlx")
+shader_parameter/palette = ExtResource("5_c8ub0")
 
 [node name="DialogBox" type="Control" unique_id=1060565242]
 layout_mode = 3
@@ -91,3 +102,33 @@ scroll_active = false
 vertical_alignment = 1
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=394093675]
+
+[node name="CanvasLayer2" type="CanvasLayer" parent="." unique_id=1925040680]
+layer = 5
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer2" unique_id=1312478245]
+material = SubResource("ShaderMaterial_gspri")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -742.0
+offset_top = -444.0
+offset_right = 219.0
+offset_bottom = 238.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CanvasLayer3" type="CanvasLayer" parent="." unique_id=1914560914]
+layer = 5
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer3" unique_id=927008257]
+material = SubResource("ShaderMaterial_yhndi")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -778.0
+offset_top = -430.0
+offset_right = 183.0
+offset_bottom = 252.0
+grow_horizontal = 2
+grow_vertical = 2

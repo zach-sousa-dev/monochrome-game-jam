@@ -3,13 +3,26 @@
 [ext_resource type="Script" uid="uid://cki1x2l337gnd" path="res://scenes/projectiles_scenes/lazer.gd" id="1_r7oxx"]
 [ext_resource type="Texture2D" uid="uid://c58trb3d62n3o" path="res://assets/projectiles_images/lazer.png" id="2_v16ax"]
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_vp3vh"]
+light_mode = 1
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bwooc"]
 size = Vector2(79, 8)
+
+[sub_resource type="Gradient" id="Gradient_vp3vh"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_r7oxx"]
+gradient = SubResource("Gradient_vp3vh")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.84347826, 0.13913043)
 
 [node name="Lazer" type="Area2D" unique_id=1143992300]
 script = ExtResource("1_r7oxx")
 
 [node name="Lazer" type="Sprite2D" parent="." unique_id=1077711344]
+material = SubResource("CanvasItemMaterial_vp3vh")
 position = Vector2(-1.8189894e-12, -5.9604645e-08)
 scale = Vector2(0.206, 0.11)
 texture = ExtResource("2_v16ax")
@@ -17,3 +30,8 @@ texture = ExtResource("2_v16ax")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1394731974]
 position = Vector2(-12.5, 0)
 shape = SubResource("RectangleShape2D_bwooc")
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=687746428]
+shadow_enabled = true
+texture = SubResource("GradientTexture2D_r7oxx")
+texture_scale = 3.19
