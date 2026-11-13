@@ -1,73 +1,8 @@
 [gd_scene format=3 uid="uid://di5cl76maifjy"]
 
-[ext_resource type="Texture2D" uid="uid://hvsf8phswr3l" path="res://assets/sprites/npcs/placeholder/eli1.png" id="1_dpyoa"]
 [ext_resource type="Script" uid="uid://bcw7uxrh0f60n" path="res://scenes/npc/npc.gd" id="1_r4bp4"]
-[ext_resource type="AudioStream" uid="uid://b7eah2nxpvxa1" path="res://assets/sounds/npc/placeholder/talk.wav" id="2_ay68w"]
-[ext_resource type="Texture2D" uid="uid://raeuda7gos8x" path="res://assets/sprites/npcs/placeholder/eli2.png" id="2_r4bp4"]
-[ext_resource type="Script" uid="uid://c66jua0epg6uf" path="res://scenes/npc/speech.gd" id="2_woxlu"]
-[ext_resource type="FontFile" uid="uid://dm1a5r2el8jk0" path="res://assets/ui_assets/placeholder/omelette_font/ttf/om_small_plain.ttf" id="6_ay68w"]
-
-[sub_resource type="Resource" id="Resource_dpyoa"]
-script = ExtResource("2_woxlu")
-metadata/_custom_type_script = "uid://c66jua0epg6uf"
-
-[sub_resource type="Resource" id="Resource_r4bp4"]
-script = ExtResource("2_woxlu")
-name = "Lamar"
-dialog = "Ah, fella, don't hate me 'cause I'm beautiful, fella"
-metadata/_custom_type_script = "uid://c66jua0epg6uf"
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_2vina"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("1_dpyoa")
-}, {
-"duration": 1.0,
-"texture": ExtResource("2_r4bp4")
-}],
-"loop": 1,
-"name": &"idle",
-"speed": 2.0
-}]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_q4mm8"]
-size = Vector2(32, 29)
-
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_rx80j"]
-light_mode = 1
 
 [node name="NPC" type="Area2D" unique_id=71207571]
 process_mode = 3
 script = ExtResource("1_r4bp4")
-voice_sound = ExtResource("2_ay68w")
-speeches = Array[ExtResource("2_woxlu")]([SubResource("Resource_dpyoa"), SubResource("Resource_r4bp4")])
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=9266485]
-texture_filter = 1
-sprite_frames = SubResource("SpriteFrames_2vina")
-animation = &"idle"
-autoplay = "idle"
-frame_progress = 0.11661904
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1584941531]
-position = Vector2(0, 1.5)
-shape = SubResource("RectangleShape2D_q4mm8")
-
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1612832722]
-layer = 346
-visible = false
-follow_viewport_enabled = true
-
-[node name="InteractLabel" type="RichTextLabel" parent="CanvasLayer" unique_id=325016164]
-material = SubResource("CanvasItemMaterial_rx80j")
-offset_left = -51.0
-offset_top = -29.0
-offset_right = 51.0
-offset_bottom = -13.0
-theme_override_fonts/normal_font = ExtResource("6_ay68w")
-text = "Talk"
-fit_content = true
-scroll_active = false
-horizontal_alignment = 1
-vertical_alignment = 1
+player_group = "player"
