@@ -7,4 +7,5 @@
 script = ExtResource("2_8aisv")
 person_name = "C. Burger"
 person_voice = ExtResource("1_7yx51")
+seconds_per_letter = 0.05
 metadata/_custom_type_script = "uid://b3op2433pdm0f"
