@@ -10,16 +10,11 @@ extends Node2D
 
 @export_category("Config")
 @export var player_group: String
-@export var interact_label_text: String
-@export var scene_node: NodePath
 
 @export_category("Dialog Options")
 @export var seconds_per_letter: float = 0.1
 @export var voice_sound: AudioStream
 @export var speeches: Array[Speech]
-
-#@onready var label: RichTextLabel = $CanvasLayer/InteractLabel
-#@onready var canvas_layer: CanvasLayer = $CanvasLayer
 
 var touching_player: bool = false
 var current_speech_index: int = 0
@@ -29,8 +24,6 @@ signal dialog_complete
 func _ready() -> void:
 	connect("body_entered", _on_body_entered)
 	connect("body_exited", _on_body_exited)
-	#label.text = interact_label_text
-	#canvas_layer.visible = false
 
 
 
@@ -58,14 +51,10 @@ func _process(delta: float) -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if not body.is_in_group(player_group): return
-	#canvas_layer.visible = true
 	touching_player = true
-	#canvas_layer.reparent(get_node(scene_node))
 
 
 
 func _on_body_exited(body: Node2D) -> void:
 	if not body.is_in_group(player_group): return
-	#canvas_layer.visible = false
 	touching_player = false
-	#canvas_layer.reparent(self)
