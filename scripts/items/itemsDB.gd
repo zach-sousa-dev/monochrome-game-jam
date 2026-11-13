@@ -5,7 +5,8 @@ extends  RefCounted
 # -- Add items here
 enum Id {
 	LIGHTER,
-	LANTERN
+	LANTERN,
+	FLAMETHROWER
 }
 
 
@@ -17,6 +18,8 @@ static func create(item_id: Id) -> ItemData:
 			return LighterItem.new()
 		Id.LANTERN:
 			return LanternItem.new()
+		Id.FLAMETHROWER:
+			return FlameThrower.new()
 	# -- if not item with that name is real
 	push_error("ItemDB: unknown item")
 	return null

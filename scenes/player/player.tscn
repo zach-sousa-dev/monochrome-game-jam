@@ -20,6 +20,7 @@ horizontal_acceleration = 900.0
 horizontal_decceleration = 300.0
 jump_velocity = -250.0
 coyote_time_duration_seconds = 0.05
+starting_items = Array[int]([0, 1, 2])
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1561572402]
 texture_filter = 1
