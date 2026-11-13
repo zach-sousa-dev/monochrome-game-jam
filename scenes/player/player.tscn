@@ -13,6 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://kvcq2iycoaft" path="res://assets/sprites/player/placeholder/run10.png" id="10_kvlxm"]
 [ext_resource type="Texture2D" uid="uid://bnohvrb24sjkc" path="res://assets/sprites/player/placeholder/stand.png" id="11_je7p5"]
 [ext_resource type="AudioStream" uid="uid://birtlg78gxn0e" path="res://assets/sounds/player/placeholder/jump.wav" id="13_gx1jg"]
+[ext_resource type="PackedScene" uid="uid://cnbjlghsyps40" path="res://scenes/player/tool.tscn" id="15_fcs02"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_x7p2l"]
 animations = [{
@@ -94,3 +95,5 @@ shape = SubResource("RectangleShape2D_x7p2l")
 
 [node name="JumpSound" type="AudioStreamPlayer2D" parent="." unique_id=1474954606]
 stream = ExtResource("13_gx1jg")
+
+[node name="Tool" parent="." unique_id=1965235933 instance=ExtResource("15_fcs02")]
