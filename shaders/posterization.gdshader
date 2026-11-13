@@ -3,7 +3,8 @@ shader_type canvas_item;
 uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, filter_nearest;
 
 group_uniforms Steps;
-uniform int step_count : hint_range(1, 255);
+//uniform int step_count : hint_range(1, 255);
+uniform sampler2D palette : source_color, filter_nearest;
 group_uniforms;
 
 vec3 hsv_to_rgb(vec3 hsv){
@@ -71,12 +72,19 @@ vec3 rgb_to_hsv(vec3 rgb){
 	return vec3(hue, sat, value);
 }
 
-float posterize_value(float val_in, float step_size){
-	float val_out = 1.0;
+float posterize_value(float val_in){
+	int step_count = textureSize(palette,0).y;
+	
+	vec4 last = texelFetch(palette, ivec2(0,step_count-1), 0);
+	float val_out = rgb_to_hsv(vec3(last.x, last.y, last.z)).z;;
 	
 	for(int i = 0; i < step_count; i++){
-		float step = float(i) * step_size;
-		float next = float(i + 1) * step_size;
+		//vec4 pixel = texture(palette, vec2((float(i)+0.5)/float(step_count), 0.5));
+		vec4 pixel = texelFetch(palette, ivec2(0,i), 0);
+		float step = rgb_to_hsv(vec3(pixel.x, pixel.y, pixel.z)).z;
+		//vec4 next_pixel = texture(palette, vec2((float(i+1)+0.5)/float(step_count), 0.5));
+		vec4 next_pixel = texelFetch(palette, ivec2(0,i+1), 0);
+		float next = rgb_to_hsv(vec3(next_pixel.x, next_pixel.y, next_pixel.z)).z;
 		if(abs(val_in - step) < abs(val_in - next)){
 			val_out = step;
 			break;
@@ -91,9 +99,9 @@ void fragment() {
 	
 	vec3 hsv_sc = rgb_to_hsv(original_sc.rgb);
 	
-	float step_size = 1.0 / float(step_count);
+	//float step_size = 1.0 / float(step_count);
 	
-	float val_out = posterize_value(hsv_sc.z, step_size);
+	float val_out = posterize_value(hsv_sc.z);
         
 	vec3 hsv_out = vec3(hsv_sc.x, hsv_sc.y, val_out);
 	

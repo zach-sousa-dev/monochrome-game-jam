@@ -93,7 +93,7 @@ func _update_light():
 	var brightness: float = item.light_brightness
 	var size: float = item.light_range
 	if item.dim_with_fuel:
-		brightness *= lerp(0.3, 1.0, ratio)
+		brightness *= lerp(0.2, 1.0, ratio)
 		size *= lerp(0.4, 1.0, ratio)
 	
 	tool_point_light_2d.energy = brightness
