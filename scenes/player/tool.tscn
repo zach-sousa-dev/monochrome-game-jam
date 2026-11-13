@@ -1,0 +1,97 @@
+[gd_scene format=3 uid="uid://cnbjlghsyps40"]
+
+[ext_resource type="Script" path="res://scenes/player/tool.gd" id="1_eklfw"]
+[ext_resource type="Texture2D" uid="uid://fu7401kyu3jd" path="res://assets/sprites/player/placeholder/run1.png" id="2_pcrlx"]
+[ext_resource type="Texture2D" uid="uid://duidwdtk7ijff" path="res://assets/sprites/player/placeholder/run2.png" id="3_whxtt"]
+[ext_resource type="Texture2D" uid="uid://dbvbgxqos02fl" path="res://assets/sprites/player/placeholder/run3.png" id="4_flwx8"]
+[ext_resource type="Texture2D" uid="uid://ci37jhlmvhl4g" path="res://assets/sprites/player/placeholder/run4.png" id="5_oegds"]
+[ext_resource type="Texture2D" uid="uid://cemhiprn5utrm" path="res://assets/sprites/player/placeholder/run5.png" id="6_enapc"]
+[ext_resource type="Texture2D" uid="uid://ddm47y6ly03on" path="res://assets/sprites/player/placeholder/run6.png" id="7_7drs6"]
+[ext_resource type="Texture2D" uid="uid://ev0cbgrvn0f2" path="res://assets/sprites/player/placeholder/run7.png" id="8_kle4c"]
+[ext_resource type="Texture2D" uid="uid://okpdm0w7u2hk" path="res://assets/sprites/player/placeholder/run8.png" id="9_0hoyv"]
+[ext_resource type="Texture2D" uid="uid://diofht7bvvgxp" path="res://assets/sprites/player/placeholder/run9.png" id="10_vpell"]
+[ext_resource type="Texture2D" uid="uid://kvcq2iycoaft" path="res://assets/sprites/player/placeholder/run10.png" id="11_4newb"]
+[ext_resource type="Texture2D" uid="uid://bnohvrb24sjkc" path="res://assets/sprites/player/placeholder/stand.png" id="12_ap1su"]
+
+[sub_resource type="Gradient" id="Gradient_eklfw"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_in0jd"]
+gradient = SubResource("Gradient_eklfw")
+fill = 1
+fill_from = Vector2(0.48122066, 0.5093897)
+fill_to = Vector2(0.5046948, 1)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_2gxee"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_pcrlx")
+}],
+"loop": 1,
+"name": &"fall",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_pcrlx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_whxtt")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_flwx8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_oegds")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_enapc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_7drs6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_kle4c")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_0hoyv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_vpell")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_4newb")
+}],
+"loop": 1,
+"name": &"run",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_ap1su")
+}],
+"loop": 1,
+"name": &"stand",
+"speed": 5.0
+}]
+
+[node name="Tool" type="Node2D" unique_id=1965235933]
+script = ExtResource("1_eklfw")
+
+[node name="ToolPointLight2D" type="PointLight2D" parent="." unique_id=1557680071]
+unique_name_in_owner = true
+scale = Vector2(0.673, 1)
+energy = 2.0
+texture = SubResource("GradientTexture2D_in0jd")
+
+[node name="ToolSprite2D" type="AnimatedSprite2D" parent="." unique_id=783287713]
+unique_name_in_owner = true
+texture_filter = 1
+position = Vector2(0, -0.5)
+sprite_frames = SubResource("SpriteFrames_2gxee")
+animation = &"stand"
+
+[node name="ToolMarker2D" type="Marker2D" parent="." unique_id=1013744363]
+unique_name_in_owner = true
+position = Vector2(9, 3)

@@ -85,8 +85,7 @@ texture_filter = 1
 position = Vector2(0, -0.5)
 sprite_frames = SubResource("SpriteFrames_x7p2l")
 animation = &"run"
-frame = 8
-frame_progress = 0.031095108
+frame_progress = 0.05665351
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2058630931]
 shape = SubResource("RectangleShape2D_x7p2l")
