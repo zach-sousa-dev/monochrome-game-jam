@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SpeakingPerson" format=3 uid="uid://bcao1ro4uo6nv"]
+
+[ext_resource type="AudioStream" uid="uid://de8hvim1y04q" path="res://assets/sounds/npc/placeholder/josh.wav" id="1_7yx51"]
+[ext_resource type="Script" uid="uid://b3op2433pdm0f" path="res://scenes/npc/speaking_person.gd" id="2_8aisv"]
+
+[resource]
+script = ExtResource("2_8aisv")
+person_name = "C. Burger"
+person_voice = ExtResource("1_7yx51")
+metadata/_custom_type_script = "uid://b3op2433pdm0f"

@@ -13,7 +13,6 @@ extends Node2D
 
 @export_category("Dialog Options")
 @export var seconds_per_letter: float = 0.1
-@export var voice_sound: AudioStream
 @export var speeches: Array[Speech]
 
 var touching_player: bool = false
@@ -24,8 +23,6 @@ signal dialog_complete
 func _ready() -> void:
 	connect("body_entered", _on_body_entered)
 	connect("body_exited", _on_body_exited)
-
-
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("interact") && touching_player:
@@ -43,7 +40,7 @@ func _process(delta: float) -> void:
 			return
 		
 		# construct new dialog box
-		current_dialog_box = DialogBox.construct_dialog(speeches[current_speech_index].name, speeches[current_speech_index].dialog, seconds_per_letter, voice_sound)
+		current_dialog_box = DialogBox.construct_dialog(speeches[current_speech_index].person.person_name, speeches[current_speech_index].dialog, seconds_per_letter, speeches[current_speech_index].person.person_voice if !speeches[current_speech_index].is_muted else null)
 		add_child(current_dialog_box)
 		current_speech_index += 1 # go to next dialog
 

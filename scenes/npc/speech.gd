@@ -1,5 +1,6 @@
 class_name Speech
 extends Resource
 
-@export var name: String = "Franklin"
-@export var dialog: String = "Man, fuck you. I'll see you at work."
+@export var person: SpeakingPerson
+@export var dialog: String
+@export var is_muted: bool = false
