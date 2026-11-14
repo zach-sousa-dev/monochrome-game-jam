@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://cqlhbp6f1eigy"]
+
+[ext_resource type="Script" uid="uid://bfxtji3gux1w7" path="res://scenes/doors/door.gd" id="1_qq3h0"]
+
+[sub_resource type="Gradient" id="Gradient_qq3h0"]
+colors = PackedColorArray(0.27022192, 0.27022192, 0.2702219, 1, 0.51007515, 0.51007515, 0.51007515, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_fnoyy"]
+gradient = SubResource("Gradient_qq3h0")
+width = 20
+height = 45
+fill = 3
+fill_from = Vector2(1, 0.88566554)
+fill_to = Vector2(0.056759164, 0.96416384)
+
+[node name="Door" type="Node2D" unique_id=1838182369]
+script = ExtResource("1_qq3h0")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=672248647]
+texture_filter = 1
+texture = SubResource("GradientTexture2D_fnoyy")

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SpeakingPerson" format=3 uid="uid://byw2224njjoaw"]
+
+[ext_resource type="AudioStream" uid="uid://b7eah2nxpvxa1" path="res://assets/sounds/npc/placeholder/talk.wav" id="1_7og2u"]
+[ext_resource type="Script" uid="uid://b3op2433pdm0f" path="res://scenes/npc/speaking_person.gd" id="2_qbush"]
+
+[resource]
+script = ExtResource("2_qbush")
+person_name = "Keymaster"
+person_voice = ExtResource("1_7og2u")
+seconds_per_letter = 0.075
+metadata/_custom_type_script = "uid://b3op2433pdm0f"
