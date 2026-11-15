@@ -14,5 +14,8 @@ func _ready() -> void:
 
 func grant_key() -> void:
 	var new_key: Key = Key.create_key(key_id, player)
-	KeyInventory.add_key(new_key)
+	var successful: bool = KeyInventory.add_key(new_key)
+	print(successful)
+	if not successful: new_key.queue_free()
 	add_child(new_key)
+	new_key.reparent(get_tree().current_scene)
