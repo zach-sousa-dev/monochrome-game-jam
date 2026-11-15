@@ -5,7 +5,7 @@
 # Note: If you want an event to occur after the conversation, you can connect
 # to the NPC's dialog_complete signal.
 
-
+class_name NPC
 extends KeySignalEmitter
 
 @export_category("Config")

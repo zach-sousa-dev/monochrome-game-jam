@@ -5,14 +5,19 @@ extends Node
 
 static var keys: Array[Key]
 
-# add a key to the list if it doesn't already exist
-static func add_key(key: Key) -> void:
+# add a key to the list if it doesn't already exist, returns false if it already exists
+static func add_key(key: Key) -> bool:
 	if not has_key_with_id(key.key_id):
 		keys.append(key)
+		return true
+	return false
+	
+static func get_keys() -> Array[Key]:
+	return keys
 
 # check if key is in keys
 static func has_key_with_id(id: int) -> bool:
-	return not find_key(id, keys)
+	return not (find_key(id, keys) == null)
 
 # remove the key from keys
 static func remove_key_with_id(id: int) -> void:

@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("2_qbush")
-person_name = "Keymaster"
+person_name = "John"
 person_voice = ExtResource("1_7og2u")
 seconds_per_letter = 0.075
 metadata/_custom_type_script = "uid://b3op2433pdm0f"

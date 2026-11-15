@@ -1,21 +1,23 @@
 [gd_scene format=3 uid="uid://cqlhbp6f1eigy"]
 
 [ext_resource type="Script" uid="uid://bfxtji3gux1w7" path="res://scenes/doors/door.gd" id="1_qq3h0"]
+[ext_resource type="PackedScene" uid="uid://di5cl76maifjy" path="res://scenes/npc/npc.tscn" id="2_cjc7v"]
+[ext_resource type="SpriteFrames" uid="uid://dt3wd2b61v6po" path="res://assets/animations/door/door.tres" id="3_d8f5h"]
 
-[sub_resource type="Gradient" id="Gradient_qq3h0"]
-colors = PackedColorArray(0.27022192, 0.27022192, 0.2702219, 1, 0.51007515, 0.51007515, 0.51007515, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_fnoyy"]
-gradient = SubResource("Gradient_qq3h0")
-width = 20
-height = 45
-fill = 3
-fill_from = Vector2(1, 0.88566554)
-fill_to = Vector2(0.056759164, 0.96416384)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cjc7v"]
+size = Vector2(20, 40)
 
 [node name="Door" type="Node2D" unique_id=1838182369]
 script = ExtResource("1_qq3h0")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=672248647]
+[node name="NPC" parent="." unique_id=71207571 instance=ExtResource("2_cjc7v")]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NPC" unique_id=242554002]
+shape = SubResource("RectangleShape2D_cjc7v")
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=167185271]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=385226979]
 texture_filter = 1
-texture = SubResource("GradientTexture2D_fnoyy")
+sprite_frames = ExtResource("3_d8f5h")
+animation = &"unlocked"
