@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://dcu60lrt1uchs"]
+
+[ext_resource type="Script" uid="uid://bft530avw42dg" path="res://scenes/boss-fight/moving-platform/moving_platform.gd" id="1_vq7q5"]
+[ext_resource type="Texture2D" uid="uid://570g2ekop7ub" path="res://assets/sprites/tiles/moving-platform.png" id="2_4hsuk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6rkir"]
+size = Vector2(80, 7)
+
+[node name="MovingPlatform" type="AnimatableBody2D" unique_id=935345490]
+script = ExtResource("1_vq7q5")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1201428358]
+texture_filter = 1
+position = Vector2(0, 61.5)
+texture = ExtResource("2_4hsuk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=149014763]
+shape = SubResource("RectangleShape2D_6rkir")
+one_way_collision = true

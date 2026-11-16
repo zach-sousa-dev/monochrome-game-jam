@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://dd4d7wdo1184u" path="res://scenes/player/player.tscn" id="1_ia4q5"]
 [ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://shaders/clamp.gdshader" id="1_nej6s"]
 [ext_resource type="Script" uid="uid://c66jua0epg6uf" path="res://scenes/npc/speech.gd" id="2_hrqc2"]
+[ext_resource type="PackedScene" uid="uid://c38nlhgymq2c" path="res://scenes/shader-layers/darkness.tscn" id="2_nc6ft"]
 [ext_resource type="Texture2D" uid="uid://cpi7kaxfadgg2" path="res://assets/sprites/player/placeholder/vignette.png" id="2_ocyxy"]
 [ext_resource type="PackedScene" uid="uid://di5cl76maifjy" path="res://scenes/npc/npc.tscn" id="3_qlt7d"]
 [ext_resource type="PackedScene" uid="uid://dvlpg5qhtivvq" path="res://scenes/doors/key-distributor.tscn" id="4_grteb"]
@@ -14,19 +15,19 @@
 [ext_resource type="Texture2D" uid="uid://b2r2k3006tal3" path="res://assets/sprites/npcs/john_the_keyguy.png" id="11_grteb"]
 [ext_resource type="PackedScene" uid="uid://cqlhbp6f1eigy" path="res://scenes/doors/door.tscn" id="12_0vcjt"]
 [ext_resource type="Texture2D" uid="uid://b6kfg6jyjcht0" path="res://assets/sprites/a_burger.png" id="16_bobjc"]
-[ext_resource type="Shader" uid="uid://1p3yx37wwnye" path="res://shaders/posterization.gdshader" id="18_qo24a"]
-[ext_resource type="Texture2D" uid="uid://b5hgkaux5asdm" path="res://shaders/shader-palette.png" id="19_07j5v"]
-[ext_resource type="TileSet" uid="uid://dk5q18pf5ttvy" path="res://assets/tile-maps/environment.tres" id="20_bobjc"]
+[ext_resource type="PackedScene" uid="uid://cioy31i408y3s" path="res://scenes/shader-layers/clamp_shader.tscn" id="16_grteb"]
+[ext_resource type="PackedScene" uid="uid://cgvtuautwuuj" path="res://scenes/shader-layers/posterize_shader.tscn" id="17_nc6ft"]
+[ext_resource type="TileSet" uid="uid://dk5q18pf5ttvy" path="res://assets/tile-sets/environment.tres" id="20_bobjc"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1ydht"]
 shader = ExtResource("1_nej6s")
 shader_parameter/colour = Color(0, 0, 0, 1)
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_slj1a"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_nc6ft"]
 noise_type = 3
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_bobjc"]
-noise = SubResource("FastNoiseLite_slj1a")
+noise = SubResource("FastNoiseLite_nc6ft")
 
 [sub_resource type="Gradient" id="Gradient_d0ra6"]
 colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
@@ -161,20 +162,10 @@ animations = [{
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ga1ex"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_7g6oh"]
-shader = ExtResource("1_nej6s")
-shader_parameter/colour = Color(0.68235296, 0.8980392, 0.83137256, 1)
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_5011q"]
-shader = ExtResource("18_qo24a")
-shader_parameter/palette = ExtResource("19_07j5v")
-
 [node name="ZachScene" type="Node2D" unique_id=1366947214]
 material = SubResource("ShaderMaterial_1ydht")
 
-[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1015420312]
-visible = false
-color = Color(0, 0, 0, 1)
+[node name="Darkness" parent="." unique_id=2093894846 instance=ExtResource("2_nc6ft")]
 
 [node name="Backdrop" type="Sprite2D" parent="." unique_id=107408518]
 position = Vector2(1, 0)
@@ -197,7 +188,6 @@ z_index = 1
 floor_max_angle = 1.0471976
 floor_snap_length = 8.0
 cam_path = NodePath("../Camera2D")
-cam_speed = 0.1
 debug_velocity = true
 
 [node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=519715087]
@@ -299,33 +289,9 @@ sprite_frames = SubResource("SpriteFrames_o3oms")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="NPCs/Burger NPC" unique_id=280616837]
 shape = SubResource("RectangleShape2D_ga1ex")
 
-[node name="Clamp Shader" type="CanvasLayer" parent="." unique_id=1484889600]
+[node name="Clamp Shader" parent="." unique_id=481358893 instance=ExtResource("16_grteb")]
 
-[node name="ColorRect" type="ColorRect" parent="Clamp Shader" unique_id=1853059257]
-material = SubResource("ShaderMaterial_7g6oh")
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -742.0
-offset_top = -444.0
-offset_right = 219.0
-offset_bottom = 238.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Posterize Shader" type="CanvasLayer" parent="." unique_id=1313702084]
-
-[node name="ColorRect" type="ColorRect" parent="Posterize Shader" unique_id=1209809950]
-material = SubResource("ShaderMaterial_5011q")
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -776.0
-offset_top = -429.0
-offset_right = 185.0
-offset_bottom = 253.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="Posterize Shader" parent="." unique_id=1317576496 instance=ExtResource("17_nc6ft")]
 
 [editable path="NPCs/NPC"]
 [editable path="NPCs/Keymaster"]
