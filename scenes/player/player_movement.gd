@@ -27,6 +27,11 @@ var has_started_timer: bool = false
 
 @onready var tool = $Tool
 
+@export_category("Hurt")
+@export var knockback_force: Vector2 = Vector2(150, -120)
+@export var knockback_time: float = 0.2
+@export var invinceible_time: float = 0.8
+
 @export_category("Debug")
 @export var debug_mode: bool = false
 @export var debug_coyote: bool = false
@@ -38,7 +43,8 @@ var has_started_timer: bool = false
 @onready var camera: Camera2D = self.get_node(cam_path)
 @onready var jump_sound_player: AudioStreamPlayer2D = $"JumpSound"
 
-
+var _knockback_timer: float = 0.0
+var _invincible_timer: float = 0.0
 
 func _ready() -> void:
 	
@@ -56,6 +62,14 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	
+	_invincible_timer -= delta
+	_knockback_timer -= delta
+	
+	if _knockback_timer > 0.0:
+		velocity += get_gravity() * delta
+		move_and_slide()
+		return
 	
 	if Input.is_physical_key_pressed(KEY_Q):
 		print("q pressed")
@@ -150,3 +164,25 @@ func _print_debug() -> void:
 func _on_died():
 	print("Died - refilling fuel")
 	Fuel.reset_fuel()
+
+func hurt(amount: float, from_pos: Vector2):
+	if _invincible_timer > 0.0:
+		return
+	
+	Fuel.take_damage(amount)
+	_flash()
+	_invincible_timer = invinceible_time
+	_knockback_timer = knockback_time
+	
+	var push_dir: float = signf(global_position.x - from_pos.x)
+	if push_dir == 0.0:
+		push_dir = 1.0
+	
+	velocity = Vector2(knockback_force.x * push_dir, knockback_force.y)
+
+
+func _flash():
+	var tween := create_tween()
+	for i in 3:
+		tween.tween_property(self, "modulate", Color.BLACK, 0.05)
+		tween.tween_property(self, "modulate", Color.WHITE, 0.05)

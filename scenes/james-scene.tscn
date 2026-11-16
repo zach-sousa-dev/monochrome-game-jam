@@ -1,0 +1,231 @@
+[gd_scene format=4 uid="uid://dh681e4d6orqh"]
+
+[ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://shaders/clamp.gdshader" id="1_7ggvs"]
+[ext_resource type="TileSet" uid="uid://dk5q18pf5ttvy" path="res://assets/tile-maps/environment.tres" id="2_juuk7"]
+[ext_resource type="PackedScene" uid="uid://di5cl76maifjy" path="res://scenes/npc/npc.tscn" id="3_y5j4i"]
+[ext_resource type="Script" uid="uid://c66jua0epg6uf" path="res://scenes/npc/speech.gd" id="4_w5u4m"]
+[ext_resource type="Resource" uid="uid://01xdddeppj1y" path="res://assets/speeches/people/eli.tres" id="5_6ss0j"]
+[ext_resource type="Resource" uid="uid://b2tun44myyvu7" path="res://assets/speeches/people/you.tres" id="6_ykxpf"]
+[ext_resource type="SpriteFrames" uid="uid://cpycgpcppo65m" path="res://assets/animations/npc/npc_placeholder.tres" id="7_jaxxm"]
+[ext_resource type="Resource" uid="uid://bcao1ro4uo6nv" path="res://assets/speeches/people/burger.tres" id="8_8efk5"]
+[ext_resource type="Texture2D" uid="uid://b6kfg6jyjcht0" path="res://assets/sprites/a_burger.png" id="9_nk8bq"]
+[ext_resource type="PackedScene" uid="uid://dd4d7wdo1184u" path="res://scenes/player/player.tscn" id="10_5s4ra"]
+[ext_resource type="Texture2D" uid="uid://cpi7kaxfadgg2" path="res://assets/sprites/player/placeholder/vignette.png" id="11_sa3m2"]
+[ext_resource type="Shader" uid="uid://1p3yx37wwnye" path="res://shaders/posterization.gdshader" id="12_6yjxs"]
+[ext_resource type="Texture2D" uid="uid://b5hgkaux5asdm" path="res://shaders/shader-palette.png" id="13_4n4o5"]
+[ext_resource type="PackedScene" uid="uid://civmu6ops2sov" path="res://scenes/enemies/enemy_squish.tscn" id="14_juuk7"]
+[ext_resource type="PackedScene" uid="uid://rgxghtaucdx4" path="res://scenes/enemies/EnemyFly.tscn" id="15_y5j4i"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1ydht"]
+shader = ExtResource("1_7ggvs")
+shader_parameter/colour = Color(0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_slj1a"]
+noise_type = 3
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_bobjc"]
+noise = SubResource("FastNoiseLite_slj1a")
+
+[sub_resource type="Resource" id="Resource_6nf5r"]
+script = ExtResource("4_w5u4m")
+person = ExtResource("5_6ss0j")
+dialog = "...I hate the smell"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_bl2hb"]
+script = ExtResource("4_w5u4m")
+person = ExtResource("5_6ss0j")
+dialog = "I just think of anesthesia"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_ibh68"]
+script = ExtResource("4_w5u4m")
+person = ExtResource("5_6ss0j")
+dialog = "..."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_fiaps"]
+script = ExtResource("4_w5u4m")
+person = ExtResource("5_6ss0j")
+dialog = "reminds me of when I got tubes in my ears"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_0oo3m"]
+script = ExtResource("4_w5u4m")
+person = ExtResource("5_6ss0j")
+dialog = "the smell was disgusting and the experience was unpleasant"
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_15swg"]
+script = ExtResource("4_w5u4m")
+person = ExtResource("5_6ss0j")
+dialog = "(painful)"
+is_muted = true
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_ar3ua"]
+script = ExtResource("4_w5u4m")
+person = ExtResource("6_ykxpf")
+dialog = "We did not need to know that lil bro..."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_061we"]
+script = ExtResource("4_w5u4m")
+person = ExtResource("5_6ss0j")
+dialog = "I just thought you should know."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_15swg"]
+size = Vector2(32, 29)
+
+[sub_resource type="Resource" id="Resource_bobjc"]
+script = ExtResource("4_w5u4m")
+person = ExtResource("8_8efk5")
+dialog = "cheeseburger..."
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="Resource" id="Resource_0vcjt"]
+script = ExtResource("4_w5u4m")
+person = ExtResource("8_8efk5")
+dialog = "*smells delicious*"
+is_muted = true
+metadata/_custom_type_script = "uid://c66jua0epg6uf"
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_o3oms"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_nk8bq")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ga1ex"]
+
+[sub_resource type="Gradient" id="Gradient_d0ra6"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_7g6oh"]
+gradient = SubResource("Gradient_d0ra6")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.8521739, 0.17826086)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7g6oh"]
+shader = ExtResource("1_7ggvs")
+shader_parameter/colour = Color(0.68235296, 0.8980392, 0.83137256, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5011q"]
+shader = ExtResource("12_6yjxs")
+shader_parameter/palette = ExtResource("13_4n4o5")
+
+[node name="ZachScene" type="Node2D" unique_id=1366947214]
+material = SubResource("ShaderMaterial_1ydht")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1015420312]
+color = Color(0, 0, 0, 1)
+
+[node name="Backdrop" type="Sprite2D" parent="." unique_id=107408518]
+position = Vector2(1, 0)
+scale = Vector2(2.0234375, 1.4355469)
+texture = SubResource("NoiseTexture2D_bobjc")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=968897521]
+light_mask = 2
+texture_filter = 1
+position = Vector2(-120, 0)
+tile_map_data = PackedByteArray("AAD//wIAAAAFAAAAAAAAAAIAAAABAAAAAAABAAIAAAAAAAEAAAD9/wIAAAABAAEAAAD+/wIAAAAEAAAAAAD9/wMAAAAEAAAAAAD+/wMAAAAEAAAAAAD//wMAAAAEAAAAAAAAAAMAAAAEAAAAAAABAAMAAAAEAAAAAAD9/wQAAAAEAAAAAAD+/wQAAAADAAAAAAD//wQAAAAEAAAAAAAAAAQAAAADAAAAAAABAAQAAAAEAAAAAAAAAAUAAAAEAAAAAAD//wUAAAAEAAAAAAD+/wUAAAADAAAAAAD9/wUAAAADAAAAAAABAAUAAAAEAAAAAAD9/wYAAAADAAAAAAD+/wYAAAADAAAAAAD//wYAAAADAAAAAAAAAAYAAAAEAAAAAAABAAYAAAAEAAAAAAACAAYAAAAFAAAAAAADAAYAAAABAAAAAAAEAAYAAAAFAAAAAAAFAAYAAAABAAAAAAAGAAYAAAAFAAAAAAAHAAYAAAAFAAAAAAAIAAYAAAABAAAAAAAJAAYAAAAFAAAAAAD9/wcAAAADAAAAAAD+/wcAAAAEAAAAAAD//wcAAAADAAAAAAAAAAcAAAAEAAAAAAABAAcAAAAEAAAAAAACAAcAAAAEAAAAAAADAAcAAAAEAAAAAAAEAAcAAAAEAAAAAAAFAAcAAAAEAAAAAAAGAAcAAAAEAAAAAAAHAAcAAAAEAAAAAAAIAAcAAAADAAAAAAAJAAcAAAAEAAAAAAAIAAgAAAAEAAAAAAAHAAgAAAADAAAAAAAGAAgAAAAEAAAAAAAFAAgAAAADAAAAAAAEAAgAAAAEAAAAAAADAAgAAAADAAAAAAACAAgAAAAEAAAAAAABAAgAAAADAAAAAAAAAAgAAAAEAAAAAAD//wgAAAAEAAAAAAD+/wgAAAAEAAAAAAD9/wgAAAAEAAAAAAADAAMAAAADAAMAAAAEAAMAAAAEAAMAAAAFAAMAAAAFAAMAAAAGAAMAAAAEAAMAAAAHAAMAAAAFAAMAAAAIAAMAAAAAAAQAAAADAAQAAAACAAMAAAADAAUAAAACAAQAAAAIAAQAAAACAAMAAAAIAAUAAAACAAMAAAAFAAUAAAACAAMAAAAFAAQAAAADAAQAAAAGAAUAAAACAAQAAAAKAAYAAAAEAAQAAAALAAcAAAAEAAQAAAAMAAgAAAAEAAQAAAAKAAcAAAAEAAAAAAAKAAgAAAADAAAAAAALAAgAAAAEAAAAAAAJAAgAAAAEAAAAAAANAAkAAAAFAAAAAAAOAAkAAAAFAAAAAAAPAAkAAAAFAAAAAAAQAAkAAAAFAAAAAAAMAAkAAAACAAEAAAALAAkAAAACAAEAAAAKAAkAAAACAAEAAAAJAAkAAAACAAEAAAAIAAkAAAACAAEAAAAHAAkAAAACAAEAAAAGAAkAAAACAAEAAAAFAAkAAAACAAEAAAAEAAkAAAACAAEAAAADAAkAAAACAAEAAAACAAkAAAACAAEAAAABAAkAAAACAAEAAAAAAAkAAAACAAEAAAD//wkAAAACAAEAAAD+/wkAAAACAAEAAAD9/wkAAAADAAEAAAANAAoAAAADAAEAAAAOAAoAAAACAAEAAAAPAAoAAAACAAEAAAAQAAoAAAAEAAEAAAAOAAgAAAABAAMAAAAPAAgAAAAAAAMAAAAQAAgAAAAAAAMAAAD9/wEAAAACAAQAAAD+/wEAAAAEAAAAAAABAAEAAAAAAAMAAAAAAAEAAAAAAAMAAAACAAQAAAACAAQAAAACAAUAAAACAAQAAAD+/wAAAAAEAAAAAAD+////AAAEAAAAAAD+//7/AAABAAQAAAA=")
+tile_set = ExtResource("2_juuk7")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=906906192]
+position = Vector2(1, 0)
+zoom = Vector2(2.5, 2.5)
+
+[node name="NPC" parent="." unique_id=71207571 instance=ExtResource("3_y5j4i")]
+position = Vector2(193, 164)
+collision_mask = 3
+speeches = Array[ExtResource("4_w5u4m")]([SubResource("Resource_6nf5r"), SubResource("Resource_bl2hb"), SubResource("Resource_ibh68"), SubResource("Resource_fiaps"), SubResource("Resource_0oo3m"), SubResource("Resource_15swg"), SubResource("Resource_ar3ua"), SubResource("Resource_061we")])
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="NPC" unique_id=1153239735]
+texture_filter = 1
+sprite_frames = ExtResource("7_jaxxm")
+animation = &"idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NPC" unique_id=1164065645]
+position = Vector2(0, 1.5)
+shape = SubResource("RectangleShape2D_15swg")
+
+[node name="Burger NPC" parent="." unique_id=608656700 instance=ExtResource("3_y5j4i")]
+position = Vector2(-101, 21)
+collision_mask = 3
+speeches = Array[ExtResource("4_w5u4m")]([SubResource("Resource_bobjc"), SubResource("Resource_0vcjt")])
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Burger NPC" unique_id=1186661104]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_o3oms")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Burger NPC" unique_id=280616837]
+shape = SubResource("RectangleShape2D_ga1ex")
+
+[node name="Player" parent="." unique_id=1818162535 instance=ExtResource("10_5s4ra")]
+position = Vector2(-100, 0)
+floor_max_angle = 1.0471976
+floor_snap_length = 8.0
+cam_path = NodePath("../Camera2D")
+cam_speed = 0.1
+debug_velocity = true
+
+[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=519715087]
+visible = false
+position = Vector2(7.6293945e-06, 3.8146973e-06)
+scale = Vector2(0.3273148, 0.3273148)
+texture = ExtResource("11_sa3m2")
+
+[node name="PointLight2D" type="PointLight2D" parent="Player" unique_id=576487711]
+visible = false
+position = Vector2(-2, 1)
+color = Color(0.41000003, 1, 0.67550004, 1)
+energy = 2.0
+shadow_enabled = true
+texture = SubResource("GradientTexture2D_7g6oh")
+texture_scale = 4.81
+
+[node name="Clamp Shader" type="CanvasLayer" parent="." unique_id=1484889600]
+
+[node name="ColorRect" type="ColorRect" parent="Clamp Shader" unique_id=1853059257]
+material = SubResource("ShaderMaterial_7g6oh")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -742.0
+offset_top = -444.0
+offset_right = 219.0
+offset_bottom = 238.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Posterize Shader" type="CanvasLayer" parent="." unique_id=1313702084]
+
+[node name="ColorRect" type="ColorRect" parent="Posterize Shader" unique_id=1209809950]
+material = SubResource("ShaderMaterial_5011q")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -778.0
+offset_top = -430.0
+offset_right = 183.0
+offset_bottom = 252.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="EnemySquish" parent="." unique_id=1587447975 instance=ExtResource("14_juuk7")]
+position = Vector2(4, 43)
+collision_mask = 3
+
+[node name="EnemyFly" parent="." unique_id=1946113309 instance=ExtResource("15_y5j4i")]
+position = Vector2(181, 90)
+
+[editable path="NPC"]
+[editable path="Burger NPC"]

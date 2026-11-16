@@ -17,6 +17,7 @@ const FUEL_FILL = preload("uid://c1pblfgw3u4bw")
 @onready var slot_template = %ItemPanel
 @onready var fuel_bar_container = %FualBarContainer
 @onready var fuel_texture = %ItemTexture
+@onready var item_swap_sound = %ItemSwapSound
 
 # -- Tween vars
 @onready var bar_home_pos: Vector2 = fuel_bar_container.position
@@ -70,6 +71,8 @@ func _rebuild_slots():
 # -- swaps the big image to selected item
 func _on_selected_changed(item: ItemData):
 	var tex : Texture2D = default_texture
+	
+	item_swap_sound.play()
 	
 	if item: 
 		tex = item.get_hud_texture()

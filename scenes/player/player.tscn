@@ -13,6 +13,7 @@ light_mode = 1
 size = Vector2(30, 38)
 
 [node name="Player" type="CharacterBody2D" unique_id=1818162535]
+collision_layer = 2
 slide_on_ceiling = false
 script = ExtResource("1_fm80t")
 horizontal_max_velocity = 90.0
