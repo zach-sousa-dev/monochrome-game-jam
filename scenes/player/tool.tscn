@@ -12,6 +12,9 @@ fill = 1
 fill_from = Vector2(0.48122066, 0.5093897)
 fill_to = Vector2(0.5046948, 1)
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_nc6ft"]
+light_mode = 1
+
 [node name="Tool" type="Node2D" unique_id=1965235933]
 script = ExtResource("1_eklfw")
 
@@ -28,6 +31,7 @@ texture = SubResource("GradientTexture2D_in0jd")
 [node name="ToolSprite2D" type="AnimatedSprite2D" parent="." unique_id=783287713]
 unique_name_in_owner = true
 texture_filter = 1
+material = SubResource("CanvasItemMaterial_nc6ft")
 sprite_frames = ExtResource("2_1ahuj")
 
 [node name="ToolMarker2D" type="Marker2D" parent="." unique_id=1013744363]

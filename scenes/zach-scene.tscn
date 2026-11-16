@@ -173,6 +173,7 @@ shader_parameter/palette = ExtResource("19_07j5v")
 material = SubResource("ShaderMaterial_1ydht")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1015420312]
+visible = false
 color = Color(0, 0, 0, 1)
 
 [node name="Backdrop" type="Sprite2D" parent="." unique_id=107408518]
@@ -233,6 +234,16 @@ door_id = 1
 
 [node name="Door1WarpPoint" type="Marker2D" parent="Doors/Door1" unique_id=506562551]
 position = Vector2(-5, -274)
+
+[node name="Door2" parent="Doors" unique_id=1985685370 node_paths=PackedStringArray("player", "destination") instance=ExtResource("12_0vcjt")]
+position = Vector2(-30, 260)
+player = NodePath("../../Player")
+destination = NodePath("Door2WarpPoint")
+locked = true
+door_id = 2
+
+[node name="Door2WarpPoint" type="Marker2D" parent="Doors/Door2" unique_id=2038770877]
+position = Vector2(0, -45)
 
 [node name="NPCs" type="Node" parent="." unique_id=2070483288]
 
