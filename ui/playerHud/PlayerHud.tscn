@@ -2,8 +2,26 @@
 
 [ext_resource type="Texture2D" uid="uid://byxsnjvpuaxuj" path="res://assets/ui_assets/Lighter.png" id="1_4qq7d"]
 [ext_resource type="Script" uid="uid://cosxf3q14hdu6" path="res://ui/playerHud/player_hud.gd" id="1_i11o4"]
+[ext_resource type="Theme" uid="uid://x1haa1fvyc6g" path="res://scenes/npc/dialog.tres" id="2_fl1f2"]
 [ext_resource type="Texture2D" uid="uid://kee6vj1kpctn" path="res://assets/ui_assets/laturnExample.png" id="2_i11o4"]
 [ext_resource type="Shader" uid="uid://c1pblfgw3u4bw" path="res://shaders/fuel_fill.gdshader" id="3_uwl7a"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nc6ft"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nej6s"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bobjc"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_slj1a"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jid7r"]
+
+[sub_resource type="Theme" id="Theme_grteb"]
+Button/styles/disabled = SubResource("StyleBoxEmpty_nc6ft")
+Button/styles/focus = SubResource("StyleBoxEmpty_nej6s")
+Button/styles/hover = SubResource("StyleBoxEmpty_bobjc")
+Button/styles/normal = SubResource("StyleBoxEmpty_slj1a")
+Button/styles/pressed = SubResource("StyleBoxEmpty_jid7r")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_uwl7a"]
 shader = ExtResource("3_uwl7a")
@@ -43,12 +61,14 @@ offset_right = 69.25
 offset_bottom = 160.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_fl1f2")
 theme_override_constants/separation = 9
 alignment = 1
 
 [node name="ItemPanel" type="Panel" parent="Control/ItemsBarContainer" unique_id=2044956887]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 0)
+texture_filter = 1
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 
 [node name="ItemNumber" type="Label" parent="Control/ItemsBarContainer/ItemPanel" unique_id=1679104783]
@@ -62,17 +82,19 @@ text = "1"
 [node name="TextureRect" type="TextureRect" parent="Control/ItemsBarContainer/ItemPanel" unique_id=1583939062]
 texture_filter = 1
 layout_mode = 0
-offset_top = 3.0
-offset_right = 40.0
-offset_bottom = 37.0
+offset_left = 9.389706
+offset_top = 9.0
+offset_right = 41.90441
+offset_bottom = 31.0
 texture = ExtResource("1_4qq7d")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="ItemButton" type="Button" parent="Control/ItemsBarContainer/ItemPanel" unique_id=377778890]
 layout_mode = 0
-offset_right = 40.0
+offset_right = 50.25
 offset_bottom = 40.0
+theme = SubResource("Theme_grteb")
 
 [node name="FualBarContainer" type="Control" parent="Control" unique_id=672650082]
 unique_name_in_owner = true

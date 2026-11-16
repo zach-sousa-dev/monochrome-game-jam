@@ -1,0 +1,4 @@
+SOUNDS
+Warp sound - Warping Object by cb9382 -- https://freesound.org/s/868381/ -- License: Creative Commons 0
+Door unlock sound - Door_Locking_Unlocking_Twice.wav by vcspran -- https://freesound.org/s/344582/ -- License: Creative Commons 0
+Locked door sound - Door Locked by BenjaminNelan -- https://freesound.org/s/321087/ -- License: Creative Commons 0

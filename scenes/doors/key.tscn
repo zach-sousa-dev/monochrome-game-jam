@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dnhx76eesloqo"]
+
+[ext_resource type="Script" uid="uid://bbi22bfx87lfb" path="res://scenes/doors/key.gd" id="1_k1q41"]
+[ext_resource type="Texture2D" uid="uid://bjqia26uxlfkn" path="res://assets/sprites/items/key.png" id="1_yk2u2"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_grteb"]
+light_mode = 1
+
+[node name="Key" type="Node2D" unique_id=2129495300]
+script = ExtResource("1_k1q41")
+travel_speed = 0.025
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1963194574]
+z_index = 1
+texture_filter = 1
+material = SubResource("CanvasItemMaterial_grteb")
+texture = ExtResource("1_yk2u2")
