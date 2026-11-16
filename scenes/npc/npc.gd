@@ -13,6 +13,7 @@ extends KeySignalEmitter
 
 @export_category("Dialog Options")
 @export var speeches: Array[Speech]
+@export var interaction_required: bool = true
 
 var touching_player: bool = false
 var current_speech_index: int = 0

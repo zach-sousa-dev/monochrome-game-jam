@@ -281,6 +281,7 @@ texture = SubResource("GradientTexture2D_grteb")
 [node name="Burger NPC" parent="NPCs" unique_id=608656700 instance=ExtResource("3_qlt7d")]
 position = Vector2(-101, 21)
 speeches = Array[ExtResource("2_hrqc2")]([SubResource("Resource_bobjc"), SubResource("Resource_0vcjt")])
+interaction_required = false
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="NPCs/Burger NPC" unique_id=1186661104]
 texture_filter = 1

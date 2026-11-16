@@ -31,6 +31,7 @@ fill_to = Vector2(0.5, 0)
 [node name="BossFight" type="Node2D" unique_id=777930682]
 
 [node name="Darkness" parent="." unique_id=2093894846 instance=ExtResource("4_6rkir")]
+visible = false
 
 [node name="Backdrop" type="Sprite2D" parent="." unique_id=548871520]
 position = Vector2(1, 0)
