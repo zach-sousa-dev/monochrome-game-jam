@@ -108,7 +108,7 @@ func _physics_process(delta: float) -> void:
 	_choose_animation(is_on_floor(), velocity.x, direction, animated_sprite)
 	
 	# Follow cam
-	if using_follow_camera: camera.global_position = camera.global_position.lerp(self.position, cam_speed)
+	if using_follow_camera: camera.global_position = camera.global_position.lerp(Vector2(self.position.x, self.position.y - 15), cam_speed)
 	
 	# Debug
 	if debug_mode:
