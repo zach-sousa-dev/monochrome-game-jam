@@ -1,3 +1,4 @@
+class_name Player
 extends CharacterBody2D
 
 
@@ -142,6 +143,9 @@ func _choose_animation(grounded: bool, horizontal_speed: float, direction: float
 	if not grounded: animated_sprite.play("fall")
 	elif horizontal_speed != 0: animated_sprite.play("run")
 	else: animated_sprite.play("stand")
+
+func is_left_facing() -> bool:
+	return animated_sprite.flip_h
 
 
 

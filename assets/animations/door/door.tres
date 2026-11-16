@@ -1,0 +1,23 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://dt3wd2b61v6po"]
+
+[ext_resource type="Texture2D" uid="uid://ob2jm4sae1v1" path="res://assets/sprites/items/locked-door.png" id="1_w6c0w"]
+[ext_resource type="Texture2D" uid="uid://c3v5yfmaiji6f" path="res://assets/sprites/items/door.png" id="2_qxvqw"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_w6c0w")
+}],
+"loop": 1,
+"name": &"locked",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_qxvqw")
+}],
+"loop": 1,
+"name": &"unlocked",
+"speed": 5.0
+}]

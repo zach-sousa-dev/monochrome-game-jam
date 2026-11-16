@@ -5,8 +5,8 @@
 # Note: If you want an event to occur after the conversation, you can connect
 # to the NPC's dialog_complete signal.
 
-
-extends Node2D
+class_name NPC
+extends KeySignalEmitter
 
 @export_category("Config")
 @export var player_group: String
@@ -35,6 +35,7 @@ func _process(delta: float) -> void:
 			current_speech_index = 0 
 			get_tree().paused = false
 			dialog_complete.emit()
+			grant_key.emit()
 			#print("dialog complete")
 			return
 		

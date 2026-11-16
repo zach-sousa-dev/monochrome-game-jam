@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 
 PlayerInventory="*uid://yp6n8aegqak0"
 Fuel="*uid://exrppyilidsr"
+Keydistributor="*uid://5pqyvhpsm6et"
 
 [display]
 
