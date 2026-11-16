@@ -1,0 +1,202 @@
+[gd_scene format=3 uid="uid://civmu6ops2sov"]
+
+[ext_resource type="Script" uid="uid://c0gyba3e704va" path="res://scenes/enemies/enemy_squish.gd" id="1_jc2f0"]
+[ext_resource type="Texture2D" uid="uid://b0idcleufuoq1" path="res://assets/sprites/fuel_dog/attack/fuel_dog_enemy_attack0000.png" id="2_ptox5"]
+[ext_resource type="Texture2D" uid="uid://br5sb0r6mu38v" path="res://assets/sprites/fuel_dog/attack/fuel_dog_enemy_attack0001.png" id="3_l4kfe"]
+[ext_resource type="Texture2D" uid="uid://buodxxpn1dked" path="res://assets/sprites/rader/Rader3.png" id="3_v4a2n"]
+[ext_resource type="Texture2D" uid="uid://b7p3mf7mbiw3" path="res://assets/sprites/rader/Rader2.png" id="4_3kv3r"]
+[ext_resource type="Texture2D" uid="uid://cj7fjgodt0c0p" path="res://assets/sprites/fuel_dog/attack/fuel_dog_enemy_attack0002.png" id="4_dh7xc"]
+[ext_resource type="Texture2D" uid="uid://c5lerql2n1503" path="res://assets/sprites/fuel_dog/attack/fuel_dog_enemy_attack0003.png" id="5_6giwl"]
+[ext_resource type="Texture2D" uid="uid://cgt04uyc1apcw" path="res://assets/sprites/rader/Rader1.png" id="5_j4bdi"]
+[ext_resource type="Texture2D" uid="uid://c5joymehlaupi" path="res://assets/sprites/fuel_dog/attack/fuel_dog_enemy_attack0004.png" id="6_n03yl"]
+[ext_resource type="Texture2D" uid="uid://bwx6vu43tg0u8" path="res://assets/sprites/fuel_dog/attack/fuel_dog_enemy_attack0005.png" id="7_o52dt"]
+[ext_resource type="Texture2D" uid="uid://da6tnn5uru6cq" path="res://assets/sprites/fuel_dog/attack/fuel_dog_enemy_attack0006.png" id="8_mbrv0"]
+[ext_resource type="Texture2D" uid="uid://c7gyyap2hndqg" path="res://assets/sprites/fuel_dog/attack/fuel_dog_enemy_attack0007.png" id="9_8210g"]
+[ext_resource type="Texture2D" uid="uid://diuqat2lmcmlq" path="res://assets/sprites/fuel_dog/attack/fuel_dog_enemy_attack0008.png" id="10_motoq"]
+[ext_resource type="Texture2D" uid="uid://dls1mfpjutl7n" path="res://assets/sprites/fuel_dog/attack/fuel_dog_enemy_attack0009.png" id="11_0og5p"]
+[ext_resource type="Texture2D" uid="uid://cu2ddap53xrki" path="res://assets/sprites/fuel_dog/attack/fuel_dog_enemy_attack0010.png" id="12_ywkli"]
+[ext_resource type="Texture2D" uid="uid://cqk7qe7ojn405" path="res://assets/sprites/fuel_dog/run/fuel_dog_enemy_run0000.png" id="13_e16a5"]
+[ext_resource type="Texture2D" uid="uid://dp6vgh3qticn7" path="res://assets/sprites/fuel_dog/run/fuel_dog_enemy_run0001.png" id="14_qaowv"]
+[ext_resource type="Texture2D" uid="uid://cdsc2vgwric0o" path="res://assets/sprites/fuel_dog/run/fuel_dog_enemy_run0002.png" id="15_3eoy1"]
+[ext_resource type="Texture2D" uid="uid://borgm3e3krllv" path="res://assets/sprites/fuel_dog/run/fuel_dog_enemy_run0003.png" id="16_wlpq5"]
+[ext_resource type="Texture2D" uid="uid://gr06split7t1" path="res://assets/sprites/fuel_dog/run/fuel_dog_enemy_run0004.png" id="17_7cvlb"]
+[ext_resource type="Texture2D" uid="uid://bmje2p7hqwt3h" path="res://assets/sprites/fuel_dog/run/fuel_dog_enemy_run0005.png" id="18_dik1f"]
+[ext_resource type="Texture2D" uid="uid://cpivqbh4x4qfi" path="res://assets/sprites/fuel_dog/run/fuel_dog_enemy_run0006.png" id="19_6si8i"]
+[ext_resource type="Texture2D" uid="uid://bko85kj8rcbne" path="res://assets/sprites/fuel_dog/run/fuel_dog_enemy_run0007.png" id="20_otxsk"]
+[ext_resource type="Texture2D" uid="uid://cpbha784kt00k" path="res://assets/sprites/fuel_dog/run/fuel_dog_enemy_run0008.png" id="21_tykpn"]
+[ext_resource type="Texture2D" uid="uid://cmg0liaogym6k" path="res://assets/sprites/fuel_dog/run/fuel_dog_enemy_run0009.png" id="22_sibm6"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_juuk7"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_ptox5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_l4kfe")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_dh7xc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_6giwl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_n03yl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_o52dt")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_mbrv0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_8210g")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_motoq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_0og5p")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_ywkli")
+}],
+"loop": 1,
+"name": &"attack",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("13_e16a5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_qaowv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_3eoy1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_wlpq5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_7cvlb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_dik1f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_6si8i")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_otxsk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_tykpn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_sibm6")
+}],
+"loop": 1,
+"name": &"run",
+"speed": 9.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3pikm"]
+size = Vector2(30, 27)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bwooc"]
+size = Vector2(17, 26)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_juuk7"]
+light_mode = 1
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bwooc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_v4a2n")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_3kv3r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_j4bdi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_j4bdi")
+}],
+"loop": 1,
+"name": &"spot",
+"speed": 5.0
+}]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_6ac07"]
+light_mode = 1
+
+[sub_resource type="Gradient" id="Gradient_3pikm"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[node name="EnemySquish" type="CharacterBody2D" unique_id=1587447975]
+collision_layer = 4
+script = ExtResource("1_jc2f0")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1467333147]
+unique_name_in_owner = true
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_juuk7")
+animation = &"run"
+frame_progress = 0.47219712
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1216167277]
+position = Vector2(0, 1.5)
+shape = SubResource("RectangleShape2D_3pikm")
+debug_color = Color(0.9333102, 0.17957026, 0.47469014, 0.41960785)
+
+[node name="HitBox" type="Area2D" parent="." unique_id=819081828]
+unique_name_in_owner = true
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox" unique_id=1851790893]
+light_mask = 3
+position = Vector2(-7.5, 3)
+shape = SubResource("RectangleShape2D_bwooc")
+
+[node name="RayCast2D" type="RayCast2D" parent="." unique_id=1845567512]
+unique_name_in_owner = true
+
+[node name="Alert" type="AnimatedSprite2D" parent="." unique_id=1944844152]
+unique_name_in_owner = true
+texture_filter = 1
+material = SubResource("CanvasItemMaterial_juuk7")
+scale = Vector2(0.46666667, 0.43333334)
+sprite_frames = SubResource("SpriteFrames_bwooc")
+animation = &"spot"
+frame_progress = 0.4291601
+
+[node name="Death" type="CPUParticles2D" parent="." unique_id=310531535]
+unique_name_in_owner = true
+material = SubResource("CanvasItemMaterial_6ac07")
+emitting = false
+amount = 40
+lifetime = 1.4000000000000001
+one_shot = true
+explosiveness = 0.6
+emission_shape = 3
+emission_rect_extents = Vector2(8, 12)
+direction = Vector2(1, -1)
+spread = 30.0
+gravity = Vector2(0, -20)
+initial_velocity_min = 15.0
+initial_velocity_max = 35.0
+scale_amount_max = 2.0
+color_ramp = SubResource("Gradient_3pikm")
+
+[node name="DeathSound" type="AudioStreamPlayer2D" parent="." unique_id=436733944]
+unique_name_in_owner = true
+
+[node name="HitSound" type="AudioStreamPlayer2D" parent="." unique_id=1190966332]
+unique_name_in_owner = true
+
+[node name="AlertSound" type="AudioStreamPlayer2D" parent="." unique_id=1068654192]
+unique_name_in_owner = true

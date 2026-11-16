@@ -5,6 +5,7 @@
 [ext_resource type="Theme" uid="uid://x1haa1fvyc6g" path="res://scenes/npc/dialog.tres" id="2_fl1f2"]
 [ext_resource type="Texture2D" uid="uid://kee6vj1kpctn" path="res://assets/ui_assets/laturnExample.png" id="2_i11o4"]
 [ext_resource type="Shader" uid="uid://c1pblfgw3u4bw" path="res://shaders/fuel_fill.gdshader" id="3_uwl7a"]
+[ext_resource type="AudioStream" uid="uid://de8hvim1y04q" path="res://assets/sounds/npc/placeholder/josh.wav" id="5_fl1f2"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nc6ft"]
 
@@ -125,3 +126,7 @@ scale = Vector2(0.630687, 0.630687)
 texture = ExtResource("2_i11o4")
 expand_mode = 3
 stretch_mode = 5
+
+[node name="ItemSwapSound" type="AudioStreamPlayer2D" parent="Control" unique_id=268312354]
+unique_name_in_owner = true
+stream = ExtResource("5_fl1f2")

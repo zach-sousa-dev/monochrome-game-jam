@@ -1,0 +1,178 @@
+[gd_scene format=3 uid="uid://rgxghtaucdx4"]
+
+[ext_resource type="Script" uid="uid://blmijyckykjl1" path="res://scenes/enemies/enemy_fly.gd" id="1_wyfio"]
+[ext_resource type="Texture2D" uid="uid://do17oo4hcr4fq" path="res://assets/sprites/bird_thing/attack/match_bird_enemy_attack0000.png" id="2_uo0s5"]
+[ext_resource type="Texture2D" uid="uid://buodxxpn1dked" path="res://assets/sprites/rader/Rader3.png" id="3_1ohxu"]
+[ext_resource type="Texture2D" uid="uid://e0gh48h07tyy" path="res://assets/sprites/bird_thing/attack/match_bird_enemy_attack0001.png" id="3_tes1y"]
+[ext_resource type="Texture2D" uid="uid://iadyxreilfd4" path="res://assets/sprites/bird_thing/attack/match_bird_enemy_attack0002.png" id="4_2ik26"]
+[ext_resource type="Texture2D" uid="uid://b7p3mf7mbiw3" path="res://assets/sprites/rader/Rader2.png" id="4_ejbag"]
+[ext_resource type="Texture2D" uid="uid://cgt04uyc1apcw" path="res://assets/sprites/rader/Rader1.png" id="5_3w6ay"]
+[ext_resource type="Texture2D" uid="uid://dv5cvgh6xp3bh" path="res://assets/sprites/bird_thing/attack/match_bird_enemy_attack0003.png" id="5_fw7wn"]
+[ext_resource type="Texture2D" uid="uid://djw8m8nn8x6rs" path="res://assets/sprites/bird_thing/attack/match_bird_enemy_attack0004.png" id="6_e6ujw"]
+[ext_resource type="Texture2D" uid="uid://fk5ospdm8wsi" path="res://assets/sprites/bird_thing/attack/match_bird_enemy_attack0005.png" id="7_t0ihe"]
+[ext_resource type="Texture2D" uid="uid://cm0tbkbsvda04" path="res://assets/sprites/bird_thing/attack/match_bird_enemy_attack0006.png" id="8_w816r"]
+[ext_resource type="Texture2D" uid="uid://ckq2i8k76gg7r" path="res://assets/sprites/bird_thing/attack/match_bird_enemy_attack0007.png" id="9_lv20g"]
+[ext_resource type="Texture2D" uid="uid://cablswu7tcndp" path="res://assets/sprites/bird_thing/fly/match_bird_enemy_fly0000.png" id="10_ppxcv"]
+[ext_resource type="Texture2D" uid="uid://bw6ymlb3mfih5" path="res://assets/sprites/bird_thing/fly/match_bird_enemy_fly0001.png" id="11_sn0ei"]
+[ext_resource type="Texture2D" uid="uid://bq0bssbub6iqc" path="res://assets/sprites/bird_thing/fly/match_bird_enemy_fly0002.png" id="12_mkmsy"]
+[ext_resource type="Texture2D" uid="uid://55c0ldde5lpd" path="res://assets/sprites/bird_thing/fly/match_bird_enemy_fly0003.png" id="13_up1ae"]
+[ext_resource type="Texture2D" uid="uid://b7i7dak8wi30n" path="res://assets/sprites/bird_thing/fly/match_bird_enemy_fly0004.png" id="14_7bcxi"]
+[ext_resource type="Texture2D" uid="uid://orp3fmkdewvu" path="res://assets/sprites/bird_thing/fly/match_bird_enemy_fly0005.png" id="15_smqyo"]
+[ext_resource type="Texture2D" uid="uid://b482ps2x58hie" path="res://assets/sprites/bird_thing/fly/match_bird_enemy_fly0006.png" id="16_wivkf"]
+[ext_resource type="Texture2D" uid="uid://by7qpyhkfbtwt" path="res://assets/sprites/bird_thing/fly/match_bird_enemy_fly0007.png" id="17_4n7se"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_juuk7"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_uo0s5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_tes1y")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_2ik26")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_fw7wn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_e6ujw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_t0ihe")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_w816r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_lv20g")
+}],
+"loop": 1,
+"name": &"attack",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_ppxcv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_sn0ei")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_mkmsy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_up1ae")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_7bcxi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_smqyo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_wivkf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_4n7se")
+}],
+"loop": 1,
+"name": &"fly",
+"speed": 12.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_d2s7x"]
+size = Vector2(28, 21)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8hbtr"]
+size = Vector2(30, 17.5)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_bapwr"]
+light_mode = 1
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_5uij3"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_1ohxu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_ejbag")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_3w6ay")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_3w6ay")
+}],
+"loop": 1,
+"name": &"spot",
+"speed": 5.0
+}]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_txe8i"]
+light_mode = 1
+
+[sub_resource type="Gradient" id="Gradient_rag0r"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[node name="EnemyFly" type="CharacterBody2D" unique_id=1946113309]
+collision_layer = 4
+script = ExtResource("1_wyfio")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=2067357318]
+unique_name_in_owner = true
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_juuk7")
+animation = &"fly"
+frame_progress = 0.38503087
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=760232869]
+position = Vector2(0, -1.5)
+shape = SubResource("RectangleShape2D_d2s7x")
+debug_color = Color(0.9333102, 0.17957026, 0.47469014, 0.41960785)
+
+[node name="HitBox" type="Area2D" parent="." unique_id=1100192105]
+unique_name_in_owner = true
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox" unique_id=969278298]
+light_mask = 3
+position = Vector2(0, -2.25)
+shape = SubResource("RectangleShape2D_8hbtr")
+
+[node name="Alert" type="AnimatedSprite2D" parent="." unique_id=1631372299]
+unique_name_in_owner = true
+material = SubResource("CanvasItemMaterial_bapwr")
+position = Vector2(0, 2)
+scale = Vector2(0.46666667, 0.43333334)
+sprite_frames = SubResource("SpriteFrames_5uij3")
+animation = &"spot"
+
+[node name="Death" type="CPUParticles2D" parent="." unique_id=997571756]
+unique_name_in_owner = true
+material = SubResource("CanvasItemMaterial_txe8i")
+emitting = false
+amount = 40
+lifetime = 1.4000000000000001
+one_shot = true
+explosiveness = 0.6
+emission_shape = 3
+emission_rect_extents = Vector2(8, 12)
+direction = Vector2(1, -1)
+spread = 30.0
+gravity = Vector2(0, -20)
+initial_velocity_min = 15.0
+initial_velocity_max = 35.0
+scale_amount_max = 2.0
+color_ramp = SubResource("Gradient_rag0r")
+
+[node name="DeathSound" type="AudioStreamPlayer2D" parent="." unique_id=866161767]
+unique_name_in_owner = true
+
+[node name="HitSound" type="AudioStreamPlayer2D" parent="." unique_id=1099467061]
+unique_name_in_owner = true
+
+[node name="AlertSound" type="AudioStreamPlayer2D" parent="." unique_id=1309051773]
+unique_name_in_owner = true
