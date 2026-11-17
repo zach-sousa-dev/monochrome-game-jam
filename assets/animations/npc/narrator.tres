@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SpeakingPerson" format=3 uid="uid://nace1wl1fyum"]
+
+[ext_resource type="AudioStream" uid="uid://dt3s185w54pd5" path="res://assets/sounds/npc/narrator-voice.wav" id="1_5qcdv"]
+[ext_resource type="Script" uid="uid://b3op2433pdm0f" path="res://scenes/npc/speaking_person.gd" id="2_fxiwd"]
+
+[resource]
+script = ExtResource("2_fxiwd")
+person_name = "???"
+person_voice = ExtResource("1_5qcdv")
+seconds_per_letter = 0.05
+metadata/_custom_type_script = "uid://b3op2433pdm0f"

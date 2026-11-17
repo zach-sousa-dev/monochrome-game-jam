@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SpeakingPerson" format=3 uid="uid://cvja06y4pki1w"]
+
+[ext_resource type="AudioStream" uid="uid://xpqmjk3darqa" path="res://assets/sounds/npc/boss-voice.wav" id="1_w8f2n"]
+[ext_resource type="Script" uid="uid://b3op2433pdm0f" path="res://scenes/npc/speaking_person.gd" id="2_tr8w8"]
+
+[resource]
+script = ExtResource("2_tr8w8")
+person_name = "Eclipse"
+person_voice = ExtResource("1_w8f2n")
+seconds_per_letter = 0.075
+metadata/_custom_type_script = "uid://b3op2433pdm0f"

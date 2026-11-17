@@ -42,6 +42,7 @@ var _stuck_timer: float = 0.0
 var _ignore_timer: float = 0.0
 var _attcking: bool = false
 
+
 func _ready():
 	add_to_group("enemy")
 	player = get_tree().get_first_node_in_group("player")

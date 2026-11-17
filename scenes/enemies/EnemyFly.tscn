@@ -126,7 +126,6 @@ unique_name_in_owner = true
 texture_filter = 1
 sprite_frames = SubResource("SpriteFrames_juuk7")
 animation = &"fly"
-frame_progress = 0.38503087
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=760232869]
 position = Vector2(0, -1.5)
@@ -155,7 +154,7 @@ unique_name_in_owner = true
 material = SubResource("CanvasItemMaterial_txe8i")
 emitting = false
 amount = 40
-lifetime = 1.4000000000000001
+lifetime = 1.4
 one_shot = true
 explosiveness = 0.6
 emission_shape = 3

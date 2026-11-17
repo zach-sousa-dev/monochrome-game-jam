@@ -166,6 +166,7 @@ animations = [{
 material = SubResource("ShaderMaterial_1ydht")
 
 [node name="Darkness" parent="." unique_id=2093894846 instance=ExtResource("2_nc6ft")]
+visible = false
 
 [node name="Backdrop" type="Sprite2D" parent="." unique_id=107408518]
 position = Vector2(1, 0)
@@ -185,6 +186,7 @@ zoom = Vector2(2.5, 2.5)
 
 [node name="Player" parent="." unique_id=1818162535 instance=ExtResource("1_ia4q5")]
 z_index = 1
+collision_layer = 1
 floor_max_angle = 1.0471976
 floor_snap_length = 8.0
 cam_path = NodePath("../Camera2D")
