@@ -24,9 +24,7 @@ func _ready() -> void:
 
 func try_enter() -> void:
 	if not locked:
-		player.global_position = destination.global_position
-		audio_player.stream = warp_sound
-		audio_player.play()
+		do_enter()
 	elif locked and KeyInventory.has_key_with_id(door_id):
 		audio_player.stream = unlock_sound
 		audio_player.play()
@@ -36,3 +34,8 @@ func try_enter() -> void:
 	else: 
 		audio_player.stream = locked_sound
 		audio_player.play()
+		
+func do_enter() -> void:
+	player.global_position = destination.global_position
+	audio_player.stream = warp_sound
+	audio_player.play()

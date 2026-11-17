@@ -14,12 +14,14 @@
 [ext_resource type="PackedScene" uid="uid://dwjlmofdokvwx" path="res://scenes/chests/chest.tscn" id="6_nc6ft"]
 [ext_resource type="PackedScene" uid="uid://dsj0uhvnc1yy8" path="res://scenes/ignitable/ignitable.tscn" id="7_nej6s"]
 [ext_resource type="Resource" uid="uid://byw2224njjoaw" path="res://assets/speeches/people/keymaster.tres" id="8_bl2hb"]
+[ext_resource type="PackedScene" uid="uid://bdvn78ugaxuao" path="res://scenes/boss-fight/boss-fight.tscn" id="8_jid7r"]
 [ext_resource type="Texture2D" uid="uid://b2r2k3006tal3" path="res://assets/sprites/npcs/john_the_keyguy.png" id="11_grteb"]
 [ext_resource type="PackedScene" uid="uid://cqlhbp6f1eigy" path="res://scenes/doors/door.tscn" id="12_0vcjt"]
 [ext_resource type="Texture2D" uid="uid://b6kfg6jyjcht0" path="res://assets/sprites/a_burger.png" id="16_bobjc"]
 [ext_resource type="PackedScene" uid="uid://cioy31i408y3s" path="res://scenes/shader-layers/clamp_shader.tscn" id="16_grteb"]
 [ext_resource type="PackedScene" uid="uid://cgvtuautwuuj" path="res://scenes/shader-layers/posterize_shader.tscn" id="17_nc6ft"]
 [ext_resource type="TileSet" uid="uid://dk5q18pf5ttvy" path="res://assets/tile-sets/environment.tres" id="20_bobjc"]
+[ext_resource type="PackedScene" uid="uid://fnrb8q3hqwp6" path="res://scenes/doors/scene-door.tscn" id="21_slj1a"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1ydht"]
 shader = ExtResource("1_nej6s")
@@ -168,6 +170,7 @@ animations = [{
 material = SubResource("ShaderMaterial_1ydht")
 
 [node name="Darkness" parent="." unique_id=2093894846 instance=ExtResource("2_nc6ft")]
+visible = false
 
 [node name="Backdrop" type="Sprite2D" parent="." unique_id=107408518]
 position = Vector2(1, 0)
@@ -238,6 +241,12 @@ door_id = 2
 
 [node name="Door2WarpPoint" type="Marker2D" parent="Doors/Door2" unique_id=2038770877]
 position = Vector2(0, -45)
+
+[node name="SceneDoor" parent="Doors" unique_id=1344126317 node_paths=PackedStringArray("player") instance=ExtResource("21_slj1a")]
+position = Vector2(218, 260)
+scene = ExtResource("8_jid7r")
+player = NodePath("../../Player")
+door_id = 3
 
 [node name="Chests" type="Node" parent="." unique_id=932106822]
 
