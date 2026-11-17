@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://dsj0uhvnc1yy8"]
+
+[ext_resource type="Script" uid="uid://cl8snpagq162c" path="res://scenes/ignitable/ignitable.gd" id="1_c574c"]
+[ext_resource type="Texture2D" uid="uid://s4wcmjouno12" path="res://assets/sprites/flame/flame0000.png" id="2_a3ht7"]
+[ext_resource type="Texture2D" uid="uid://dy37cin8aq21s" path="res://assets/sprites/flame/flame0001.png" id="3_210r2"]
+[ext_resource type="Texture2D" uid="uid://bhjcxh0qauoki" path="res://assets/sprites/flame/transparent.png" id="4_210r2"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_y5j4i"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_a3ht7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_210r2")
+}],
+"loop": 1,
+"name": &"lit",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_210r2")
+}],
+"loop": 1,
+"name": &"unlit",
+"speed": 5.0
+}]
+
+[sub_resource type="Gradient" id="Gradient_a3ht7"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_7g6oh"]
+gradient = SubResource("Gradient_a3ht7")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.8565217, 0.15652174)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c574c"]
+size = Vector2(30, 27)
+
+[node name="Ignitable" type="CharacterBody2D" unique_id=621263669]
+collision_layer = 8
+script = ExtResource("1_c574c")
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=303044437]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=751460806]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_y5j4i")
+animation = &"unlit"
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=1171760596]
+texture = SubResource("GradientTexture2D_7g6oh")
+offset = Vector2(0.5, 0.5)
+texture_scale = 2.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1625094773]
+shape = SubResource("RectangleShape2D_c574c")
+debug_color = Color(0.9333102, 0.17957026, 0.47469014, 0.41960785)
