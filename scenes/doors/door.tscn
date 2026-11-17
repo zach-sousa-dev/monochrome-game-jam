@@ -11,6 +11,7 @@ size = Vector2(20, 40)
 script = ExtResource("1_qq3h0")
 
 [node name="NPC" parent="." unique_id=71207571 instance=ExtResource("2_cjc7v")]
+collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="NPC" unique_id=242554002]
 shape = SubResource("RectangleShape2D_cjc7v")

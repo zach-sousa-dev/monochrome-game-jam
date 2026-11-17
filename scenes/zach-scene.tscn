@@ -10,6 +10,8 @@
 [ext_resource type="Resource" uid="uid://01xdddeppj1y" path="res://assets/speeches/people/eli.tres" id="5_ar3ua"]
 [ext_resource type="Resource" uid="uid://bcao1ro4uo6nv" path="res://assets/speeches/people/burger.tres" id="6_ar3ua"]
 [ext_resource type="Resource" uid="uid://b2tun44myyvu7" path="res://assets/speeches/people/you.tres" id="6_c1iva"]
+[ext_resource type="PackedScene" uid="uid://dwjlmofdokvwx" path="res://scenes/chests/chest.tscn" id="6_nc6ft"]
+[ext_resource type="PackedScene" uid="uid://dsj0uhvnc1yy8" path="res://scenes/ignitable/ignitable.tscn" id="7_nej6s"]
 [ext_resource type="Resource" uid="uid://byw2224njjoaw" path="res://assets/speeches/people/keymaster.tres" id="8_bl2hb"]
 [ext_resource type="Texture2D" uid="uid://b2r2k3006tal3" path="res://assets/sprites/npcs/john_the_keyguy.png" id="11_grteb"]
 [ext_resource type="PackedScene" uid="uid://cqlhbp6f1eigy" path="res://scenes/doors/door.tscn" id="12_0vcjt"]
@@ -173,7 +175,6 @@ shader_parameter/palette = ExtResource("19_07j5v")
 material = SubResource("ShaderMaterial_1ydht")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1015420312]
-visible = false
 color = Color(0, 0, 0, 1)
 
 [node name="Backdrop" type="Sprite2D" parent="." unique_id=107408518]
@@ -198,6 +199,7 @@ floor_max_angle = 1.0471976
 floor_snap_length = 8.0
 cam_path = NodePath("../Camera2D")
 cam_speed = 0.1
+starting_items = Array[int]([0, 1])
 debug_velocity = true
 
 [node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=519715087]
@@ -245,10 +247,27 @@ door_id = 2
 [node name="Door2WarpPoint" type="Marker2D" parent="Doors/Door2" unique_id=2038770877]
 position = Vector2(0, -45)
 
+[node name="Chests" type="Node" parent="." unique_id=932106822]
+
+[node name="Chest" parent="Chests" unique_id=1827163476 node_paths=PackedStringArray("player") instance=ExtResource("6_nc6ft")]
+position = Vector2(48, 261)
+player = NodePath("../../Player")
+chest_id = 5
+
+[node name="Flames" type="Node" parent="." unique_id=409377814]
+
+[node name="Ignitable" parent="Flames" unique_id=1252951616 instance=ExtResource("7_nej6s")]
+position = Vector2(-70, 247)
+
+[node name="KeyHolder" parent="Flames/Ignitable" index="0" unique_id=1444114925 node_paths=PackedStringArray("player")]
+key_id = 5
+player = NodePath("../../../Player")
+
 [node name="NPCs" type="Node" parent="." unique_id=2070483288]
 
 [node name="NPC" parent="NPCs" unique_id=71207571 instance=ExtResource("3_qlt7d")]
 position = Vector2(193, 164)
+collision_mask = 3
 speeches = Array[ExtResource("2_hrqc2")]([SubResource("Resource_6nf5r"), SubResource("Resource_bl2hb"), SubResource("Resource_ibh68"), SubResource("Resource_fiaps"), SubResource("Resource_0oo3m"), SubResource("Resource_15swg"), SubResource("Resource_ar3ua"), SubResource("Resource_061we")])
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="NPCs/NPC" unique_id=1153239735]
@@ -263,6 +282,7 @@ shape = SubResource("RectangleShape2D_15swg")
 [node name="Keymaster" parent="NPCs" unique_id=449651432 instance=ExtResource("3_qlt7d")]
 light_mask = 0
 position = Vector2(-123, 258)
+collision_mask = 3
 speeches = Array[ExtResource("2_hrqc2")]([SubResource("Resource_grteb"), SubResource("Resource_nc6ft"), SubResource("Resource_nej6s"), SubResource("Resource_slj1a")])
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="NPCs/Keymaster" unique_id=666764927]
@@ -290,6 +310,7 @@ texture = SubResource("GradientTexture2D_grteb")
 
 [node name="Burger NPC" parent="NPCs" unique_id=608656700 instance=ExtResource("3_qlt7d")]
 position = Vector2(-101, 21)
+collision_mask = 3
 speeches = Array[ExtResource("2_hrqc2")]([SubResource("Resource_bobjc"), SubResource("Resource_0vcjt")])
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="NPCs/Burger NPC" unique_id=1186661104]
@@ -327,6 +348,7 @@ offset_bottom = 253.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[editable path="Flames/Ignitable"]
 [editable path="NPCs/NPC"]
 [editable path="NPCs/Keymaster"]
 [editable path="NPCs/Burger NPC"]
