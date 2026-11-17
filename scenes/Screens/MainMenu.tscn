@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://bo0iuk2eahuq0"]
 
 [ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://shaders/clamp.gdshader" id="1_ptake"]
-[ext_resource type="TileSet" uid="uid://dk5q18pf5ttvy" path="res://assets/tile-maps/environment.tres" id="2_hubol"]
+[ext_resource type="TileSet" uid="uid://dk5q18pf5ttvy" path="res://assets/tile-sets/environment.tres" id="2_hubol"]
 [ext_resource type="PackedScene" uid="uid://dwhu7jb3mnk8e" path="res://scenes/player_fake/player_fake.tscn" id="5_jmi86"]
 [ext_resource type="Script" uid="uid://b8nlbb4yb17u4" path="res://scenes/player_fake/player_fake.gd" id="6_v5x7b"]
 [ext_resource type="PackedScene" uid="uid://d12s8pxdl381h" path="res://scenes/player/tool.tscn" id="6_vs0dr"]

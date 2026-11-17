@@ -9,7 +9,7 @@ extends Node2D
 @onready var player: Player = $"../Player"
 @onready var fade: Fade = $"../FadeToWhite" 
 
-var title_screen: PackedScene = preload("res://scenes/zach-scene.tscn")
+var title_screen: PackedScene = preload("res://scenes/Screens/MainMenu.tscn")
 
 func _ready() -> void:
 	opening_dialog.connect("dialog_complete", on_completed_opening_dialog)
