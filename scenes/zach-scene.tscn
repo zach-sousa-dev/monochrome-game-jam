@@ -192,11 +192,8 @@ collision_layer = 1
 floor_max_angle = 1.0471976
 floor_snap_length = 8.0
 cam_path = NodePath("../Camera2D")
-<<<<<<< HEAD
-=======
 cam_speed = 0.1
 starting_items = Array[int]([0, 1])
->>>>>>> 564f61aa0e3b7563bf44c31a50b17cadf3cdff18
 debug_velocity = true
 
 [node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=519715087]
