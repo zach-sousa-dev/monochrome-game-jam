@@ -14,7 +14,7 @@ enum Permission {
 	MODIFY_CUSTOM_FILES
 }
 
-const PROTOCOL_VERSION = 2
+const PROTOCOL_VERSION = 4
 const SUPPORTED_ENGINE_VERSION = [4, 7, 2]
 
 const MIN_DISK_SPACE = 1024 * 1024 * 500 + 1 # 500 MB
@@ -24,8 +24,8 @@ const ENABLE_CUSTOM_LOGGER = true
 
 const _META_LOCK_NAME = "gdt_lock"
 
-const GUI_SCENE = preload("../scenes/GUI/GUI.tscn")
-const CHAT_SCENE = preload("../scenes/GUI/chat/chat.tscn")
+var gui_scene = load("res://addons/GodotTogether/src/scenes/GUI/GUI.tscn")
+var chat_scene = load("res://addons/GodotTogether/src/scenes/GUI/chat/chat.tscn")
 
 var client = GDTClient.new(self, "client")
 var server = GDTServer.new(self, "server")
@@ -33,11 +33,12 @@ var dual = GDTDual.new(self, "dual")
 
 var file_sync = GDTFileSync.new(self, "file_sync")
 var node_sync = GDTNodeSync.new(self, "node_sync")
+var script_sync = GDTScriptSync.new(self, "script_sync")
 
 # Do not access this directly, use get_gui()
 # Godot will randomly throw a "Cyclic reference" error
-var gui: GodotTogetherGUI = GUI_SCENE.instantiate()  
-var chat: GDTChat = CHAT_SCENE.instantiate()
+var gui: GodotTogetherGUI = null
+var chat: GDTChat = null
 
 var button = GDTMenuButton.new()
 var toaster: EditorToaster = EditorInterface.get_editor_toaster()
@@ -51,12 +52,15 @@ var extras = GDTExtras.new(self, "extras")
 
 var logger: GDTLogger = null
 var mp_override: GDTMultiplayerExtension = null
+var editor_node := GDTEditorNode.new()
 
 var plugin_started := false
 var components = []
 
 func _enter_tree() -> void:
 	await get_tree().process_frame
+	
+	init_scene_nodes()
 	
 	if not pre_start_check():
 		printerr("GodotTogether will not run.")
@@ -77,14 +81,9 @@ func _enter_tree() -> void:
 	setup_menu_button()
 	settings.load_settings()
 	
-	if not check_path():
-		return
-	
-	if not create_lock():
-		return
-	
-	if not check_disk_space():
-		return
+	if not check_path(): return
+	if not create_lock(): return
+	if not check_disk_space(): return
 	
 	await get_tree().process_frame
 	
@@ -114,6 +113,7 @@ func _exit_tree() -> void:
 	
 	if chat:
 		remove_control_from_bottom_panel(chat)
+		chat.queue_free()
 	
 	if button:
 		button.queue_free()
@@ -127,11 +127,15 @@ func _exit_tree() -> void:
 	if ENABLE_MULTIPLAYER_OVERRIDE:
 		get_tree().set_multiplayer(SceneMultiplayer.new(), GDTMultiplayerExtension.ROOT_PATH)
 
+func init_scene_nodes() -> void:
+	# Possible mitigation for dumb Godot type errors may be to assign the values after waiting 
+	gui = gui_scene.instantiate() as GodotTogetherGUI
+	chat = chat_scene.instantiate() as GDTChat
+
 func init_components() -> void:
-	
 	components = [
 		client, server, dual,
-		file_sync, node_sync, 
+		file_sync, node_sync, script_sync,
 		settings,
 		gui,
 		script_security,
@@ -288,6 +292,9 @@ func is_session_active() -> bool:
 		)
 	)
 
+func is_dev_version() -> bool:
+	return FileAccess.file_exists("res://addons/GodotTogether/.dev")
+
 func setup_menu_button() -> void:
 	add_control_to_container(EditorPlugin.CONTAINER_TOOLBAR, button)
 	
@@ -296,9 +303,9 @@ func setup_menu_button() -> void:
 
 func pre_start_check() -> bool:
 	if not gui:
-		printerr("GUI is not available")
+		printerr("GUI is not available. Try restarting Godot.")
 		return false
-		
+	
 	if not gui.get_menu_window():
 		printerr("get_menu_window() is not available and errors cannot be properly displayed")
 		return false

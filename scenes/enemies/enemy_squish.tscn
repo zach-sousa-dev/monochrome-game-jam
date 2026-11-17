@@ -25,6 +25,7 @@
 [ext_resource type="Texture2D" uid="uid://bko85kj8rcbne" path="res://assets/sprites/fuel_dog/run/fuel_dog_enemy_run0007.png" id="20_otxsk"]
 [ext_resource type="Texture2D" uid="uid://cpbha784kt00k" path="res://assets/sprites/fuel_dog/run/fuel_dog_enemy_run0008.png" id="21_tykpn"]
 [ext_resource type="Texture2D" uid="uid://cmg0liaogym6k" path="res://assets/sprites/fuel_dog/run/fuel_dog_enemy_run0009.png" id="22_sibm6"]
+[ext_resource type="AudioStream" uid="uid://ebprjxtqfehf" path="res://assets/sounds/npc/damage.wav" id="26_l4kfe"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_juuk7"]
 animations = [{
@@ -197,6 +198,7 @@ unique_name_in_owner = true
 
 [node name="HitSound" type="AudioStreamPlayer2D" parent="." unique_id=1190966332]
 unique_name_in_owner = true
+stream = ExtResource("26_l4kfe")
 
 [node name="AlertSound" type="AudioStreamPlayer2D" parent="." unique_id=1068654192]
 unique_name_in_owner = true

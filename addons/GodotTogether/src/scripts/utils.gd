@@ -10,6 +10,17 @@ static func sha256_of_buffer(buffer: PackedByteArray) -> String:
 	
 	return hasher.finish().hex_encode()
 
+static func alphabetic_dict_hash(dict: Dictionary) -> int:
+	var keys = dict.keys()
+	keys.sort()
+	
+	var res = 0
+	
+	for key in keys:
+		res += hash(dict[key])
+	
+	return res
+
 static func get_rpc_checksum(node: Node) -> int:
 	var script: Script = node.get_script()
 	var res = 0
@@ -18,12 +29,12 @@ static func get_rpc_checksum(node: Node) -> int:
 		var script_conf: Dictionary = script.get_rpc_config()
 		
 		if script_conf:
-			res = script_conf.hash()
+			res += alphabetic_dict_hash(script_conf)
 	
 	var node_conf = node.get_node_rpc_config()
 	
 	if node_conf:
-		res += node_conf.hash()
+		res += alphabetic_dict_hash(node_conf)
 	
 	return res 
 
@@ -94,6 +105,41 @@ static func get_nested(obj, path: String, separator := DICT_PATH_SEPARATOR):
 		current = current[level]
 	
 	return current
+	
+static func has_nested(obj, path: String, separator := DICT_PATH_SEPARATOR) -> bool:
+	var levels = path.split(separator)
+	var current = obj
+	
+	for level in levels:
+		if not current is Dictionary and not current is Object:
+			return false
+		
+		if not level in current: 
+			return false
+		
+		current = current[level]
+	
+	return true
+
+static func erase_nested(dict: Dictionary, path: String, separator := DICT_PATH_SEPARATOR) -> bool:
+	var levels = path.split(separator)
+	var current = dict
+	
+	for level_i in levels.size():
+		var level = levels[level_i]
+		
+		if not current is Dictionary:
+			return false
+		
+		if not level in current: 
+			return false
+		
+		if level_i == levels.size() - 1:
+			current.erase(level)
+		else:
+			current = current[level]
+	
+	return true
 
 static func set_nested(
 	obj, 
@@ -176,6 +222,9 @@ static func compare_dicts(
 
 static func get_tree() -> SceneTree:
 	return EditorInterface.get_base_control().get_tree()
+
+static func get_root() -> Node:
+	return get_tree().root
 
 static func try_connect(sig: Signal, fn: Callable) -> void:
 	if not sig.is_connected(fn):
@@ -323,6 +372,50 @@ static func set_control_disabled(node: Control, state: bool) -> void:
 static func is_file_resource(resource: Resource) -> bool:
 	return not resource.resource_path.is_empty() and not resource.resource_path.contains("::")
 
+static func line_column_to_index(text: String, line: int, col: int) -> int:
+	var lines = text.split("\n")
+	
+	if lines.size() <= line:
+		return -1
+	
+	var res = 0
+	
+	for line_i in lines.size():
+		if line_i != line:
+			res += lines[line_i].length() + 1 # 1 for \n char
+		else:
+			res += col
+			break
+	
+	return res
+
+static func index_to_line_column(text: String, idx: int) -> Array:
+	if idx < 0:
+		return [-1, -1]
+	
+	if idx >= text.length():
+		return [-1, -1]
+	
+	var line = 0
+	var col = 0
+	
+	var cols_counted = false
+	
+	for i in idx:
+		var ch = text[i]
+		var ch_reverse = text[idx - i - 1]
+		
+		if ch == "\n":
+			line += 1
+		
+		if ch_reverse == "\n":
+			cols_counted = true
+		
+		if not cols_counted:
+			col += 1
+		
+	return [line, col]
+		
 static func get_stack_lines() -> Array:
 	var res = []
 	var stack = get_stack()
@@ -333,6 +426,16 @@ static func get_stack_lines() -> Array:
 		res.append("%s %s:%s" % [ i["source"], i["function"], i["line"] ])
 	
 	return res
+
+static func get_engine_version_str() -> String:
+	var ver_info = Engine.get_version_info()
+	
+	return "%s.%s.%s-%s" % [
+		ver_info["major"],
+		ver_info["minor"],
+		ver_info["patch"],
+		ver_info["status"]
+	]
 
 static func printerr_stack(message) -> void:
 	var stack_lines = get_stack_lines()

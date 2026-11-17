@@ -148,7 +148,7 @@ func shoot():
 	
 	var facing: int = get_facing()
 	var projectile: Node2D = data.scene.instantiate()
-	get_tree().current_scene.add_child(projectile)
+	if is_inside_tree(): get_tree().current_scene.add_child(projectile)
 	projectile.global_position = tool_marker_2d.global_position
 	
 	var dir: Vector2 = Vector2(facing, 0).rotated(deg_to_rad(-data.angle) * facing)

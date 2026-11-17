@@ -20,6 +20,7 @@
 [ext_resource type="Texture2D" uid="uid://orp3fmkdewvu" path="res://assets/sprites/bird_thing/fly/match_bird_enemy_fly0005.png" id="15_smqyo"]
 [ext_resource type="Texture2D" uid="uid://b482ps2x58hie" path="res://assets/sprites/bird_thing/fly/match_bird_enemy_fly0006.png" id="16_wivkf"]
 [ext_resource type="Texture2D" uid="uid://by7qpyhkfbtwt" path="res://assets/sprites/bird_thing/fly/match_bird_enemy_fly0007.png" id="17_4n7se"]
+[ext_resource type="AudioStream" uid="uid://ebprjxtqfehf" path="res://assets/sounds/npc/damage.wav" id="21_tes1y"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_juuk7"]
 animations = [{
@@ -172,6 +173,7 @@ unique_name_in_owner = true
 
 [node name="HitSound" type="AudioStreamPlayer2D" parent="." unique_id=1099467061]
 unique_name_in_owner = true
+stream = ExtResource("21_tes1y")
 
 [node name="AlertSound" type="AudioStreamPlayer2D" parent="." unique_id=1309051773]
 unique_name_in_owner = true

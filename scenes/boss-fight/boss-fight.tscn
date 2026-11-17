@@ -129,7 +129,6 @@ zoom = Vector2(2.5, 2.5)
 [node name="OpeningDialog" parent="." unique_id=1080896306 instance=ExtResource("7_wrn4i")]
 position = Vector2(-4, -49)
 collision_layer = 1
-collision_mask = 2
 speeches = Array[ExtResource("4_4sl4k")]([SubResource("Resource_f4k1l"), SubResource("Resource_ahsn2"), SubResource("Resource_6t3l3"), SubResource("Resource_rpv4h"), SubResource("Resource_bji4e"), SubResource("Resource_85jru"), SubResource("Resource_5mqxy"), SubResource("Resource_joe4g")])
 interaction_required = false
 
@@ -140,7 +139,6 @@ shape = SubResource("RectangleShape2D_f4k1l")
 [node name="ClosingDialog" parent="." unique_id=71207571 instance=ExtResource("7_wrn4i")]
 position = Vector2(-4, -49)
 collision_layer = 1
-collision_mask = 2
 speeches = Array[ExtResource("4_4sl4k")]([SubResource("Resource_8857s"), SubResource("Resource_4sl4k"), SubResource("Resource_7b5dl")])
 interaction_required = false
 
@@ -152,6 +150,7 @@ disabled = true
 [node name="Boss" parent="." unique_id=1946113309 instance=ExtResource("6_f4k1l")]
 process_mode = 3
 position = Vector2(0, -57)
+health = 100.0
 
 [node name="PointLight2D" type="PointLight2D" parent="Boss" unique_id=349349042]
 position = Vector2(0, -1)
@@ -199,14 +198,14 @@ stream = ExtResource("18_wrn4i")
 position = Vector2(-76, -95)
 delay = 15.0
 enemy_scene = ExtResource("13_tnlrm")
-max_enemies = 2
+max_enemies = 1
 offset = Vector2(50, 50)
 
 [node name="FlySpawner2" parent="." unique_id=150760547 instance=ExtResource("12_tkt16")]
 position = Vector2(84, -95)
 delay = 15.0
 enemy_scene = ExtResource("13_tnlrm")
-max_enemies = 2
+max_enemies = 1
 offset = Vector2(50, 50)
 
 [node name="FadeToWhite" type="Sprite2D" parent="." unique_id=1861187707]

@@ -5,6 +5,8 @@
 [ext_resource type="Theme" uid="uid://x1haa1fvyc6g" path="res://scenes/npc/dialog.tres" id="2_fl1f2"]
 [ext_resource type="Texture2D" uid="uid://kee6vj1kpctn" path="res://assets/ui_assets/laturnExample.png" id="2_i11o4"]
 [ext_resource type="Shader" uid="uid://c1pblfgw3u4bw" path="res://shaders/fuel_fill.gdshader" id="3_uwl7a"]
+[ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://shaders/clamp.gdshader" id="6_jf7rs"]
+[ext_resource type="AudioStream" uid="uid://dgu1rwoelf5xb" path="res://assets/sounds/player/equip.wav" id="7_gx1jo"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nc6ft"]
 
@@ -29,6 +31,10 @@ shader_parameter/progress = 1.0
 shader_parameter/fill_from_bottom = true
 shader_parameter/edge_softness = 0.01
 shader_parameter/empty_brightness = 0.6
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gx1jo"]
+shader = ExtResource("6_jf7rs")
+shader_parameter/colour = Color(0.68235296, 0.8980392, 0.83137256, 1)
 
 [node name="PlayerHud" type="CanvasLayer" unique_id=868017095]
 script = ExtResource("1_i11o4")
@@ -126,5 +132,20 @@ texture = ExtResource("2_i11o4")
 expand_mode = 3
 stretch_mode = 5
 
+[node name="ColorRect" type="ColorRect" parent="Control" unique_id=234653738]
+material = SubResource("ShaderMaterial_gx1jo")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -362.0
+offset_top = -284.0
+offset_right = 599.0
+offset_bottom = 398.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
 [node name="ItemSwapSound" type="AudioStreamPlayer2D" parent="Control" unique_id=268312354]
 unique_name_in_owner = true
+stream = ExtResource("7_gx1jo")

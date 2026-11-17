@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://byj4rjqnr66yl" path="res://scenes/projectiles_scenes/laturn_blast.gd" id="1_pr886"]
 [ext_resource type="Texture2D" uid="uid://bjyc6aa7wad4a" path="res://assets/projectiles_images/LaturnBLAST.png" id="2_pr886"]
-[ext_resource type="AudioStream" uid="uid://bvloh4j4ugrip" path="res://assets/sounds/doors/warp.wav" id="3_8vycq"]
-[ext_resource type="AudioStream" uid="uid://bsb2tblj7hbgd" path="res://assets/sounds/doors/locked.wav" id="4_bq0gm"]
+[ext_resource type="AudioStream" uid="uid://6lk164kpso4j" path="res://assets/sounds/player/explosion.wav" id="3_pr886"]
+[ext_resource type="AudioStream" uid="uid://d4hajdvduccp3" path="res://assets/sounds/player/shoot.wav" id="4_pr886"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ftuob"]
 radius = 8.0
@@ -83,8 +83,8 @@ color = Color(0.7480997, 0.7480997, 0.7480996, 1)
 
 [node name="Explosion_sound" type="AudioStreamPlayer2D" parent="." unique_id=1352256845]
 unique_name_in_owner = true
-stream = ExtResource("3_8vycq")
+stream = ExtResource("3_pr886")
 
 [node name="Shooting_sound" type="AudioStreamPlayer2D" parent="." unique_id=766265662]
 unique_name_in_owner = true
-stream = ExtResource("4_bq0gm")
+stream = ExtResource("4_pr886")

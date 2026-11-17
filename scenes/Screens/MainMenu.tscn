@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://b8nlbb4yb17u4" path="res://scenes/player_fake/player_fake.gd" id="6_v5x7b"]
 [ext_resource type="PackedScene" uid="uid://d12s8pxdl381h" path="res://scenes/player/tool.tscn" id="6_vs0dr"]
 [ext_resource type="PackedScene" uid="uid://bgtgl5plu7p1s" path="res://ui/Main_menu/MenuButtons.tscn" id="8_elq80"]
+[ext_resource type="AudioStream" uid="uid://dmqxsyanoomr" path="res://assets/music/Week 20 - Dust Bowl PARCHED.ogg" id="9_ldqa5"]
 [ext_resource type="Shader" uid="uid://1p3yx37wwnye" path="res://shaders/posterization.gdshader" id="12_hm0al"]
 [ext_resource type="Texture2D" uid="uid://b5hgkaux5asdm" path="res://shaders/shader-palette.png" id="13_i7r3k"]
 
@@ -87,3 +88,8 @@ auto_drain = false
 position = Vector2(28, 1)
 
 [node name="MenuButtons" parent="." unique_id=506439092 instance=ExtResource("8_elq80")]
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=1185792498]
+stream = ExtResource("9_ldqa5")
+volume_db = -10.0
+autoplay = true

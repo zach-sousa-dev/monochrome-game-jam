@@ -15,7 +15,9 @@ const LOCALHOST := [
 ]
 
 var server_peer = ENetMultiplayerPeer.new()
+
 var ip_join_times = {}
+var last_alive_ping: float = 0.0
 
 func _ready() -> void:
 	multiplayer.peer_connected.connect(_peer_connected)
@@ -24,13 +26,24 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	if not main: return
-	if not main.is_session_active(): return
+	if not is_active(): return
 	
 	var now = Time.get_unix_time_from_system()
 	
+	if (now - last_alive_ping) > GDTDual.PING_INTERVAL:
+		last_alive_ping = now
+		main.client._s2c_connection_alive.rpc()
+	
 	for user: GDTUser in main.dual.users:
+		if user.id == 1: continue
+		
 		if not user.was_ever_authenticated() and now > user.joined_at + APPROVE_TIMEOUT:
 			user.reject(GDTUser.DisconnectReason.APPROVE_TIMEOUT)
+			continue
+			
+		if (now - user.last_ping) > GDTDual.TIMEOUT:
+			user.kick(GDTUser.DisconnectReason.TIMEOUT)
+			continue
 
 func _peer_connected(id: int) -> void:
 	if not multiplayer.is_server(): 
@@ -39,10 +52,10 @@ func _peer_connected(id: int) -> void:
 	var now = Time.get_unix_time_from_system()
 	var peer = server_peer.get_peer(id)
 	var user = GDTUser.new(id, peer, main)
-	var ip = peer.get_remote_address()
-
+	var ip = user.get_address()
+	
 	print("New connection from %s ID: %d" % [peer.get_remote_address(), id])
-
+	
 	if get_users_with_address(ip) and not main.get_settings().get_setting("server/allow_multiple_users_from_same_address"):
 		user.kick(GDTUser.DisconnectReason.ADDRESS_IN_USE)
 		print("Address already used, refusing connection")
@@ -107,6 +120,9 @@ func create_server_user() -> GDTUser:
 	return user
 
 func get_users_with_address(ip: String) -> Array:
+	if ip.contains("<"):
+		return []
+	
 	var res = []
 	
 	ip = GDTUser.normalize_address(ip)
@@ -229,6 +245,8 @@ func _c2s_receive_join_data(data_dict: Dictionary) -> void:
 		GDTUtils.printerr_stack("Got join data, but %s is already authenticated" % id)
 		return
 	
+	user.got_ping()
+	
 	var data = GDTJoinData.from_dict(data_dict)
 	
 	if not data:
@@ -272,37 +290,14 @@ func _c2s_receive_join_data(data_dict: Dictionary) -> void:
 	
 	user.auth()
 
-@rpc("any_peer", "call_remote", "reliable")
-func _c2s_file_request(path: String) -> void:
-	var id = multiplayer.get_remote_sender_id()
-	var user = main.dual.get_user_by_id(id)
-
-	if not validate_c2s():
-		return
+@rpc("any_peer", "unreliable", "call_remote", GDTDual.NetChannel.MISC)
+func _c2s_connection_alive() -> void:
+	if not validate_c2s(): return
 	
+	var user = get_calling_user()
 	if not user: return
-	if not user.authenticated: return
 	
-	if not GDTValidator.is_path_safe(path):
-		GDTUtils.printerr_stack(
-			"User %s (%s) tried to request file at unsafe path: %s" %
-			[user.name, user.id, path]
-		)
-		return
-	
-	if not FileAccess.file_exists(path):
-		return
-	
-	GDTFileSync.read_chunks_callback(path, func(buf: PackedByteArray, cursor: int):
-		main.client.receive_file.rpc_id(
-			id, 
-			path, 
-			buf, 
-			cursor, 
-			cursor == 0
-		)
-	)
-
+	user.got_ping()
 
 @rpc("any_peer", "call_remote", "reliable")
 func broadcast_restart():
@@ -322,7 +317,11 @@ func auth_rpc(fn: Callable, args: Array, exclude_ids: Array[int] = []) -> void:
 			fn.rpc_id.callv([i] + args)
 
 func is_active() -> bool:
-	return server_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED
+	return (
+		main and
+		multiplayer.multiplayer_peer == server_peer and
+		server_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED
+	)
 
 static func is_local(ip: String) -> bool:
 	if ip in LOCALHOST: return true

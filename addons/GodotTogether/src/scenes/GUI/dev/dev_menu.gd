@@ -5,6 +5,11 @@ class_name GDTDevMenu
 var main: GodotTogether = null
 
 func _ready() -> void:
+	var tree = get_tree()
+	
+	if tree and tree.current_scene == self:
+		return
+	
 	await get_tree().process_frame
 	await get_tree().process_frame
 	await get_tree().process_frame
@@ -18,6 +23,15 @@ func _ready() -> void:
 	register_settings($main/scroll/vbox/settings/vbox.get_children())
 	
 	$main/scroll/vbox/tests/vbox/btnRunUnitTests.pressed.connect(main.tests.run_tests)
+	
+	$main/scroll/vbox/info/vbox/version.text = "Version name: %s" % main.get_plugin_version()
+	$main/scroll/vbox/info/vbox/protocol.text = "Protocol version: %s" % main.PROTOCOL_VERSION
+	$main/scroll/vbox/info/vbox/dev.text = "Is dev (source code) version: %s" % main.is_dev_version()
+	
+	var res_dir = DirAccess.open("res://")
+	
+	if res_dir:
+		$main/scroll/vbox/info/vbox/diskSpace.text = "Supports disk space check: %s" % (res_dir.get_space_left() > 0)
 
 func register_settings(nodes: Array) -> void:
 	for i in nodes:
@@ -37,8 +51,13 @@ func fill_main() -> void:
 			if first and "main" in first:
 				first.main = main
 
-func _on_btn_node_classes_pressed() -> void:
-	GDTDebug.dump_node_classes()
+# For use in the code executor
+func inspect_tree(node: Node = GDTUtils.get_root()) -> void:
+	if not node:
+		printerr("Node is null")
+		return
+		
+	main.gui.scene_tree_editor.load_tree(node)
 
 func _on_btn_file_tree_pressed() -> void:
 	var paths = GDTFiles.get_file_tree()
@@ -63,6 +82,13 @@ func _on_btn_node_data_pressed() -> void:
 		prints("---", node, "---")
 		print(main.node_sync.node_data_dict[node])
 		print("")
+
+func _on_btn_userdata_pressed() -> void:
+	for i: GDTUser in main.dual.users:
+		print("-- %s: %s --" % [i.id, i.name])
+		print(JSON.stringify(i.to_dict(), "  "))
+	
+	print("Total: %s" % main.dual.users.size())
 
 func _on_btn_execute_pressed() -> void:
 	var expr = Expression.new()
@@ -134,3 +160,54 @@ func _on_btn_test_chunk_tool_script_pressed() -> void:
 	f.close()
 	
 	print("Created %s" % path)
+
+
+func _on_btn_death_pressed() -> void:
+	if not await main.gui.confirm("Are you sure? This will require a plugin restart to undo."):
+		return
+	
+	main.gui.get_menu_window().set_error_of_death(
+		"Oopsie whoopsie OwO!",
+		"It's your fault."
+	)
+
+
+func _on_btn_write_test_pressed() -> void:
+	if not main: return
+	
+	main.get_gui().get_menu_window().hide()
+	hide()
+	
+	await get_tree().process_frame
+	
+	var f = FileAccess.open("res://project.godot", FileAccess.READ_WRITE)
+	
+	if not f:
+		printerr("Unable to open project file")
+		return
+	
+	f.seek_end()
+	f.store_string("\n")
+
+
+func _on_btn_script_update_test_pressed() -> void:
+	if not main: return
+	
+	print("Waiting...")
+	
+	await get_tree().create_timer(5).timeout
+	print("Updating")
+	
+	var editor = main.gui.script_editor_mgr.get_code_editor()
+	var new_text = "# First line test\n" + editor.text + "\n# Last line test" 
+	
+	main.gui.script_editor_mgr.update_text_edit(editor, new_text)
+
+func _on_btn_disclaimer_pressed() -> void:
+	if not main: return
+	
+	if not await main.get_gui().confirm("This requires a restart. Continue?"):
+		return
+	
+	main.get_settings().set_setting("seen/disclaimer", false)
+	main.restart()

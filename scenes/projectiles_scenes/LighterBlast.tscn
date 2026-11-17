@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://ht474mc1caqd" path="res://scenes/projectiles_scenes/lighter_blast.gd" id="1_bs83i"]
 [ext_resource type="Texture2D" uid="uid://brdorlovu3tms" path="res://assets/projectiles_images/LIGHERBLAST.png" id="1_inish"]
-[ext_resource type="AudioStream" uid="uid://bvloh4j4ugrip" path="res://assets/sounds/doors/warp.wav" id="3_i58qx"]
-[ext_resource type="AudioStream" uid="uid://bsb2tblj7hbgd" path="res://assets/sounds/doors/locked.wav" id="4_pj3ur"]
+[ext_resource type="AudioStream" uid="uid://6lk164kpso4j" path="res://assets/sounds/player/explosion.wav" id="3_i58qx"]
+[ext_resource type="AudioStream" uid="uid://d4hajdvduccp3" path="res://assets/sounds/player/shoot.wav" id="4_i58qx"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bs83i"]
 radius = 8.0
@@ -86,4 +86,4 @@ stream = ExtResource("3_i58qx")
 
 [node name="Shooting_sound" type="AudioStreamPlayer2D" parent="." unique_id=965935278]
 unique_name_in_owner = true
-stream = ExtResource("4_pj3ur")
+stream = ExtResource("4_i58qx")
