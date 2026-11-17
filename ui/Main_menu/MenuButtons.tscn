@@ -1,0 +1,111 @@
+[gd_scene format=3 uid="uid://bgtgl5plu7p1s"]
+
+[ext_resource type="Script" uid="uid://bknypin2qoagp" path="res://ui/Main_menu/menu_buttons.gd" id="1_ehimh"]
+[ext_resource type="Theme" uid="uid://x1haa1fvyc6g" path="res://scenes/npc/dialog.tres" id="1_wtd66"]
+[ext_resource type="Texture2D" uid="uid://54cqe6q2g1kr" path="res://assets/ui_assets/placeholder/dialog-box.png" id="2_ehimh"]
+[ext_resource type="Script" uid="uid://d0w588iasf3il" path="res://ui/Main_menu/play.gd" id="4_how2t"]
+[ext_resource type="AudioStream" uid="uid://de8hvim1y04q" path="res://assets/sounds/npc/placeholder/josh.wav" id="5_37a67"]
+[ext_resource type="Script" uid="uid://dq5tfs5e4sgw1" path="res://ui/Main_menu/credits.gd" id="5_70ow8"]
+[ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://shaders/clamp.gdshader" id="7_2y64i"]
+[ext_resource type="Texture2D" uid="uid://bwb5dtdpfhsb5" path="res://assets/sprites/gaslight_logo_title (1).png" id="8_qbc8q"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_how2t"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+texture = ExtResource("2_ehimh")
+texture_margin_left = 13.0
+texture_margin_top = 13.0
+texture_margin_right = 13.0
+texture_margin_bottom = 13.0
+region_rect = Rect2(0, 0, 32, 32)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2y64i"]
+shader = ExtResource("7_2y64i")
+shader_parameter/colour = Color(0.68235296, 0.8980392, 0.83137256, 1)
+
+[node name="MenuButtons" type="CanvasLayer" unique_id=506439092]
+script = ExtResource("1_ehimh")
+
+[node name="Control" type="Control" parent="." unique_id=187767292]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -180.0
+offset_right = 320.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Play" type="Button" parent="Control" unique_id=570476189]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 50.0
+offset_top = 8.264999
+offset_right = 209.99997
+offset_bottom = 52.26503
+grow_vertical = 2
+theme = ExtResource("1_wtd66")
+theme_override_font_sizes/font_size = 19
+theme_override_styles/normal = SubResource("StyleBoxTexture_how2t")
+text = "PLAY"
+script = ExtResource("4_how2t")
+
+[node name="Credits" type="Button" parent="Control" unique_id=564946004]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 50.0
+offset_top = 60.304993
+offset_right = 151.00003
+offset_bottom = 100.305115
+grow_vertical = 2
+theme = ExtResource("1_wtd66")
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxTexture_how2t")
+text = "Credits"
+script = ExtResource("5_70ow8")
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="Control" unique_id=92701687]
+stream = ExtResource("5_37a67")
+
+[node name="GaslightLogoTitle(1)" type="Sprite2D" parent="Control" unique_id=354119663]
+texture_filter = 1
+position = Vector2(233.62502, 84.87499)
+scale = Vector2(2.9360468, 2.6402438)
+texture = ExtResource("8_qbc8q")
+
+[node name="ColorRect" type="ColorRect" parent="Control" unique_id=1737222800]
+material = SubResource("ShaderMaterial_2y64i")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -566.0
+offset_top = -513.0
+offset_right = 395.0
+offset_bottom = 169.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="FadeRect" type="ColorRect" parent="Control" unique_id=1025038998]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -11.0
+offset_top = -6.0
+offset_right = 680.0
+offset_bottom = 368.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)

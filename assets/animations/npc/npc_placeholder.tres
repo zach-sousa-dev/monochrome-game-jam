@@ -5,11 +5,6 @@
 
 [resource]
 animations = [{
-"frames": [],
-"loop": 1,
-"name": &"attack",
-"speed": 5.0
-}, {
 "frames": [{
 "duration": 1.0,
 "texture": ExtResource("1_5ei2t")
@@ -20,9 +15,4 @@ animations = [{
 "loop": 1,
 "name": &"idle",
 "speed": 2.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"run",
-"speed": 5.0
 }]

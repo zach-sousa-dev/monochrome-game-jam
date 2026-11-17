@@ -168,7 +168,6 @@ animations = [{
 material = SubResource("ShaderMaterial_1ydht")
 
 [node name="Darkness" parent="." unique_id=2093894846 instance=ExtResource("2_nc6ft")]
-visible = false
 
 [node name="Backdrop" type="Sprite2D" parent="." unique_id=107408518]
 position = Vector2(1, 0)
@@ -192,7 +191,6 @@ collision_layer = 1
 floor_max_angle = 1.0471976
 floor_snap_length = 8.0
 cam_path = NodePath("../Camera2D")
-cam_speed = 0.1
 starting_items = Array[int]([0, 1])
 debug_velocity = true
 
@@ -252,10 +250,6 @@ chest_id = 5
 
 [node name="Ignitable" parent="Flames" unique_id=1252951616 instance=ExtResource("7_nej6s")]
 position = Vector2(-70, 247)
-
-[node name="KeyHolder" parent="Flames/Ignitable" index="0" unique_id=1444114925 node_paths=PackedStringArray("player")]
-key_id = 5
-player = NodePath("../../../Player")
 
 [node name="NPCs" type="Node" parent="." unique_id=2070483288]
 

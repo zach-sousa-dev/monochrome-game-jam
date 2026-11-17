@@ -62,3 +62,6 @@ func get_drain_rate():
 	if item:                                                #Only if an item is selected             
 		multiplier = item.drain_multiplier                  #Use items speed
 	return drain_per_second * multiplier                    #Base drain x item speed = fuel lost per second
+
+func is_full() -> bool:
+	return fuel >= max_fuel

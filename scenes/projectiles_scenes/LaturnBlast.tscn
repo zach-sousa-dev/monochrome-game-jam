@@ -1,0 +1,90 @@
+[gd_scene format=3 uid="uid://repw185xo224"]
+
+[ext_resource type="Script" uid="uid://byj4rjqnr66yl" path="res://scenes/projectiles_scenes/laturn_blast.gd" id="1_pr886"]
+[ext_resource type="Texture2D" uid="uid://bjyc6aa7wad4a" path="res://assets/projectiles_images/LaturnBLAST.png" id="2_pr886"]
+[ext_resource type="AudioStream" uid="uid://bvloh4j4ugrip" path="res://assets/sounds/doors/warp.wav" id="3_8vycq"]
+[ext_resource type="AudioStream" uid="uid://bsb2tblj7hbgd" path="res://assets/sounds/doors/locked.wav" id="4_bq0gm"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ftuob"]
+radius = 8.0
+height = 24.0
+
+[sub_resource type="Gradient" id="Gradient_pr886"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_1jnnr"]
+gradient = SubResource("Gradient_pr886")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.84347826, 0.13913043)
+
+[sub_resource type="Curve" id="Curve_ddfbw"]
+_data = [Vector2(0.08695653, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_7cloc"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[node name="LaturnBlast" type="Area2D" unique_id=1579831471]
+collision_mask = 5
+script = ExtResource("1_pr886")
+
+[node name="LaturnBlast" type="Sprite2D" parent="." unique_id=486406851]
+texture_filter = 1
+position = Vector2(-5, -2)
+texture = ExtResource("2_pr886")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=705371380]
+position = Vector2(-2, 0)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_ftuob")
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=1301450279]
+shadow_enabled = true
+texture = SubResource("GradientTexture2D_1jnnr")
+texture_scale = 3.19
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="." unique_id=382723984]
+rotation = -0.08816577
+amount = 40
+lifetime = 0.35000000000000003
+randomness = 0.4
+emission_shape = 1
+emission_sphere_radius = 3.0
+direction = Vector2(-1, 0)
+spread = 27.02
+gravity = Vector2(0, -60)
+initial_velocity_min = 10.0
+initial_velocity_max = 35.0
+scale_amount_min = 2.0
+scale_amount_max = 4.0
+scale_amount_curve = SubResource("Curve_ddfbw")
+color = Color(0.8745098, 0.44313726, 0.14901961, 1)
+
+[node name="Explosion" type="CPUParticles2D" parent="." unique_id=2091029722]
+unique_name_in_owner = true
+rotation = 0.22412315
+emitting = false
+amount = 30
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+spread = 180.0
+gravity = Vector2(0, -40)
+initial_velocity_min = 40.0
+initial_velocity_max = 110.0
+damping_min = 100.0
+damping_max = 160.0
+scale_amount_min = 2.0
+scale_amount_max = 5.0
+scale_amount_curve = SubResource("Curve_7cloc")
+color = Color(0.7480997, 0.7480997, 0.7480996, 1)
+
+[node name="Explosion_sound" type="AudioStreamPlayer2D" parent="." unique_id=1352256845]
+unique_name_in_owner = true
+stream = ExtResource("3_8vycq")
+
+[node name="Shooting_sound" type="AudioStreamPlayer2D" parent="." unique_id=766265662]
+unique_name_in_owner = true
+stream = ExtResource("4_bq0gm")

@@ -1,0 +1,129 @@
+[gd_scene format=3 uid="uid://y35fk8j7d6a7"]
+
+[ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://shaders/clamp.gdshader" id="1_i66a0"]
+[ext_resource type="Script" uid="uid://ckrbome4vvktn" path="res://ui/credits/credits_ui.gd" id="1_w15ss"]
+[ext_resource type="Texture2D" uid="uid://bwb5dtdpfhsb5" path="res://assets/sprites/gaslight_logo_title (1).png" id="2_nsq62"]
+[ext_resource type="Texture2D" uid="uid://54cqe6q2g1kr" path="res://assets/ui_assets/placeholder/dialog-box.png" id="3_gq7oe"]
+[ext_resource type="Theme" uid="uid://x1haa1fvyc6g" path="res://scenes/npc/dialog.tres" id="3_nsq62"]
+[ext_resource type="Script" uid="uid://d0w588iasf3il" path="res://ui/Main_menu/play.gd" id="4_sl6h2"]
+[ext_resource type="AudioStream" uid="uid://de8hvim1y04q" path="res://assets/sounds/npc/placeholder/josh.wav" id="6_sl6h2"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_w15ss"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+texture = ExtResource("3_gq7oe")
+texture_margin_left = 13.0
+texture_margin_top = 13.0
+texture_margin_right = 13.0
+texture_margin_bottom = 13.0
+region_rect = Rect2(0, 0, 32, 32)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8604d"]
+shader = ExtResource("1_i66a0")
+shader_parameter/colour = Color(0.68235296, 0.8980392, 0.83137256, 1)
+
+[node name="CreditsUi" type="CanvasLayer" unique_id=551121492]
+script = ExtResource("1_w15ss")
+
+[node name="Control" type="Control" parent="." unique_id=695355050]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -180.0
+offset_right = 320.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TextureRect" type="TextureRect" parent="Control" unique_id=1398676036]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -144.0
+offset_top = -145.56
+offset_right = 144.0
+offset_bottom = -48.56012
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_nsq62")
+
+[node name="Back" type="Button" parent="Control" unique_id=390041205]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 35.0
+offset_top = -153.0
+offset_right = 78.0
+offset_bottom = -108.99997
+grow_vertical = 2
+theme = ExtResource("3_nsq62")
+theme_override_font_sizes/font_size = 19
+theme_override_styles/normal = SubResource("StyleBoxTexture_w15ss")
+text = "<"
+script = ExtResource("4_sl6h2")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Control" unique_id=1677494590]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -99.25
+offset_top = -34.229996
+offset_right = 99.25
+offset_bottom = 150.7699
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/ScrollContainer" unique_id=663569658]
+layout_mode = 2
+theme = ExtResource("3_nsq62")
+theme_override_constants/separation = 7
+
+[node name="Label" type="Label" parent="Control/ScrollContainer/VBoxContainer" unique_id=944944270]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "Eli - Idea Manager"
+
+[node name="FadeRect" type="ColorRect" parent="Control" unique_id=2086718911]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -17.0
+offset_top = -5.0
+offset_right = 654.0
+offset_bottom = 375.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="ColorRect" type="ColorRect" parent="Control" unique_id=1264099071]
+material = SubResource("ShaderMaterial_8604d")
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -475.0
+offset_top = -304.0
+offset_right = 486.0
+offset_bottom = 378.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="Control" unique_id=1531950284]
+stream = ExtResource("6_sl6h2")
