@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://dwhu7jb3mnk8e"]
+
+[ext_resource type="Script" uid="uid://l78j261ijlh6" path="res://scenes/player/player_movement.gd" id="1_aklvl"]
+[ext_resource type="SpriteFrames" uid="uid://busp3m6jdab6b" path="res://assets/animations/player_frames.tres" id="2_uasfj"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_fcs02"]
+light_mode = 1
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x7p2l"]
+size = Vector2(30, 38)
+
+[node name="PlayerFake" type="CharacterBody2D" unique_id=1818162535]
+collision_layer = 2
+slide_on_ceiling = false
+script = ExtResource("1_aklvl")
+horizontal_max_velocity = 90.0
+horizontal_acceleration = 900.0
+horizontal_decceleration = 300.0
+jump_velocity = -250.0
+coyote_time_duration_seconds = 0.05
+starting_items = Array[int]([0, 1, 2])
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1561572402]
+texture_filter = 1
+material = SubResource("CanvasItemMaterial_fcs02")
+position = Vector2(0, -2)
+sprite_frames = ExtResource("2_uasfj")
+animation = &"run"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2058630931]
+shape = SubResource("RectangleShape2D_x7p2l")

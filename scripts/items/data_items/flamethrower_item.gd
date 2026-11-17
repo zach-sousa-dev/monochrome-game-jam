@@ -17,13 +17,12 @@ func _init():
 	light_color = Color(1.0, 1.0, 1.0)
 	
 	#-- fireball screen
-	var fireball: PackedScene = load("res://scenes/projectiles_scenes/fireball.tscn")
-	var lazer: PackedScene = load("res://scenes/projectiles_scenes/lazer.tscn")
+	var flame: PackedScene = load("res://scenes/projectiles_scenes/flameProject.tscn")
 	#-- projectiles stored by flamethrower
 	projectiles = [
 		# -- (scene, speed, damage, angle, lifetime)
-		ProjectileData.make(fireball, 250.0, 15.0, 0.0, 10),
+		ProjectileData.make(flame, 300.0, 20.0, 0.0, 10),
 	]
 	
-	fire_cooldown = 0.5
-	fuel_per_shot = 3.0
+	fire_cooldown = 1
+	fuel_per_shot = 6.0

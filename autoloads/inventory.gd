@@ -38,7 +38,7 @@ func add_item(item: ItemData) -> bool:
 
 # -- picks the item in a slot
 func select(index: int, force: bool = false):
-	if index < 0 or index > items.size():
+	if index < 0 or index >= items.size():
 		return
 	if index == selected_index and not force:
 		return
