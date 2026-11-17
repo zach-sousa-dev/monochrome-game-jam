@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://cgvtuautwuuj"]
+
+[ext_resource type="Shader" uid="uid://1p3yx37wwnye" path="res://shaders/posterization.gdshader" id="1_00np7"]
+[ext_resource type="Texture2D" uid="uid://b5hgkaux5asdm" path="res://shaders/shader-palette.png" id="2_ybetd"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5011q"]
+shader = ExtResource("1_00np7")
+shader_parameter/palette = ExtResource("2_ybetd")
+
+[node name="Posterize Shader" type="CanvasLayer" unique_id=1317576496]
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=782837377]
+material = SubResource("ShaderMaterial_5011q")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -776.0
+offset_top = -429.0
+offset_right = 185.0
+offset_bottom = 253.0
+grow_horizontal = 2
+grow_vertical = 2

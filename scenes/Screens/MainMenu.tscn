@@ -1,0 +1,89 @@
+[gd_scene format=4 uid="uid://bo0iuk2eahuq0"]
+
+[ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://shaders/clamp.gdshader" id="1_ptake"]
+[ext_resource type="TileSet" uid="uid://dk5q18pf5ttvy" path="res://assets/tile-sets/environment.tres" id="2_hubol"]
+[ext_resource type="PackedScene" uid="uid://dwhu7jb3mnk8e" path="res://scenes/player_fake/player_fake.tscn" id="5_jmi86"]
+[ext_resource type="Script" uid="uid://b8nlbb4yb17u4" path="res://scenes/player_fake/player_fake.gd" id="6_v5x7b"]
+[ext_resource type="PackedScene" uid="uid://d12s8pxdl381h" path="res://scenes/player/tool.tscn" id="6_vs0dr"]
+[ext_resource type="PackedScene" uid="uid://bgtgl5plu7p1s" path="res://ui/Main_menu/MenuButtons.tscn" id="8_elq80"]
+[ext_resource type="Shader" uid="uid://1p3yx37wwnye" path="res://shaders/posterization.gdshader" id="12_hm0al"]
+[ext_resource type="Texture2D" uid="uid://b5hgkaux5asdm" path="res://shaders/shader-palette.png" id="13_i7r3k"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1ydht"]
+shader = ExtResource("1_ptake")
+shader_parameter/colour = Color(0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_elq80"]
+noise_type = 3
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_bobjc"]
+noise = SubResource("FastNoiseLite_elq80")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7g6oh"]
+shader = ExtResource("1_ptake")
+shader_parameter/colour = Color(0.68235296, 0.8980392, 0.83137256, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5011q"]
+shader = ExtResource("12_hm0al")
+shader_parameter/palette = ExtResource("13_i7r3k")
+
+[node name="MainMenu" type="Node2D" unique_id=1366947214]
+material = SubResource("ShaderMaterial_1ydht")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1015420312]
+color = Color(0, 0, 0, 1)
+
+[node name="Backdrop" type="Sprite2D" parent="." unique_id=107408518]
+position = Vector2(1, 0)
+scale = Vector2(2.0234375, 1.4355469)
+texture = SubResource("NoiseTexture2D_bobjc")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=968897521]
+light_mask = 2
+texture_filter = 1
+position = Vector2(-120, 0)
+tile_map_data = PackedByteArray("AAAGAAMAAAAEAAMAAAAHAAMAAAAFAAMAAAAIAAMAAAAAAAQAAAAFAAMAAAAFAAMAAAAEAAMAAAAEAAMAAAADAAMAAAADAAMAAAADAAQAAAACAAMAAAAFAAQAAAADAAQAAAAIAAQAAAACAAMAAAAFAAUAAAACAAMAAAAGAAYAAAAFAAAAAAAFAAYAAAABAAAAAAAEAAYAAAAFAAAAAAADAAYAAAABAAAAAAACAAYAAAAFAAAAAAAHAAYAAAAFAAAAAAAIAAYAAAABAAAAAAAJAAYAAAAFAAAAAAAKAAYAAAAEAAQAAAAKAAcAAAAEAAAAAAAKAAkAAAACAAEAAAAJAAkAAAACAAEAAAAIAAkAAAACAAEAAAAHAAkAAAACAAEAAAAGAAkAAAACAAEAAAAFAAkAAAACAAEAAAAEAAkAAAACAAEAAAADAAkAAAACAAEAAAACAAkAAAACAAEAAAABAAkAAAACAAEAAAAAAAkAAAACAAEAAAD//wkAAAACAAEAAAD+/wkAAAACAAEAAAD9/wkAAAADAAEAAAD9/wgAAAAEAAAAAAD+/wgAAAAEAAAAAAD//wgAAAAEAAAAAAAAAAgAAAAEAAAAAAABAAgAAAADAAAAAAACAAgAAAAEAAAAAAADAAgAAAADAAAAAAAEAAgAAAAEAAAAAAAFAAgAAAADAAAAAAAGAAgAAAAEAAAAAAAHAAgAAAADAAAAAAAIAAgAAAAEAAAAAAAJAAgAAAAEAAAAAAAKAAgAAAADAAAAAAAJAAcAAAAEAAAAAAAIAAcAAAADAAAAAAAHAAcAAAAEAAAAAAAGAAcAAAAEAAAAAAAFAAcAAAAEAAAAAAAEAAcAAAAEAAAAAAADAAcAAAAEAAAAAAACAAcAAAAEAAAAAAABAAcAAAAEAAAAAAAAAAcAAAAEAAAAAAD//wcAAAADAAAAAAD+/wcAAAAEAAAAAAD9/wcAAAADAAAAAAABAAYAAAAFAAAAAAAAAAYAAAAFAAAAAAD//wYAAAAFAAAAAAD+/wYAAAAFAAAAAAD9/wYAAAAFAAAAAAAIAAUAAAACAAMAAAADAAUAAAACAAMAAAA=")
+tile_set = ExtResource("2_hubol")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=906906192]
+position = Vector2(-50.26, 94.175)
+zoom = Vector2(2.5, 2.5)
+
+[node name="Clamp Shader" type="CanvasLayer" parent="." unique_id=1484889600]
+
+[node name="ColorRect" type="ColorRect" parent="Clamp Shader" unique_id=1853059257]
+material = SubResource("ShaderMaterial_7g6oh")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -589.0
+offset_top = -447.0
+offset_right = 372.0
+offset_bottom = 235.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Posterize Shader" type="CanvasLayer" parent="." unique_id=1313702084]
+
+[node name="ColorRect" type="ColorRect" parent="Posterize Shader" unique_id=1209809950]
+material = SubResource("ShaderMaterial_5011q")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -617.0
+offset_top = -426.0
+offset_right = 344.0
+offset_bottom = 256.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlayerFake" parent="." unique_id=1818162535 instance=ExtResource("5_jmi86")]
+position = Vector2(-23, 100)
+script = ExtResource("6_v5x7b")
+starting_items = Array[int]([0])
+auto_drain = false
+
+[node name="Tool" parent="PlayerFake" unique_id=1965235933 instance=ExtResource("6_vs0dr")]
+position = Vector2(28, 1)
+
+[node name="MenuButtons" parent="." unique_id=506439092 instance=ExtResource("8_elq80")]

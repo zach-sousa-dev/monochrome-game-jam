@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://dlnu2obm2xu1x"]
+
+[ext_resource type="Script" uid="uid://dnaeev3p2yo8h" path="res://scenes/boss-fight/fly-spawner/fly_spawner.gd" id="1_ppy3w"]
+[ext_resource type="Texture2D" uid="uid://cgwg6s6dip31w" path="res://assets/sprites/spawner/vortex1.png" id="2_rvm24"]
+[ext_resource type="Texture2D" uid="uid://dlcbwld4uygev" path="res://assets/sprites/spawner/vortex2.png" id="3_x05ve"]
+[ext_resource type="Texture2D" uid="uid://2lw7xw707o2w" path="res://assets/sprites/spawner/vortex3.png" id="4_mytey"]
+[ext_resource type="Texture2D" uid="uid://cjmsvjfjuua5d" path="res://assets/sprites/spawner/vortex4.png" id="5_qmbfl"]
+[ext_resource type="Texture2D" uid="uid://ca3c4fhethkwf" path="res://assets/sprites/spawner/vortex5.png" id="6_capj3"]
+[ext_resource type="Texture2D" uid="uid://bddnx3l1jywqu" path="res://assets/sprites/spawner/vortex6.png" id="7_srapx"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6rkir"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_rvm24")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_x05ve")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_mytey")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_qmbfl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_capj3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_srapx")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 12.0
+}]
+
+[sub_resource type="Gradient" id="Gradient_tnlrm"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_tnlrm"]
+gradient = SubResource("Gradient_tnlrm")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[node name="FlySpawner" type="Node2D" unique_id=224238743]
+script = ExtResource("1_ppy3w")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1180303331]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_6rkir")
+autoplay = "default"
+frame_progress = 0.8925588
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=283170099]
+texture = SubResource("GradientTexture2D_tnlrm")
+
+[node name="Timer" type="Timer" parent="." unique_id=284283617]
+wait_time = 5.0

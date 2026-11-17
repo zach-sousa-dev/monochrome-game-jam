@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://cc7nolw4ear1j"]
+
+[ext_resource type="PackedScene" uid="uid://rgxghtaucdx4" path="res://scenes/enemies/EnemyFly.tscn" id="1_1ex25"]
+[ext_resource type="SpriteFrames" uid="uid://c7y4chjvwtfio" path="res://assets/animations/npc/boss.tres" id="2_3uc6t"]
+[ext_resource type="Script" uid="uid://csj6jdp32s5ws" path="res://scenes/enemies/boss.gd" id="2_ub7yk"]
+[ext_resource type="AudioStream" uid="uid://nuhiy13tlvmm" path="res://assets/sounds/npc/boss-die.wav" id="4_yye4w"]
+[ext_resource type="AudioStream" uid="uid://dmpxeupo80pj5" path="res://assets/sounds/npc/boss-hurt.wav" id="5_rvo7g"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_54qsv"]
+radius = 17.0
+height = 42.5
+
+[node name="Boss" unique_id=1946113309 instance=ExtResource("1_1ex25")]
+script = ExtResource("2_ub7yk")
+health = 150.0
+fuel_reward = 100.0
+return_speed = 0.0
+chase_speed = 0.0
+chase_range = 0.0
+lose_sight_time = 0.0
+bob_height = 0.0
+bob_speed = 0.0
+stomp_damage = 0.0
+stomp_margin = 1000.0
+
+[node name="AnimatedSprite2D" parent="." index="0" unique_id=2067357318]
+process_mode = 3
+sprite_frames = ExtResource("2_3uc6t")
+animation = &"default"
+autoplay = "default"
+frame = 5
+frame_progress = 0.06609256
+
+[node name="CollisionShape2D" parent="HitBox" parent_id_path=PackedInt32Array(1100192105) index="0" unique_id=969278298]
+position = Vector2(0, -1)
+shape = SubResource("CapsuleShape2D_54qsv")
+
+[node name="Alert" parent="." index="3" unique_id=1631372299]
+visible = false
+
+[node name="DeathSound" parent="." index="5" unique_id=866161767]
+stream = ExtResource("4_yye4w")
+
+[node name="HitSound" parent="." index="6" unique_id=1099467061]
+stream = ExtResource("5_rvo7g")

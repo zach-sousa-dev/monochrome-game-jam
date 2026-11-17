@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://l78j261ijlh6" path="res://scenes/player/player_movement.gd" id="1_fm80t"]
 [ext_resource type="SpriteFrames" uid="uid://busp3m6jdab6b" path="res://assets/animations/player_frames.tres" id="2_p47bc"]
-[ext_resource type="AudioStream" uid="uid://birtlg78gxn0e" path="res://assets/sounds/player/placeholder/jump.wav" id="13_gx1jg"]
+[ext_resource type="AudioStream" uid="uid://5503yqx37nup" path="res://assets/sounds/player/jump.wav" id="3_p47bc"]
 [ext_resource type="PackedScene" uid="uid://dnot073ibmb2j" path="res://ui/playerHud/PlayerHud.tscn" id="14_ugbui"]
 [ext_resource type="PackedScene" uid="uid://d12s8pxdl381h" path="res://scenes/player/tool.tscn" id="15_fcs02"]
 
@@ -21,6 +21,7 @@ horizontal_acceleration = 900.0
 horizontal_decceleration = 300.0
 jump_velocity = -250.0
 coyote_time_duration_seconds = 0.05
+cam_speed = 0.1
 starting_items = Array[int]([0, 1, 2])
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1561572402]
@@ -36,7 +37,7 @@ shape = SubResource("RectangleShape2D_x7p2l")
 [node name="CoyoteTimer" type="Timer" parent="." unique_id=120348269]
 
 [node name="JumpSound" type="AudioStreamPlayer2D" parent="." unique_id=1474954606]
-stream = ExtResource("13_gx1jg")
+stream = ExtResource("3_p47bc")
 
 [node name="Tool" parent="." unique_id=1965235933 instance=ExtResource("15_fcs02")]
 position = Vector2(27.5, 0.5)

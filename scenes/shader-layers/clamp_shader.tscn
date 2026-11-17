@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://cioy31i408y3s"]
+
+[ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://shaders/clamp.gdshader" id="1_tvtes"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7g6oh"]
+shader = ExtResource("1_tvtes")
+shader_parameter/colour = Color(0.68235296, 0.8980392, 0.83137256, 1)
+
+[node name="Clamp Shader" type="CanvasLayer" unique_id=481358893]
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=812575261]
+material = SubResource("ShaderMaterial_7g6oh")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -742.0
+offset_top = -444.0
+offset_right = 219.0
+offset_bottom = 238.0
+grow_horizontal = 2
+grow_vertical = 2
