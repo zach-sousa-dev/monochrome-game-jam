@@ -13,6 +13,10 @@ var client_peer = ENetMultiplayerPeer.new()
 var current_join_data := GDTJoinData.new()
 var server_data: GDTServerAuthResponse = null
 
+var last_received_ping: float = 0.0
+var last_sent_ping: float = 0.0
+var ignore_alive_ping := false
+
 var connection_is_ack = false
 var connection_cancelled := false
 var disconnect_reason: GDTUser.DisconnectReason = GDTUser.DisconnectReason.UNKNOWN
@@ -35,6 +39,20 @@ func _ready() -> void:
 	#multiplayer.connection_failed.connect(_connecting_finished.bind(false))
 	
 	report_ready()
+
+func _process(_delta: float) -> void:
+	if not main: return
+	if not is_active(): return
+	
+	var now = Time.get_unix_time_from_system()
+	
+	if (now - last_received_ping) > GDTDual.TIMEOUT:
+		printerr("Connection timed out for RPC.")
+		main.close_connection()
+		
+	if (now - last_sent_ping) > GDTDual.PING_INTERVAL:
+		main.server._c2s_connection_alive.rpc_id(1)
+		last_sent_ping = now
 
 func _connected() -> void:
 	if multiplayer.is_server(): return
@@ -64,7 +82,7 @@ func _disconnected() -> void:
 		
 	main.get_gui().alert(
 		str_reason,
-		"Disconnected from the server"
+		"GodotTogether disconnected"
 	)
 
 	disconnected.emit()
@@ -112,6 +130,28 @@ func reset() -> void:
 	connection_cancelled = false
 	disconnect_reason = GDTUser.DisconnectReason.UNKNOWN
 
+func validate_s2c(can_be_local := false) -> bool:
+	if not is_active() and not can_be_local:
+		GDTUtils.printerr_stack("Attempt to call server to client function when client isn't active")
+		return false
+	
+	var id = multiplayer.get_remote_sender_id()
+	
+	if can_be_local and id == 0:
+		return true
+	
+	if id == 0:
+		GDTUtils.printerr_stack("Attempt to call RPC function locally")
+		return false
+	
+	# The ID is redundantly checked in case the internal authority check fails
+	# or the node authority is changed.
+	if id != 1 and is_active():
+		GDTUtils.printerr_stack("Called by %s instead of host 1" % id)
+		return false
+	
+	return true
+
 func leave_with_error(reason := GDTUser.DisconnectReason.UNKNOWN) -> void:
 	if not is_active():
 		return
@@ -132,6 +172,7 @@ func join_server(ip: String, port: int, data := GDTJoinData.new()) -> int:
 	print("Connecting to %s:%s..." % [ip, port])
 
 	multiplayer.multiplayer_peer = client_peer
+	last_received_ping = Time.get_unix_time_from_system()
 	current_join_data = data
 	current_join_data.rpc_checksum = main.get_global_rpc_checksum()
 	
@@ -212,10 +253,18 @@ func _s2c_connection_ack() -> void:
 		return
 	
 	connection_is_ack = true
+	last_received_ping = Time.get_unix_time_from_system()
 	connection_acknowledged.emit()
+
+@rpc("authority", "unreliable", "call_remote", GDTDual.NetChannel.MISC)
+func _s2c_connection_alive() -> void:
+	if not ignore_alive_ping:
+		last_received_ping = Time.get_unix_time_from_system()
 
 @rpc("authority", "reliable")
 func _s2c_auth_successful(data_dict: Dictionary) -> void:
+	if not main.client.validate_s2c(): return
+	
 	print("Server accepted connection")
 	
 	server_data = GDTServerAuthResponse.from_dict(data_dict)
@@ -223,6 +272,42 @@ func _s2c_auth_successful(data_dict: Dictionary) -> void:
 	if not server_data:
 		GDTUtils.printerr_stack("Unable to decode response: %s" % data_dict)
 		return
+	
+	if main.PROTOCOL_VERSION != server_data.protocol_version:
+		printerr(
+			"Protocol version mismatch. Server %s != Client %s" % 
+			[server_data.protocol_version, main.PROTOCOL_VERSION]
+		)
+		
+		if main.PROTOCOL_VERSION < server_data.protocol_version:
+			leave_with_error(GDTUser.DisconnectReason.CLIENT_OUTDATED)
+	
+		if main.PROTOCOL_VERSION > server_data.protocol_version:
+			leave_with_error(GDTUser.DisconnectReason.SERVER_OUTDATED)
+		
+		return
+	
+	var local_checksum = main.get_global_rpc_checksum()
+	
+	if server_data.rpc_checksum != local_checksum:
+		printerr(
+			"RPC checksum mismatch. Server %s != Client %s" % 
+			[server_data.rpc_checksum, local_checksum]
+		)
+		
+		leave_with_error(GDTUser.DisconnectReason.RPC_CHECKSUM_MISMATCH)
+		return
+	
+	var local_engine_ver = GDTUtils.get_engine_version_str()
+	
+	if server_data.engine_version != local_engine_ver:
+		push_warning("Godot version mismatch! Client: %s Host: %s" % [local_engine_ver, server_data.engine_version])
+		
+		main.get_gui().alert(
+			"You are running Godot %s, while the host is running Godot %s.\nYou may encounter issues." % 
+			[local_engine_ver, server_data.engine_version],
+			"Godot version mismatch warning!"
+		)
 	
 	var users = GDTUser.from_dict_bulk(server_data.users, main)
 	main.dual._users_listed(users)
@@ -234,6 +319,8 @@ func _s2c_auth_successful(data_dict: Dictionary) -> void:
 	
 @rpc("authority", "call_remote", "reliable")
 func _s2c_user_connected(user_dict: Dictionary) -> void:
+	if not validate_s2c(): return
+	
 	var user = GDTUser.from_dict(user_dict)
 	if not user: return
 	
@@ -242,6 +329,8 @@ func _s2c_user_connected(user_dict: Dictionary) -> void:
 
 @rpc("authority", "call_remote", "reliable")
 func _s2c_user_disconnected(user_dict: Dictionary) -> void:
+	if not validate_s2c(): return
+	
 	var user = GDTUser.from_dict(user_dict)
 	if not user: return
 
@@ -250,7 +339,7 @@ func _s2c_user_disconnected(user_dict: Dictionary) -> void:
 func _project_files_downloaded() -> void:
 	print("Project files downloaded")
 	
-	EditorInterface.get_resource_filesystem().scan()
+	main.editor_node.force_filesystem_scan()
 	
 	await get_tree().process_frame
 	
@@ -268,23 +357,6 @@ func _project_files_downloaded() -> void:
 	main.file_sync.resume()
 
 @rpc("authority", "reliable")
-func receive_file(
-	path: String, 
-	buffer: PackedByteArray, 
-	offset: int = 0,
-	truncate := true
-) -> void:
-	file_received.emit(path)
-
-	if not GDTValidator.is_path_safe(path):
-		print("Server attempted to send file at unsafe location: " + path)
-		return
-	
-	print("Receiving from server " + path)
-	main.file_sync.write_file(path, buffer, offset, truncate)
-	
-
-@rpc("authority", "reliable")
 func _s2c_receive_chat_message(text: String, user_id: int) -> void:
 	if not GDTChat.validate_message(text):
 		return
@@ -295,33 +367,9 @@ func _s2c_receive_chat_message(text: String, user_id: int) -> void:
 	
 	main.get_chat().add_user_message(text, user)
 
-func _apply_change_to_unloaded_scene(scene_path: String, apply_func: Callable) -> void:
-	if not FileAccess.file_exists(scene_path):
-		push_error("Scene file not found for background update: " + scene_path)
-		return
-
-	var packed_scene: PackedScene = load(scene_path)
-	if not packed_scene:
-		push_error("Failed to load scene for background update: " + scene_path)
-		return
-
-	var scene_instance = packed_scene.instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
-	if not scene_instance:
-		push_error("Failed to instantiate scene for background update: " + scene_path)
-		return
-
-	var success = apply_func.call(scene_instance)
-
-	if success:
-		var new_packed_scene = PackedScene.new()
-		var result = new_packed_scene.pack(scene_instance)
-
-		if result == OK:
-			ResourceSaver.save(new_packed_scene, scene_path)
-		else:
-			push_error("Failed to pack scene after background update: " + scene_path)
-
-	scene_instance.queue_free()
-
 func is_active() -> bool:
-	return client_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED
+	return (
+		main and
+		multiplayer.multiplayer_peer == client_peer and
+		client_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED
+	)

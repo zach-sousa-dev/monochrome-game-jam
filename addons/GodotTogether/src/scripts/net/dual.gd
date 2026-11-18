@@ -11,12 +11,19 @@ signal user_rejected(user: GDTUser)
 signal users_listed(users: Array[GDTUser])
 
 signal user_script_changed(user: GDTUser, path: String)
+signal user_script_position_changed(user: GDTUser)
 signal user_scene_changed(user: GDTUser, path: String)
 
 enum NetChannel {
 	MAIN,
-	USER_STATE
+	FILES,
+	SCRIPTS,
+	USER_STATE,
+	MISC
 }
+
+const TIMEOUT: float = 30.0
+const PING_INTERVAL: float = 2.0
 
 var camera: Camera3D
 var users: Array[GDTUser]
@@ -58,8 +65,21 @@ func _ready() -> void:
 	broadcast_timer.start()
 	
 	EditorInterface.get_selection().selection_changed.connect(broadcast_selection)
+	get_tree().multiplayer_poll = false
 	
 	report_ready()
+	
+	await get_tree().process_frame
+	
+	main.gui.script_editor_mgr.script_position_changed.connect(broadcast_selection)
+
+func _process(_delta: float) -> void:
+	for i in 128:
+		multiplayer.poll()
+
+func _physics_process(_delta: float) -> void:
+	for i in 128:
+		multiplayer.poll()
 
 func _update() -> void:
 	if not main: return
@@ -71,7 +91,7 @@ func _update() -> void:
 	
 	var mouse_pos = viewport_2d.get_mouse_position()
 	
-	if mouse_pos != prev_mouse_pos:
+	if mouse_pos != prev_mouse_pos and main.gui.is_2d_scene_editor_open():
 		prev_mouse_pos = mouse_pos
 		update_2d_avatar.rpc(mouse_pos)
 	
@@ -120,6 +140,7 @@ func _user_connected(user: GDTUser) -> void:
 	
 	create_avatar_2d(user)
 	create_avatar_3d(user)
+	main.script_sync.create_user_caret(user)
 	
 	if should_notify_user_connection():
 		var ip = user.get_address()
@@ -156,6 +177,7 @@ func _users_listed(new_users: Array[GDTUser]) -> void:
 		
 		create_avatar_2d(user)
 		create_avatar_3d(user)
+		main.script_sync.create_user_caret(user)
 
 func broadcast_selection() -> void:
 	if not main:
@@ -186,7 +208,10 @@ func broadcast_selection() -> void:
 	var current_script = script_editor.get_current_script()
 	
 	if script_editor.is_visible_in_tree() and current_script:
-		receive_current_script.rpc_id(0, current_script.resource_path)
+		var line = main.gui.script_editor_mgr.get_current_line()
+		var col = main.gui.script_editor_mgr.get_current_column()
+		
+		receive_current_script.rpc_id(0, current_script.resource_path, line, col)
 	else:
 		receive_current_script.rpc_id(0, "")
 
@@ -250,6 +275,8 @@ func remove_avatars_of_user(user_id: int) -> void:
 	if avatar_3d: 
 		avatar_3d_markers.erase(avatar_3d)
 		avatar_3d.queue_free()
+	
+	main.script_sync.remove_user_caret(user_id)
 
 func clear_avatars() -> void:
 	for i in avatar_3d_markers:
@@ -262,6 +289,7 @@ func clear_avatars() -> void:
 
 	avatar_3d_markers.clear()
 	avatar_3d_markers.clear()
+	main.script_sync.clear_user_carets()
 
 func broadcast_avatars() -> void:
 	if not main: return
@@ -387,7 +415,7 @@ func receive_current_scene(path: String) -> void:
 	update_scene_colors()
 
 @rpc("any_peer", "reliable", "call_remote", NetChannel.USER_STATE)
-func receive_current_script(path: String) -> void:
+func receive_current_script(path: String, line: int = 0, column: int = 0) -> void:
 	var id = multiplayer.get_remote_sender_id()
 	var user = get_user_by_id(id)
 	if not user: return
@@ -395,7 +423,11 @@ func receive_current_script(path: String) -> void:
 	if user.current_script != path:
 		user_script_changed.emit(user, path)
 	
+	user_script_position_changed.emit(user)
+	
 	user.current_script = path
+	user.current_script_line = line
+	user.current_script_column = column
 
 @rpc("authority", "call_remote", "reliable")
 func restart() -> void:

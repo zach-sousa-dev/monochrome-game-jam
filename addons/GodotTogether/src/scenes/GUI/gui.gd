@@ -10,10 +10,13 @@ const USER_LIST_DOCK_PATH = "res://addons/GodotTogether/src/scenes/GUI/docks/use
 var alert_heat := 0
 
 var user_list_dock: GDTUserListDock = null
+var script_editor_mgr: GDTScriptEditorManager = null
 
 var scene_tree_editor = GDTSceneTreeEditor.new()
 var scene_editor_tabs = GDTEditorSceneTabs.new()
+
 var external_file_change_dialog = GDTExternalFileChangeDialog.new()
+var external_script_change_dialog = GDTExternalScriptChangeDialog.new()
 
 @onready var dev_menu: GDTDevMenu = $DevMenu
 
@@ -32,6 +35,9 @@ func _ready() -> void:
 	
 	if not main:
 		return
+	
+	script_editor_mgr = GDTScriptEditorManager.new(main, "ScriptEditorManager")
+	add_child(script_editor_mgr)
 	
 	dev_menu.main = main
 	menu_window.visible = false
@@ -56,7 +62,8 @@ func _process(_delta: float) -> void:
 		get_menu_window().visible = true
 
 func open_dev_menu() -> void:
-	# It doesn't wanna open on Windows
+	# It doesn't wanna open sometimes
+	await get_tree().process_frame
 	dev_menu.popup_centered()
 	await get_tree().process_frame
 	dev_menu.popup_centered()
@@ -158,6 +165,19 @@ func confirm(text: String) -> bool:
 
 func visuals_available() -> bool:
 	return main or not Engine.is_editor_hint() 
+
+func is_2d_scene_editor_open() -> bool:
+	var vp = EditorInterface.get_editor_viewport_2d()
+	
+	if not vp:
+		return false
+		
+	var parent = vp.get_parent()
+	
+	if not parent is CanvasItem:
+		return true
+		
+	return parent.is_visible_in_tree()
 
 func _on_alert_cooldown_timeout() -> void:
 	if alert_heat > 0:

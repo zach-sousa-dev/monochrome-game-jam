@@ -16,29 +16,35 @@ enum DisconnectReason {
 	REJECTED,
 	JOINING_TOO_FAST,
 	
-	# Can reorder. Not yet released
 	CLIENT_OUTDATED,
 	SERVER_OUTDATED,
 	
 	APPROVE_TIMEOUT,
 	ADDRESS_IN_USE,
 	RPC_CHECKSUM_MISMATCH,
-	INVALID
+	INVALID,
+	
+	# Can reorder. Not yet released
+	
+	TIMEOUT
 }
 
-var id: int
-var name: String
-var peer: ENetPacketPeer
+var id: int = -1
+var name: String = ""
+var peer: PacketPeer = null
 var main: GodotTogether = null
 var type := Type.EDITOR
 var color := Color.WHITE
 var joined_at := -1.0
+var last_ping := 0.0
 var authenticated_at := -1.0
 var authenticated := false
 var pending := false
 
 var current_scene: String = ""
 var current_script: String = ""
+var current_script_line: int = 0
+var current_script_column: int = 0
 
 var _last_address: String = ""
 
@@ -50,10 +56,13 @@ var permissions: Array[GodotTogether.Permission] = [
 	GodotTogether.Permission.DELETE_SCRIPTS
 ]
 
-func _init(_id: int, _peer: ENetPacketPeer = null, _main: GodotTogether = null):
+func _init(_id: int, _peer: PacketPeer = null, _main: GodotTogether = null):
+	var now = Time.get_unix_time_from_system()
+	
 	id = _id
 	peer = _peer
-	joined_at = Time.get_unix_time_from_system()
+	joined_at = now
+	last_ping = now
 	main = _main
 	
 	color = Color(
@@ -71,8 +80,15 @@ func get_encodable_fields() -> Array:
 		"type",
 		"joined_at",
 		"authenticated_at",
+		"current_scene",
+		"current_script",
+		"current_script_line",
+		"current_script_column"
 		#"authenticated"
 	]
+
+func got_ping() -> void:
+	last_ping = Time.get_unix_time_from_system()
 
 func has_permission(permission: GodotTogether.Permission) -> bool:
 	return authenticated and permission in permissions
@@ -84,12 +100,16 @@ func get_address() -> String:
 	if not peer:
 		return "localhost"
 	
-	var res = peer.get_remote_address()
+	if peer is ENetPacketPeer:
+		var res = peer.get_remote_address()
+		
+		if res.is_empty():
+			return _last_address
+		
+		_last_address = normalize_address(res)
+	else:
+		_last_address = "<unknown>"
 	
-	if res.is_empty():
-		return _last_address
-	
-	_last_address = normalize_address(res)
 	return _last_address
 
 func auth() -> void:
@@ -106,8 +126,8 @@ func auth() -> void:
 		main.server._user_authenticated(self)
 
 func kick(reason: DisconnectReason = DisconnectReason.KICKED) -> void:
-	if not peer:
-		GDTUtils.printerr_stack("Cannot kick %s: missing peer object" % id)
+	if id == 1:
+		GDTUtils.printerr_stack("Attempt to kick host")
 		return
 	
 	authenticated = false
@@ -117,30 +137,69 @@ func kick(reason: DisconnectReason = DisconnectReason.KICKED) -> void:
 	else:
 		push_warning("Unable to send kick reason, main is null")
 
-	peer.peer_disconnect_later()
+	if not peer:
+		GDTUtils.printerr_stack("Cannot kick %s: missing peer object" % id)
+		return
+	
+	disconnect_peer()
 
-	await EditorInterface.get_editor_main_screen().get_tree().create_timer(3).timeout
+func try_disconnect_peer() -> void:
+	if peer is ENetPacketPeer:
+		peer.peer_disconnect_later()
+	elif main:
+		main.multiplayer.multiplayer_peer.disconnect_peer(id)
+	else:
+		GDTUtils.printerr_stack("try_disconnect_peer() failed: main is null")
 
+func force_disconnect_peer() -> void:
+	if peer is ENetPacketPeer:
+		peer.peer_disconnect_now()
+	
+	if not is_peer_connected(true):
+		return
+	
+	if not main:
+		GDTUtils.printerr_stack("Unable to kick peer %s. main is null" % id)
+		return
+	
 	if is_peer_connected(true):
-		peer.peer_disconnect_now(reason)
+		main.multiplayer.multiplayer_peer.disconnect_peer(id)
+	
+	if is_peer_connected(true):
+		main.multiplayer.multiplayer_peer.disconnect_peer(id, true)
+
+func disconnect_peer() -> void:
+	authenticated = false
+	try_disconnect_peer()
+	
+	await GDTUtils.get_tree().create_timer(3).timeout
+	
+	if not is_peer_connected(true):
+		return
+		
+	force_disconnect_peer()
 
 func is_peer_connected(truly_connected := false) -> bool:
 	if not peer:
 		return true
-
-	var state = peer.get_state()
 	
-	if truly_connected:
-		return state != ENetPacketPeer.STATE_DISCONNECTED
+	if peer is ENetPacketPeer:
+		var state = peer.get_state()
+		
+		if truly_connected:
+			return state != ENetPacketPeer.STATE_DISCONNECTED
 
-	var dis = [
-		ENetPacketPeer.STATE_DISCONNECTED,
-		ENetPacketPeer.STATE_DISCONNECT_LATER,
-		ENetPacketPeer.STATE_ACKNOWLEDGING_DISCONNECT
-	]
+		var dis = [
+			ENetPacketPeer.STATE_DISCONNECTED,
+			ENetPacketPeer.STATE_DISCONNECT_LATER,
+			ENetPacketPeer.STATE_ACKNOWLEDGING_DISCONNECT
+		]
+		
+		return not state in dis
+	else:
+		GDTUtils.printerr_stack("No way to tell if peer is connected: %s" % peer.get_class())
 	
-	return not state in dis
-
+	return false
 func is_local() -> bool:
 	if not main:
 		GDTUtils.printerr_stack("Unable to check if user is local. main is null")
@@ -153,7 +212,7 @@ func get_type_as_string() -> String:
 
 static func disconnect_reason_to_string(reason: DisconnectReason) -> String:
 	match reason:
-		DisconnectReason.UNKNOWN:
+		DisconnectReason.UNKNOWN, DisconnectReason.TIMEOUT:
 			return "Connection lost"
 		DisconnectReason.KICKED:
 			return "Kicked by host"

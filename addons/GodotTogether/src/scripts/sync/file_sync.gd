@@ -10,6 +10,8 @@ const CHUNK_SIZE = 1024 * 100 # 100 kB
 const MAX_SCRIPT_SIZE = 1024 * 1024 * 3 # 3 MB
 
 var scan_timer = Timer.new()
+var godot_scan_timer = Timer.new()
+
 var file_mod_times := {}
 
 var total_received_bytes: int = 0
@@ -23,14 +25,25 @@ func _ready() -> void:
 	add_child(scan_timer)
 	scan_timer.start()
 	
+	add_child(godot_scan_timer)
+	godot_scan_timer.timeout.connect(_force_godot_scan)
+	godot_scan_timer.start()
+	
 	EditorInterface.get_resource_filesystem().filesystem_changed.connect(scan_files)
 	main.get_gui().external_file_change_dialog.got_external_changes.connect(_gd_got_external_changes)
 	
 	ignore_last_changes()
 	report_ready()
 
+func _force_godot_scan() -> void:
+	if not main: return
+	if not DisplayServer.window_is_focused(): return
+	
+	main.editor_node.force_filesystem_scan()
+
 func update_timer_wait_times() -> void:
-	scan_timer.wait_time = main.get_settings().get_setting("sync/file_refresh_rate")
+	godot_scan_timer.wait_time = 1
+	scan_timer.wait_time = main.get_settings().get_setting("sync/file_scan_interval")
 
 func ignore_last_changes() -> void:
 	file_mod_times = GDTFiles.get_file_modification_times()
@@ -190,13 +203,16 @@ static func read_chunks_callback(
 	
 	file.close()
 
-@rpc("authority", "reliable")
+@rpc("authority", "reliable", "call_remote", GDTDual.NetChannel.FILES)
 func write_file(
 	path: String, 
 	buffer: PackedByteArray,
 	offset: int = 0,
 	truncate := true
 ) -> void:
+	if not main.client.validate_s2c(true): 
+		return
+	
 	var buf_size = buffer.size()
 	
 	if buf_size > CHUNK_SIZE:
@@ -293,8 +309,11 @@ func write_file(
 	else:
 		EditorInterface.get_resource_filesystem().scan.call_deferred()
 
-@rpc("authority", "reliable")
+@rpc("authority", "reliable", "call_remote", GDTDual.NetChannel.FILES)
 func delete_file(path: String) -> void:
+	if not main.client.validate_s2c(true): 
+		return
+	
 	if not GDTValidator.is_path_safe(path):
 		printerr("Server tried to delete file at unsafe location: %s" % path)
 		return
@@ -399,6 +418,8 @@ func _c2s_request_file(path: String) -> void:
 		GDTUtils.printerr_stack("Got file request from peer without user: %s" % id) 
 		return
 	
+	user.got_ping()
+	
 	if not user.authenticated: 
 		GDTUtils.printerr_stack("File request from unauthenticated user: %s (%s)" % [user.name, id])
 		return
@@ -415,7 +436,7 @@ func _c2s_request_file(path: String) -> void:
 	
 	server_send_file(id, path)
 
-@rpc("any_peer", "reliable")
+@rpc("any_peer", "reliable", "call_remote", GDTDual.NetChannel.FILES)
 func _c2s_request_file_write(
 	path: String, 
 	buffer: PackedByteArray, 
@@ -426,7 +447,12 @@ func _c2s_request_file_write(
 	
 	var id = multiplayer.get_remote_sender_id()
 	
-	if not main.server.caller_has_permission(GodotTogether.Permission.MODIFY_CUSTOM_FILES):
+	var user = main.dual.get_user_by_id(id)
+	if not user: return
+	
+	user.got_ping()
+	
+	if not user.has_permission(GodotTogether.Permission.MODIFY_CUSTOM_FILES):
 		return
 	
 	if not GDTValidator.is_path_safe(path): 
@@ -439,7 +465,7 @@ func _c2s_request_file_write(
 	write_file(path, buffer, offset, true)
 	server_broadcast_file_write(path, buffer, offset, truncate, id)
 
-@rpc("any_peer", "reliable")
+@rpc("any_peer", "reliable", "call_remote", GDTDual.NetChannel.FILES)
 func _c2s_request_file_delete(path: String) -> void:
 	if not main.server.is_active(): return
 	

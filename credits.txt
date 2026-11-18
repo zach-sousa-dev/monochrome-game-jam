@@ -1,5 +1,10 @@
-SOUNDS
+Credits
 Warp sound - Warping Object by cb9382 -- https://freesound.org/s/868381/ -- License: Creative Commons 0
 Door unlock sound - Door_Locking_Unlocking_Twice.wav by vcspran -- https://freesound.org/s/344582/ -- License: Creative Commons 0
 Locked door sound - Door Locked by BenjaminNelan -- https://freesound.org/s/321087/ -- License: Creative Commons 0
 Music - Abstraction https://abstractionmusic.com/
+Damage sound - Rpg by colorsCrimsonTears -- https://freesound.org/s/580307/ -- License: Creative Commons 0
+Font - https://eggboycolor.itch.io/omelette-font-set
+Equip sound - Item Equip by mrickey13 -- https://freesound.org/s/518850/ -- License: Creative Commons 0
+Shoot sound - Fire Ball Release by CTCollab -- https://freesound.org/s/223611/ -- License: Attribution 3.0
+Explosion sound - Simulated Small Explosion in Small Room 1 by tcpp -- https://freesound.org/s/132098/ -- License: Attribution 4.0

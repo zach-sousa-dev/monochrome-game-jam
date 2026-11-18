@@ -4,8 +4,8 @@
 [ext_resource type="Theme" uid="uid://x1haa1fvyc6g" path="res://scenes/npc/dialog.tres" id="1_wtd66"]
 [ext_resource type="Texture2D" uid="uid://54cqe6q2g1kr" path="res://assets/ui_assets/placeholder/dialog-box.png" id="2_ehimh"]
 [ext_resource type="Script" uid="uid://d0w588iasf3il" path="res://ui/Main_menu/play.gd" id="4_how2t"]
-[ext_resource type="AudioStream" uid="uid://de8hvim1y04q" path="res://assets/sounds/npc/placeholder/josh.wav" id="5_37a67"]
 [ext_resource type="Script" uid="uid://dq5tfs5e4sgw1" path="res://ui/Main_menu/credits.gd" id="5_70ow8"]
+[ext_resource type="AudioStream" uid="uid://bglpx0jyui4fn" path="res://assets/sounds/chests/locked.wav" id="6_qbc8q"]
 [ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://shaders/clamp.gdshader" id="7_2y64i"]
 [ext_resource type="Texture2D" uid="uid://bwb5dtdpfhsb5" path="res://assets/sprites/gaslight_logo_title (1).png" id="8_qbc8q"]
 
@@ -45,6 +45,7 @@ mouse_filter = 2
 
 [node name="Play" type="Button" parent="Control" unique_id=570476189]
 unique_name_in_owner = true
+texture_filter = 1
 layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
@@ -62,6 +63,7 @@ script = ExtResource("4_how2t")
 
 [node name="Credits" type="Button" parent="Control" unique_id=564946004]
 unique_name_in_owner = true
+texture_filter = 1
 layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
@@ -78,7 +80,7 @@ text = "Credits"
 script = ExtResource("5_70ow8")
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="Control" unique_id=92701687]
-stream = ExtResource("5_37a67")
+stream = ExtResource("6_qbc8q")
 
 [node name="GaslightLogoTitle(1)" type="Sprite2D" parent="Control" unique_id=354119663]
 texture_filter = 1

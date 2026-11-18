@@ -10,10 +10,14 @@ config_version=5
 
 [application]
 
-config/name="monochrome"
-run/main_scene="uid://bdvn78ugaxuao"
+config/name="Gaslight"
+run/main_scene="uid://bo0iuk2eahuq0"
 config/features=PackedStringArray("4.7", "GL Compatibility")
-config/icon="res://icon.svg"
+boot_splash/bg_color=Color(0, 0, 0, 1)
+boot_splash/stretch_mode=2
+boot_splash/use_filter=false
+boot_splash/image="uid://bwb5dtdpfhsb5"
+config/icon="uid://dtwjoqjkwptfo"
 <<<<<<<HEADrun/main_scene="uid://ly6sm5smerbw"
 
 [autoload]
@@ -21,12 +25,15 @@ config/icon="res://icon.svg"
 PlayerInventory="*uid://yp6n8aegqak0"
 Fuel="*uid://exrppyilidsr"
 Keydistributor="*uid://5pqyvhpsm6et"
+SceneSave="*uid://cryy45se0cqcj"
 
 [display]
 
 window/size/viewport_width=640
 window/size/viewport_height=360
+window/size/mode=3
 window/stretch/mode="canvas_items"
+window/stretch/aspect="keep_width"
 
 [editor_plugins]
 

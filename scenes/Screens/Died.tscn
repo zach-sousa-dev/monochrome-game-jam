@@ -1,0 +1,97 @@
+[gd_scene format=4 uid="uid://bpx0dk45gkwta"]
+
+[ext_resource type="TileSet" uid="uid://dk5q18pf5ttvy" path="res://assets/tile-sets/environment.tres" id="1_t1mjv"]
+[ext_resource type="Shader" uid="uid://vhibdms1a05d" path="res://shaders/clamp.gdshader" id="2_wve2u"]
+[ext_resource type="Shader" uid="uid://1p3yx37wwnye" path="res://shaders/posterization.gdshader" id="3_1dhld"]
+[ext_resource type="Texture2D" uid="uid://b5hgkaux5asdm" path="res://shaders/shader-palette.png" id="4_0lp6c"]
+[ext_resource type="PackedScene" uid="uid://7x2x5w5hmc1k" path="res://ui/felladead/dead_ui.tscn" id="5_t1mjv"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_slj1a"]
+noise_type = 3
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ksvxf"]
+noise = SubResource("FastNoiseLite_slj1a")
+
+[sub_resource type="Gradient" id="Gradient_eklfw"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_824v4"]
+gradient = SubResource("Gradient_eklfw")
+fill = 1
+fill_from = Vector2(0.48122066, 0.5093897)
+fill_to = Vector2(0.5046948, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hh0vs"]
+shader = ExtResource("2_wve2u")
+shader_parameter/colour = Color(0.68235296, 0.8980392, 0.83137256, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nhr0a"]
+shader = ExtResource("3_1dhld")
+shader_parameter/palette = ExtResource("4_0lp6c")
+
+[node name="Died" type="Node2D" unique_id=657855333]
+
+[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1872873166]
+color = Color(0, 0, 0, 1)
+
+[node name="Backdrop" type="Sprite2D" parent="." unique_id=284315860]
+position = Vector2(1, 0)
+scale = Vector2(2.0234375, 1.4355469)
+texture = SubResource("NoiseTexture2D_ksvxf")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=662761775]
+light_mask = 2
+texture_filter = 1
+position = Vector2(-120, 0)
+tile_map_data = PackedByteArray("AAAGAAYAAAAFAAAAAAAFAAYAAAABAAAAAAAEAAYAAAAFAAAAAAADAAYAAAABAAAAAAACAAYAAAAFAAAAAAAHAAYAAAAFAAAAAAAIAAYAAAABAAAAAAAJAAYAAAAFAAAAAAAKAAYAAAAEAAQAAAAKAAcAAAAEAAAAAAAKAAkAAAACAAEAAAAJAAkAAAACAAEAAAAIAAkAAAACAAEAAAAHAAkAAAACAAEAAAAGAAkAAAACAAEAAAAFAAkAAAACAAEAAAAEAAkAAAACAAEAAAADAAkAAAACAAEAAAACAAkAAAACAAEAAAABAAkAAAACAAEAAAAAAAkAAAACAAEAAAD//wkAAAACAAEAAAD+/wkAAAACAAEAAAD9/wkAAAADAAEAAAD9/wgAAAAEAAAAAAD+/wgAAAAEAAAAAAD//wgAAAAEAAAAAAAAAAgAAAAEAAAAAAABAAgAAAADAAAAAAACAAgAAAAEAAAAAAADAAgAAAADAAAAAAAEAAgAAAAEAAAAAAAFAAgAAAADAAAAAAAGAAgAAAAEAAAAAAAHAAgAAAADAAAAAAAIAAgAAAAEAAAAAAAJAAgAAAAEAAAAAAAKAAgAAAADAAAAAAAJAAcAAAAEAAAAAAAIAAcAAAADAAAAAAAHAAcAAAAEAAAAAAAGAAcAAAAEAAAAAAAFAAcAAAAEAAAAAAAEAAcAAAAEAAAAAAADAAcAAAAEAAAAAAACAAcAAAAEAAAAAAABAAcAAAAEAAAAAAAAAAcAAAAEAAAAAAD//wcAAAADAAAAAAD+/wcAAAAEAAAAAAD9/wcAAAADAAAAAAABAAYAAAAFAAAAAAAAAAYAAAAFAAAAAAD//wYAAAAFAAAAAAD+/wYAAAAFAAAAAAD9/wYAAAAFAAAAAAD//wUAAAACAAMAAAAHAAUAAAACAAMAAAAHAAQAAAADAAQAAAD//wQAAAADAAQAAAA=")
+tile_set = ExtResource("1_t1mjv")
+
+[node name="PointLight2D3" type="PointLight2D" parent="." unique_id=1167365959]
+position = Vector2(30.168, 86.89)
+scale = Vector2(3.7039843, 2.5460937)
+energy = 0.5
+range_item_cull_mask = 3
+texture = SubResource("GradientTexture2D_824v4")
+
+[node name="PointLight2D4" type="PointLight2D" parent="." unique_id=1378086555]
+position = Vector2(-130.312, 86.89)
+scale = Vector2(3.7039843, 2.5460937)
+energy = 0.5
+range_item_cull_mask = 3
+texture = SubResource("GradientTexture2D_824v4")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=741636124]
+position = Vector2(-50.26, 94.175)
+zoom = Vector2(2.5, 2.5)
+
+[node name="Clamp Shader" type="CanvasLayer" parent="." unique_id=1796483130]
+
+[node name="ColorRect" type="ColorRect" parent="Clamp Shader" unique_id=1274905917]
+material = SubResource("ShaderMaterial_hh0vs")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -589.0
+offset_top = -447.0
+offset_right = 372.0
+offset_bottom = 235.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="Posterize Shader" type="CanvasLayer" parent="." unique_id=1321071599]
+
+[node name="ColorRect" type="ColorRect" parent="Posterize Shader" unique_id=1074856799]
+material = SubResource("ShaderMaterial_nhr0a")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -706.0
+offset_top = -338.0
+offset_right = 255.0
+offset_bottom = 344.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="DeadUi" parent="." unique_id=1588002695 instance=ExtResource("5_t1mjv")]

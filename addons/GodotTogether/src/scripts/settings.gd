@@ -33,8 +33,8 @@ const _DEFAULT_DATA = {
 		"node_scan_pause_unfocused": true,
 		"node_adaptive_scan_interval": true,
 		"node_scan_mode": GDTNodeSync.NodeScanMode.CONTINUOUS,
-		"node_refresh_rate": 0.025,
-		"file_refresh_rate": 1,
+		"node_scan_interval": 0.025,
+		"file_scan_interval": 1,
 	},
 	"update": {
 		"latest_version": null,
@@ -85,13 +85,19 @@ const _DEFAULT_DATA = {
 	}
 }
 
+const RENAME_MAP := {
+	"sync/node_refresh_rate": "sync/node_scan_interval",
+	"sync/file_refresh_rate": "sync/file_scan_interval"
+}
+
 var data := {}
 var is_unsaved := false
 var have_changed := false
 var error_message := ""
 var error_line := 0
 
-var save_mutex = Mutex.new()
+var save_mutex := Mutex.new()
+var update_mutex := Mutex.new()
 
 func _ready() -> void:
 	if GDTUtils.has_readonly(data):
@@ -122,8 +128,12 @@ func has_error() -> bool:
 	return not error_message.is_empty()
 
 func load_default() -> void:
+	update_mutex.lock()
+	
 	data = get_default_data()
 	settings_changed.emit()
+	
+	update_mutex.unlock()
 	
 	if is_logging_enabled():
 		print("Loaded default settings")
@@ -175,14 +185,25 @@ func load_settings() -> bool:
 		load_default()
 		return false
 	
-	var merged = GDTUtils.merge(parsed.duplicate(true), get_default_data())
-	data = merged.duplicate(true)
+	update_mutex.lock()
+	
+	data = process_settings_data(parsed)
 	
 	if is_logging_enabled():
 		print("Settings loaded")
 	
 	settings_changed.emit()
+	update_mutex.unlock()
+	
 	return true
+
+func process_settings_data(dict: Dictionary) -> Dictionary:
+	var merged = GDTUtils.merge(dict.duplicate(true), get_default_data())
+	dict = merged.duplicate(true)
+	
+	rename_data(dict, RENAME_MAP)
+	
+	return dict
 
 func reset_settings() -> void:
 	if is_logging_enabled():
@@ -245,11 +266,15 @@ func set_setting(path: String, value) -> void:
 		GDTUtils.printerr_stack("Not updating when settings loaded with errors: %s" % path)
 		return
 	
+	update_mutex.lock()
+	
 	is_unsaved = true
 	have_changed = true
 	
 	GDTUtils.set_nested(data, path, value)
 	settings_changed.emit()
+	
+	update_mutex.unlock()
 	
 	if is_logging_enabled():
 		print("Setting changed: %s: %s" % [path, value])
@@ -308,6 +333,23 @@ func update_control(node: Control, path: String, format := "") -> void:
 		return
 	
 	GDTUtils.set_control_value(node, value, format)
+
+static func rename_data(dict: Dictionary, rename_map: Dictionary) -> void:
+	for old_path in rename_map.keys():
+		var new_path = rename_map[old_path]
+		
+		if not GDTUtils.has_nested(dict, old_path):
+			continue
+		
+		if GDTUtils.has_nested(dict, new_path):
+			continue
+		
+		var val = GDTUtils.get_nested(dict, old_path)
+		
+		if not GDTUtils.set_nested(dict, new_path, val):
+			continue
+			
+		GDTUtils.erase_nested(dict, old_path)
 
 static func get_absolute_path() -> String:
 	return ProjectSettings.globalize_path(FILE_PATH)

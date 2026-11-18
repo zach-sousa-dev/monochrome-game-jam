@@ -56,6 +56,7 @@ func run_tests() -> void:
 	print("--- Running GodotTogether tests ---")
 	
 	var test_names = []
+	var start = Time.get_unix_time_from_system()
 	
 	for i in get_method_list():
 		if i["name"].begins_with("test_"):
@@ -69,7 +70,7 @@ func run_tests() -> void:
 		exec_test(get(func_name))
 	
 	print()
-	print("Testing complete")
+	print("Testing complete. Took: %s s" % [Time.get_unix_time_from_system() - start])
 	print("Slowest: ", get_by_slowest().slice(0, 5))
 	
 	var fail_str = fail_count
@@ -184,7 +185,8 @@ func test_internals() -> bool:
 	var node_wrappers = [
 		gui.scene_editor_tabs,
 		gui.scene_tree_editor,
-		gui.external_file_change_dialog
+		gui.external_file_change_dialog,
+		gui.external_script_change_dialog
 	]
 	
 	for i: GDTNodeWrapper in node_wrappers:
@@ -202,7 +204,7 @@ func test_plugin_version() -> bool:
 		printerr("Invalid plugin version %s")
 		return false
 	
-	if not FileAccess.file_exists("res://addons/GodotTogether/.dev") and ver == "unreleased":
+	if not main.is_dev_version() and ver == "unreleased":
 		printerr("The plugin version must not be 'unreleased' in a release build")
 		return false
 	
@@ -214,6 +216,30 @@ func test_rpc_checksum() -> bool:
 	
 	if a != b:
 		printerr("RPC checksum doesn't match %s != %s" % [a, b])
+		return false
+	
+	if a == 0:
+		printerr("Global RPC checksum is 0")
+		return false
+	
+	if a == -1:
+		printerr("Global RPC checksum is -1")
+		return false
+	
+	var checksums = []
+	
+	for i in main.components:
+		var sum = GDTUtils.get_rpc_checksum(i)
+		
+		if sum != 0 and sum in checksums:
+			printerr("Duplicate RPC checksum for %s" % i)
+			printerr(checksums)
+			return false
+			
+		checksums.append(sum)
+	
+	if not checksums:
+		printerr("RPC checksum list empty")
 		return false
 	
 	return true
@@ -255,6 +281,35 @@ func test_local_resource_encoding() -> bool:
 	
 	if not decoded.albedo_texture:
 		printerr("Missing 'albedo_texture'")
+		return false
+	
+	return true
+
+func test_nested_local_resource_encoding() -> bool:
+	var mesh = BoxMesh.new()
+	var mat = StandardMaterial3D.new()
+	
+	mat.albedo_color = Color.RED
+	mesh.material = mat
+	
+	var encoded = main.node_sync.encode_resource(mesh)
+	
+	if not encoded:
+		printerr("Encoding failed")
+		return false
+	
+	if not GDTNodeSync.is_encoded_resource(encoded["props"]["material"]):
+		printerr("'material' not encoded as resource")
+		return false
+	
+	var decoded = main.node_sync.decode_resource(encoded)
+	
+	if not decoded:
+		printerr("Decoding failed")
+		return false
+	
+	if not decoded.material:
+		printerr("Material is null")
 		return false
 	
 	return true
@@ -376,6 +431,43 @@ func test_callable_encoding() -> bool:
 		printerr("decoded_bound() '%s' != 'Hello'" % decoded_bound_res)
 		return false
 	
+	
+	return true
+
+func test_connection_distinction() -> bool:
+	var node = Node.new()
+	created_nodes.append(node)
+	
+	node.tree_entered.connect(func(): pass)
+	node.tree_entered.connect(_dummy_function, ConnectFlags.CONNECT_PERSIST)
+	
+	var con_dict = GDTNodeSync.get_select_connection_dict(node, ["tree_entered"])
+	
+	if not "tree_entered" in con_dict:
+		printerr("'tree_entered' missing: %s" % con_dict)
+		return false
+	
+	var cons = con_dict["tree_entered"]
+	
+	if cons.size() != 1:
+		printerr("init_cons size mismatch %s != 1" % cons.size())
+		return false
+	
+	GDTNodeSync.clear_user_signal_connections(node, "tree_entered")
+	
+	var cleared_cons = GDTNodeSync.get_user_signal_connections(node, "tree_entered")
+	var all_cons = node.get_signal_connection_list("tree_entered")
+	
+	if not cleared_cons.is_empty():
+		printerr("clear_user_signal_connections() failed")
+		return false
+	
+	if all_cons.size() != 1:
+		printerr(
+			"Post-clear all_cons size mismatch %s != 1. Likely cleared too much." % 
+			all_cons.size()
+		)
+		return false
 	
 	return true
 
@@ -557,6 +649,14 @@ func test_setget_nested() -> bool:
 		}
 	}
 	
+	if not GDTUtils.has_nested(dict, "a/b"):
+		printerr("has_nested() should return true")
+		return false
+		
+	if GDTUtils.has_nested(dict, "a/aaaaaaaaaaaaaa"):
+		printerr("has_nested() should return false for nonexistent path")
+		return false
+	
 	if not GDTUtils.set_nested(dict, "a/b", "c"):
 		printerr("set_nested() should return true")
 		return false
@@ -565,6 +665,14 @@ func test_setget_nested() -> bool:
 	
 	if dict_val != "c":
 		printerr("Dict 'c' != '%s'" % dict_val)
+		return false
+	
+	if not GDTUtils.erase_nested(dict, "a/b"):
+		printerr("erase_nested() should return true")
+		return false
+	
+	if GDTUtils.has_nested(dict, "a/b"):
+		printerr("erase_nested() failed at deleting the path")
 		return false
 	
 	var lbl = Label.new()
@@ -928,7 +1036,7 @@ func test_node_change_applying_deep_setget() -> bool:
 	
 	var h2 = main.node_sync.get_property_hash_dict(tmap)
 	
-	var diff = main.node_sync.get_property_diff(h1, h2)
+	var diff = GDTNodeSync.get_property_diff(h1, h2)
 	
 	if not "tile_set:sources/0" in diff:
 		printerr("tile_set:sources/0 not found in diff")
@@ -1125,8 +1233,8 @@ func test_node_change_applying() -> bool:
 
 func test_scenes() -> bool:
 	var scenes = [
-		GodotTogether.GUI_SCENE,
-		GodotTogether.CHAT_SCENE,
+		main.gui_scene,
+		main.chat_scene,
 		main.dual.avatar_2d_scene,
 		main.dual.avatar_2d_scene
 	]
@@ -1459,6 +1567,34 @@ func test_settings() -> bool:
 		printerr("Loaded settings are read only")
 		return false
 	
+	for path in GDTSettings.RENAME_MAP:
+		if GDTUtils.has_nested(GDTSettings._DEFAULT_DATA, path):
+			printerr("Default settings data contains path that gets renamed in migration: %s" % path)
+			return false
+	
+	return true
+
+func test_setting_migration() -> bool:
+	var data = {
+		"hi": {
+			"a":  "hello"
+		}
+	}
+	
+	var rename_map = {
+		"hi/a": "hi/b"
+	}
+	
+	GDTSettings.rename_data(data, rename_map)
+	
+	if GDTUtils.get_nested(data, "hi/b") != "hello":
+		printerr("Value mismatch at new path")
+		return false
+	
+	if GDTUtils.has_nested(data, "hi/a"):
+		printerr("rename_data() did not delete old path")
+		return false
+	
 	return true
 
 func test_data_encoding() -> bool:
@@ -1546,5 +1682,164 @@ func test_file_chunking() -> bool:
 	
 	return true
 
-static func _dummy_function(data: String = "") -> String:
+func test_line_col_idx() -> bool:
+	var data = [ # Search char is X
+		{
+			"text": "abXc",
+			"lc": [0, 2], # line, column
+		},
+		{
+			"text": "qwertyuiopX",
+			"lc": [0, 10]
+		},
+		{
+			"text": GDTUtils.join([
+				"ab",
+				"cde",
+				".",
+				"fghjk",
+				"lXmnop",
+				"...."
+			], "\n"),
+			"lc": [4, 1],
+		},
+		{
+			"text": GDTUtils.join([
+				"X",
+				"agagagagag",
+				"fjrifjrf"
+			]),
+			"lc": [0, 0]
+		}
+	]
+	
+	for i in data:
+		var txt: String = i["text"]
+		var txt_debug = txt.substr(0, 5)
+		var expected_lc = i["lc"]
+		var expected_line = expected_lc[0]
+		var expected_col = expected_lc[1]
+		var expected_idx = txt.find("X")
+		
+		if expected_idx == -1:
+			printerr("Text %s doesn't contain X char" % txt)
+			return false
+		
+		var idx = GDTUtils.line_column_to_index(txt, expected_line, expected_col)
+		
+		if idx != expected_idx:
+			printerr(
+				"line_column_to_index() failed for text '%s...' %s != %s. Fragment at that index is: '%s'" % 
+				[ txt_debug, idx, expected_idx, txt.substr(idx, 2)]
+			)
+			return false
+	
+		var lc_res = GDTUtils.index_to_line_column(txt, idx)
+		
+		if not lc_res:
+			printerr("index_to_line_column() failed. Got empty array")
+			return false
+		
+		var line = lc_res[0]
+		var col = lc_res[1]
+		
+		if line == -1:
+			printerr("index_to_line_column() failed for text '%s...'" % [txt_debug])
+			return false
+		
+		if line != expected_line or col != expected_col:
+			printerr(
+				"index_to_line_column() failed for text '%s...'. lc %s != %s" % 
+				[txt_debug, lc_res, expected_lc]
+			)
+			
+			return false
+	
+	return true
+
+func test_line_diff_modify() -> bool:
+	var a = """
+		Hello there,
+		my fred
+		I see you've travelled so far
+	""".remove_chars("\r")
+
+	var b = """
+		Hello there
+		my fred
+		I see you've travelled so far.
+	""".remove_chars("\r")
+	
+	var diff = GDTScriptSync.get_line_diff(a, b)
+	
+	if diff.size() != 3:
+		printerr("Size mismatch. %s != %s: %s" % [diff.size(), 3, diff])
+		return false
+	
+	var applied = GDTScriptSync.apply_line_diff(a, diff)
+	
+	if applied != b:
+		printerr("Result text is wrong: %s" % applied)
+		return false
+	
+	return true
+
+func test_line_diff_modify_remove() -> bool:
+	var a = """
+		Hello there
+		my fred
+		hi
+	""".remove_chars("\r")
+
+	var b = """
+		Hello there,
+		my fred
+	""".remove_chars("\r")
+	
+	var diff = GDTScriptSync.get_line_diff(a, b)
+	
+	if diff.size() != 3:
+		printerr("Size mismatch. %s != %s: %s" % [diff.size(), 3, diff])
+		return false
+	
+	var applied = GDTScriptSync.apply_line_diff(a, diff)
+	
+	if applied != b:
+		printerr("Result text is wrong: %s" % applied)
+		return false
+	
+	return true
+
+func test_line_diff_modify_add() -> bool:
+	var a = """
+		Hello
+	""".remove_chars("\r")
+	
+	var b = """
+		Hello
+		everybody
+		my name
+		is
+		welcome.
+	""".remove_chars("\r")
+	
+	var diff = GDTScriptSync.get_line_diff(a, b)
+	
+	if diff.size() != 6:
+		printerr(
+			"Size mismatch. %s != %s: %s" % 
+			[diff.size(), 6, JSON.stringify(diff, "  ")]
+		)
+		return false
+	
+	var applied = GDTScriptSync.apply_line_diff(a, diff)
+	
+	if applied != b:
+		printerr("Result text is wrong: %s" % applied)
+		return false
+	
+	return true
+
+
+static func _dummy_function(data = ""):
 	return data

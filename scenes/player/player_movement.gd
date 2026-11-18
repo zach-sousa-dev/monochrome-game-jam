@@ -64,6 +64,8 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	
+	if global_position.y > 350: Fuel.take_damage(1000) # kill if fall out the world
+	
 	_invincible_timer -= delta
 	_knockback_timer -= delta
 	
@@ -72,12 +74,12 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 	
-	if Input.is_physical_key_pressed(KEY_Q):
-		print("q pressed")
-		Fuel.take_damage( Fuel.get_drain_rate() * test_speed * delta)
-		
-	if Input.is_physical_key_pressed(KEY_R):
-		Fuel.refuel(test_speed * delta)
+	#if Input.is_physical_key_pressed(KEY_Q):
+		#print("q pressed")
+		#Fuel.take_damage( Fuel.get_drain_rate() * test_speed * delta)
+		#
+	#if Input.is_physical_key_pressed(KEY_R):
+		#Fuel.refuel(test_speed * delta)
 	
 	if Input.is_action_pressed("shoot"): # shoot a fella
 		tool.shoot()
@@ -168,6 +170,7 @@ func _print_debug() -> void:
 func _on_died():
 	print("Died - refilling fuel")
 	Fuel.reset_fuel()
+	SceneSave.switch_scene("res://scenes/Screens/Died.tscn")
 
 func hurt(amount: float, from_pos: Vector2):
 	if _invincible_timer > 0.0:

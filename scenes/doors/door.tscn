@@ -19,6 +19,7 @@ shape = SubResource("RectangleShape2D_cjc7v")
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=167185271]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=385226979]
+light_mask = 2
 texture_filter = 1
 sprite_frames = ExtResource("3_d8f5h")
 animation = &"unlocked"

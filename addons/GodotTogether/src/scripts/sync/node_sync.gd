@@ -36,13 +36,14 @@ const IGNORED_PROPERTIES: Dictionary = {
 		"current_animation_position"
 	],
 	"Control": [
-		"offset_left", "offset_right",
-		"offset_top", "offset_bottom",
 		"pivot_offset_ratio"
 	],
-	"Resource": [
-		#"resource_path"
-	]
+	
+	"AudioStreamOggVorbis": ["packet_sequence" ],
+	"AudioStreamMP3": ["data" ],
+	"AudioStreamWAV": [ "data" ],
+	"Image": ["data" ],
+	"FontFile": [ "data" ]
 }
 
 const SETGET_PROPERTIES = {
@@ -265,7 +266,7 @@ func _ready() -> void:
 	editor_ur.history_changed.connect(_editor_undo_redo_changed)
 	
 	main.get_settings().settings_changed.connect(update_timer_wait_times)
-	EditorInterface.get_selection().selection_changed.connect(_got_changes)
+	EditorInterface.get_selection().selection_changed.connect(_selection_changed)
 	
 	setup_timers()
 	
@@ -274,6 +275,17 @@ func _ready() -> void:
 
 func _input(_event: InputEvent) -> void:
 	last_input_time = Time.get_unix_time_from_system()
+
+func _selection_changed() -> void:
+	if not main: return
+	
+	_got_changes()
+	
+	var sel = EditorInterface.get_selection()
+	
+	for i in sel.get_selected_nodes():
+		if is_node_valid(i):
+			observe_node(i)
 
 func _cycle() -> void:
 	if not main: return
@@ -394,7 +406,7 @@ func setup_timers() -> void:
 	update_timer_wait_times()
 
 func update_timer_wait_times() -> void:
-	change_timer.wait_time = main.get_settings().get_setting("sync/node_refresh_rate")
+	change_timer.wait_time = main.get_settings().get_setting("sync/node_scan_interval")
 
 func check_changes(force_full := false) -> void:
 	if not can_sync_nodes(): return
@@ -598,6 +610,39 @@ func _node_properties_changed(node: Node, property_paths: Array) -> void:
 	else:
 		_c2s_request_node_update.rpc_id(1, node_path, scene.scene_file_path, property_dict)
 
+func _scene_node_entered_tree(child: Node, parent: Node) -> void:
+	if not can_sync_nodes(): return
+	
+	var scene = GDTUtils.get_node_scene(parent)
+	if not scene: return
+	if not scene.scene_file_path: return
+	if not child.scene_file_path: return
+	
+	if not GDTValidator.is_path_safe(child.scene_file_path):
+		return
+	
+	var parent_path = scene.get_path_to(parent)
+	
+	if is_change_logging_enabled():
+		print("Scene node added %s in %s" % [child.scene_file_path, parent_path])
+	
+	var prop_dict = get_property_dict(child)
+	
+	if main.server.is_active():
+		server_broadcast_scene_node_add(
+			parent_path, 
+			scene.scene_file_path, 
+			child.scene_file_path, 
+			prop_dict
+		)
+	elif main.client.is_active():
+		_c2s_request_scene_node_add.rpc_id(1,
+			parent_path, 
+			scene.scene_file_path, 
+			child.scene_file_path, 
+			prop_dict
+		)
+	
 func _node_child_entered_tree(child: Node, parent: Node) -> void:
 	# 'owner' is set very late, causing is_node_valid(child) to return false.
 	# Do not check it here
@@ -608,20 +653,31 @@ func _node_child_entered_tree(child: Node, parent: Node) -> void:
 	if not is_node_observed(parent): return
 	if is_node_observed(child): return
 	
+	# Check if node is internal (like _h_scroll in ScrollContainer)
+	if not child in parent.get_children():
+		return
+	
 	var scene = GDTUtils.get_node_scene(parent)
 	if not scene: return
+	if scene.is_queued_for_deletion(): return
+	if not scene in EditorInterface.get_open_scene_roots(): return
+	
+	if child.owner and child.owner != scene: # Node is child of sub-scene
+		return
 	
 	child.owner = scene # Godot isn't fast enough
-	var data_dict = observe_node(child)
 	
-	# Cursed. TODO: Optimize later
-	var prop_list = get_property_diff(data_dict["property_hashes"], {})
-	var prop_dict = get_select_property_dict(child, prop_list)
+	observe_node(child)
 	
+	var prop_dict = get_property_dict(child)
 	var parent_path = scene.get_path_to(parent)
 	
 	if is_change_logging_enabled():
 		print("Node added: %s to %s" % [child, parent])
+		
+	if child.scene_file_path:
+		_scene_node_entered_tree(child, parent)
+		return
 	
 	if main.server.is_active():
 		server_broadcast_node_add(parent_path, scene.scene_file_path, child.get_class(), prop_dict)
@@ -734,11 +790,10 @@ func _node_replacing_by(new_node: Node, current_node: Node) -> void:
 		printerr("Node replacing that isn't a class change not supported")
 		return
 	
-	var path = scene.get_path_to(new_node) # Must get path to new node. Old is already gone
+	observe_node(new_node)
 	
-	var data_dict = observe_node(new_node)
-	var prop_list = get_property_diff(data_dict["property_hashes"], {})
-	var prop_dict = get_select_property_dict(new_node, prop_list)
+	var path = scene.get_path_to(new_node) # Must get path to new node. Old is already gone
+	var prop_dict = get_property_dict(new_node)
 	
 	if is_change_logging_enabled():
 		print("Node replaced: %s -> %s" % [current_node, new_node])
@@ -836,6 +891,30 @@ func _c2s_request_node_add(
 	server_broadcast_node_add(parent_path, scene_path, node_class, property_dict, id)
 
 @rpc("any_peer", "call_remote", "reliable")
+func _c2s_request_scene_node_add(
+	parent_path: String,
+	scene_path: String,
+	node_scene_path: String,
+	property_dict: Dictionary
+) -> void:
+	var id = multiplayer.get_remote_sender_id()
+	
+	if not main.server.validate_c2s(): 
+		return
+	
+	if not main.server.caller_has_permission(GodotTogether.Permission.EDIT_SCENES):
+		return
+		
+	if not GDTValidator.validate_existing_file_path(scene_path):
+		return
+		
+	if not GDTValidator.validate_existing_file_path(node_scene_path):
+		return
+	
+	add_scene_node(parent_path, scene_path, node_scene_path, property_dict)
+	server_broadcast_scene_node_add(parent_path, scene_path, node_scene_path, property_dict, id)
+
+@rpc("any_peer", "call_remote", "reliable")
 func _c2s_request_node_delete(node_path: String, scene_path: String) -> void:
 	if not main.server.validate_c2s(): 
 		return
@@ -928,6 +1007,9 @@ func _c2s_request_signal_connections_update(
 
 @rpc("authority", "call_remote", "reliable")
 func update_node_properties(node_path: String, scene_path: String, property_dict: Dictionary) -> void:
+	if not main.client.validate_s2c(true): 
+		return
+	
 	if not GDTValidator.validate_existing_file_path(scene_path):
 		return
 	
@@ -947,6 +1029,9 @@ func update_node_properties(node_path: String, scene_path: String, property_dict
 
 @rpc("authority", "call_remote", "reliable")
 func rename_node(node_path: String, scene_path: String, new_name: String) -> void:
+	if not main.client.validate_s2c(true): 
+		return
+	
 	if not GDTValidator.validate_existing_file_path(scene_path):
 		return
 	
@@ -973,6 +1058,9 @@ func add_node(
 	node_class: String,
 	property_dict: Dictionary
 ) -> void:
+	if not main.client.validate_s2c(true): 
+		return
+	
 	if not GDTValidator.validate_existing_file_path(scene_path):
 		return
 	
@@ -1013,7 +1101,68 @@ func add_node(
 	set_node_supressed(new_node, false)
 
 @rpc("authority", "call_remote", "reliable")
+func add_scene_node(
+	parent_path: String, 
+	scene_path: String,
+	node_scene_path: String,
+	property_dict: Dictionary
+) -> void:
+	if not main.client.validate_s2c(true): 
+		return
+	
+	if not GDTValidator.validate_existing_file_path(scene_path):
+		return
+	
+	if not GDTValidator.validate_existing_file_path(node_scene_path):
+		GDTUtils.printerr_stack("Invalid path of node scene at path: %s" % node_scene_path)
+		return
+	
+	var scene = GDTUtils.get_loaded_scene_root(scene_path)
+	if not scene: return
+	
+	var parent = scene.get_node_or_null(parent_path)
+	if not parent_path: return
+	
+	if not "name" in property_dict:
+		GDTUtils.printerr_stack("Missing 'name' in property dict")
+		return
+	
+	if parent.has_node(NodePath(property_dict["name"])):
+		return
+	
+	var loaded_scene = load(node_scene_path)
+	
+	if not loaded_scene:
+		GDTUtils.printerr_stack("Failed to load scene path %s" % node_scene_path)
+		return
+		
+	if not loaded_scene is PackedScene:
+		GDTUtils.printerr_stack(
+			"Scene at '%s' is not PackedScene, is '%s'" %
+			[node_scene_path, loaded_scene.get_class()]
+		)
+		return
+		
+	loaded_scene = loaded_scene as PackedScene
+	
+	if not loaded_scene.can_instantiate():
+		GDTUtils.printerr_stack("Scene %s has no nodes" % node_scene_path)
+		return
+		
+	var node = loaded_scene.instantiate()
+	apply_property_dict(node, property_dict)
+	
+	node.owner = scene
+	
+	set_node_supressed(node, true)
+	parent.add_child(node)
+	set_node_supressed(node, false)
+
+@rpc("authority", "call_remote", "reliable")
 func delete_node(node_path: String, scene_path: String) -> void:
+	if not main.client.validate_s2c(true): 
+		return
+	
 	if not GDTValidator.validate_existing_file_path(scene_path):
 		return
 	
@@ -1040,6 +1189,9 @@ func delete_node(node_path: String, scene_path: String) -> void:
 
 @rpc("authority", "call_remote", "reliable")
 func reorder_children(parent_path: String, scene_path: String, ordered_names: Array) -> void:
+	if not main.client.validate_s2c(true): 
+		return
+	
 	if not GDTValidator.validate_existing_file_path(scene_path):
 		return
 	
@@ -1067,6 +1219,9 @@ func change_node_class(
 	new_class: String,
 	property_dict: Dictionary
 ) -> void:
+	if not main.client.validate_s2c(true): 
+		return
+	
 	if not GDTValidator.validate_existing_file_path(scene_path):
 		return
 	
@@ -1116,6 +1271,9 @@ func update_node_signal_connections(
 	scene_path: String, 
 	dict: Dictionary
 ) -> void:
+	if not main.client.validate_s2c(true): 
+		return
+	
 	await get_tree().process_frame
 	
 	if not GDTValidator.validate_existing_file_path(scene_path):
@@ -1186,6 +1344,15 @@ func server_broadcast_node_add(
 	sender := 0
 ) -> void:
 	main.server.auth_rpc(add_node, [parent_path, scene_path, node_class, property_dict], [sender])
+
+func server_broadcast_scene_node_add(
+	parent_path: String,
+	scene_path: String,
+	node_scene_path: String,
+	property_dict: Dictionary,
+	sender := 1
+) -> void:
+	main.server.auth_rpc(add_scene_node, [parent_path, scene_path, node_scene_path, property_dict], [sender])
 
 func server_broadcast_reorder_children(
 	parent_path: String, 
@@ -1273,6 +1440,9 @@ func unobserve_node(node: Node) -> void:
 
 func observe_node(node: Node) -> Dictionary:
 	if not is_node_valid(node):
+		return {}
+	
+	if not is_user_node(node):
 		return {}
 	
 	if node in node_data_dict:
@@ -1419,6 +1589,9 @@ static func get_select_connection_dict(node: Node, signal_names: Array) -> Dicti
 		var connections = get_user_signal_connections(node, sig_name)
 		
 		for con in connections:
+			if not con["flags"] & ConnectFlags.CONNECT_PERSIST:
+				continue
+			
 			var cal = con["callable"]
 			callable_dicts.append(encode_callable_ref(cal))
 		
@@ -1509,6 +1682,17 @@ func fill_property_hash_dict(
 		else:
 			res[key] = hash(value)
 
+func get_property_dict(obj: Object) -> Dictionary:
+	# TODO: Cursed, optimize later
+	if not obj in node_data_dict:
+		GDTUtils.printerr_stack("Only observedNodes supported")
+		return {}
+	
+	var data_dict = node_data_dict[obj]
+	var prop_list = get_property_diff(data_dict["property_hashes"], {})
+	
+	return get_select_property_dict(obj, prop_list)
+
 func get_select_property_dict(obj: Object, paths: Array) -> Dictionary:
 	var res = {}
 	
@@ -1546,7 +1730,7 @@ static func should_property_be_ignored(obj: Object, path: String) -> bool:
 	
 	return false
 
-func apply_property_dict(obj: Object, dict: Dictionary) -> void:
+func apply_property_dict(obj: Object, dict: Dictionary, allow_unsafe_resources := false) -> void:
 	for path in dict.keys():
 		var value = dict[path]
 		
@@ -1554,7 +1738,7 @@ func apply_property_dict(obj: Object, dict: Dictionary) -> void:
 			continue
 		
 		if is_encoded_resource(value):
-			value = decode_resource(value)
+			value = decode_resource(value, allow_unsafe_resources)
 		
 		if is_setget_property(obj, path):
 			set_setget_property(obj, path, value)
@@ -1939,9 +2123,10 @@ func encode_resource(resource: Resource) -> Dictionary:
 	
 	var is_file = GDTUtils.is_file_resource(resource)
 	
+	res["path"] = resource.resource_path
+	
 	if is_file:
 		res["_gdtRes"] = ResourceType.FILE
-		res["path"] = resource.resource_path
 	else:
 		res["class"] = resource.get_class()
 		
@@ -1952,6 +2137,9 @@ func encode_resource(resource: Resource) -> Dictionary:
 				value = get_setget_property(resource, key)
 			elif key in resource:
 				value = resource[key]
+			
+			if value is Resource:
+				value = encode_resource(value)
 			
 			res["props"][key] = value
 	
@@ -1972,14 +2160,14 @@ func decode_resource(dict: Dictionary, allow_unsafe := false) -> Resource:
 	
 	match tp:
 		ResourceType.LOCAL:
-			return _decode_local_resource(dict)
+			return _decode_local_resource(dict, allow_unsafe)
 		ResourceType.FILE:
 			return _decode_file_resource(dict, allow_unsafe)
 	
 	GDTUtils.printerr_stack("Unknown encoded resource type: %s" % tp)
 	return
 
-func _decode_local_resource(dict: Dictionary) -> Resource:
+func _decode_local_resource(dict: Dictionary, allow_unsafe := false) -> Resource:
 	if not "class" in dict:
 		GDTUtils.printerr_stack("Cannot decode resource. 'class' missing")
 		return
@@ -1990,6 +2178,7 @@ func _decode_local_resource(dict: Dictionary) -> Resource:
 	
 	var cls = dict["class"]
 	var props = dict["props"]
+	var path = dict["path"]
 	
 	if not ClassDB.class_exists(cls):
 		GDTUtils.printerr_stack("Cannot decode resource of unknown class: %s" % cls)
@@ -1999,13 +2188,22 @@ func _decode_local_resource(dict: Dictionary) -> Resource:
 		GDTUtils.printerr_stack("Cannot decode resource. Class '%s' is not a Resource" % cls)
 		return
 	
-	var res = ClassDB.instantiate(cls)
+	var res = null
+	
+	if path and GDTValidator.is_path_safe(path):
+		res = load(path)
+		
+		if res != null and res.get_class() != cls:
+			res = null
+	
+	if not res:
+		res = ClassDB.instantiate(cls)
 	
 	if not res:
 		GDTUtils.printerr_stack("Failed to create resource")
 		return
 	
-	apply_property_dict(res, props)
+	apply_property_dict(res, props, allow_unsafe)
 	return res
 
 func _decode_file_resource(dict: Dictionary, allow_unsafe := false) -> Resource:
@@ -2064,7 +2262,30 @@ func get_property_keys(obj: Object) -> Array[String]:
 	return res
 
 static func is_user_node(node: Node) -> bool:
-	return node and is_instance_valid(node) and not node.name.contains("@")
+	var basic_check = (
+		node and 
+		is_instance_valid(node) and
+		not node.is_queued_for_deletion() and
+		node.name and
+		not node.name.contains("@") 
+	)
+	
+	if not basic_check:
+		return false
+	
+	# Godot will sometimes name unnamed nodes "_ClassName_id6digits"
+	var instance_str = "_%s_%s" % [node.get_class(), str(node.get_instance_id()).substr(0, 6)]
+	
+	if node.name == instance_str:
+		return false
+	
+	var parent = node.get_parent()
+	
+	if parent and not parent.is_queued_for_deletion():
+		if parent is GraphEdit and node.name == "_connection_layer":
+			return false
+	
+	return true
 
 # "node" must be untyped to properly check freed nodes
 static func is_node_valid(node) -> bool:
